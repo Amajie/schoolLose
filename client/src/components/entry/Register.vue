@@ -58,12 +58,13 @@
             </van-radio-group>
         </div>       
         <div class="register-btn">
-            <van-button type="info" size="large">注册</van-button>
+            <van-button @click.native="api" type="info" size="large">注册</van-button>
         </div>
     </div>
 </template>
 
 <script>
+import {register} from '../../axios/api.js' 
 export default {
     name: 'Register',
     data(){
@@ -82,6 +83,19 @@ export default {
         //前往登陆
         backToLogin(){
             this.$router.push('/login')
+        },
+        //测试axios的拦截器
+        api(){
+
+            const data = {
+                name: '车神-黄杰',
+                age: 23
+            }
+            
+            register(data).then(res =>{
+                console.log(res)
+            })
+            
         }
     }
 }
@@ -89,6 +103,7 @@ export default {
 
 <style lang="less" scoped>
 #register{
+    
     .logo{
         img{
            display: block;

@@ -5,46 +5,43 @@ const Schema = mongoose.Schema
 mongoose.connect("mongodb://localhost/graproject", { useNewUrlParser: true })
 
 var userSchema = new Schema({
-    userId:{
-        type: Object,
+
+    userName: {
+        type: String,
         required: true
     },
-    realName: {
+    password: {
+        type: String,
+        required: true
+    },
+    emaild: {
+        type: String,
+        required: true
+    },
+    userType: {
+        type: String,
+        required: true
+    },
+    gender:{ //性别
+        Type: String,
+        default: ''
+    },
+    headerImg:{
         type: String,
         default: ''
     },
-    gender: {
-        type: String,
-        default: '*'
-    },
-    trade: {
-        type: String,
-        default: '*'
-    },
-    year: {
-        type: String,
-        default: '*'
-    },
-    month: {
-        type: String,
-        default: '*'
-    },
-    data: {
-        type: String,
-        default: '*'
-    },
-    province: {
-        type: String,
-        default: '*'
-    },
-    city: {
-        type: String,
-        default: '*'
-    },
-    intronl: {
-        type: String,
+    userId:{ //学号 
+        Type: String,
         default: ''
-    }
+    },
+    college:{ //学院
+        Type: String,
+        default: ''
+    },
+    address:{ //宿舍地址 类型为老师 直接设置 闽师大 即可
+        Type: String,
+        default: ''
+    },
 })
 
 module.exports = mongoose.model('user', userSchema)

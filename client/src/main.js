@@ -8,7 +8,8 @@ import store from './store'
 
 import {Button, Icon, NavBar,
   Field, CellGroup, Cell,
-  RadioGroup, Radio} from 'vant'
+  RadioGroup, Radio,
+  Checkbox, CheckboxGroup} from 'vant'
 
 Vue.use(Button)
 Vue.use(Icon)
@@ -18,6 +19,8 @@ Vue.use(CellGroup)
 Vue.use(Cell)
 Vue.use(RadioGroup)
 Vue.use(Radio)
+Vue.use(CheckboxGroup)
+Vue.use(Checkbox)
 
 Vue.config.productionTip = false
 
