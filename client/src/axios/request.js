@@ -10,7 +10,12 @@ const service = axios.create({
 service.interceptors.request.use(config =>{
 
     // 后台也已经允许什么请求头可以传到后台
-    config.headers['Authorization'] = 'jie412.com'//注意请求头不能出现中文 不然会报错
+    //注意请求头不能出现中文
+    const url = config.url
+
+    //此时需要token 后台判断是否需要 token 
+    config.headers['Authorization'] = localStorage.token
+    
     return config
 }, error =>{
     console.log('超时')
@@ -18,7 +23,7 @@ service.interceptors.request.use(config =>{
 
 //响应处理
 service.interceptors.response.use(response =>{
-
+    // 这里限制 某些url 不需要 token 根据数据返回是 code 是否为 55555
     return response
 }, error =>{
     console.log(111+error)

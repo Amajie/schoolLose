@@ -72,14 +72,7 @@ export default {
          //测试axios的拦截器
         api(){
 
-            const data = {
-                name: '车神-黄杰',
-                age: 23
-            }
-            
-            register(data).then(res =>{
-                console.log(res)
-            })
+           localStorage.setItem('token', 'che-hj')
             
         }
     }

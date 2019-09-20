@@ -21,7 +21,7 @@ service.interceptors.request.use(config =>{
 
 //响应处理
 service.interceptors.response.use(response =>{
-
+    //后台发现没有token 即返回一个数据 表示没有 token
     return response
 }, error =>{
     console.log(111+error)
