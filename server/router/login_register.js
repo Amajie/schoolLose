@@ -61,15 +61,17 @@ router.get('/login', (req, res) =>{
 * @function 获取客户端的邮箱 发送邮箱验证码 
 *   1 获取激活的邮箱账户
 *   2 查看账户 是否绑定账户 再查看是否已经激活
-*   3 获取验证码
-*   4 验证码插入数据库 并发送邮箱验证码 并设置验证码24小时内有效 在这24小时无需要在发送
+*   3 查看验证码 是否已经发送
+*       1 已经发送 无需再次发送
+*       2 没有发送 获取验证码
+*   5 验证码插入数据库 并发送邮箱验证码 并设置验证码24小时内有效 在这24小时无需要在发送
 *
 *
 */
 router.get('/sendE', (req, res) =>{
     //获取激活邮箱
     const {email} = req.query
-    console.log(email)
+
     //查看账户 是否绑定账户 是否已经激活
     userInfo.findOne({email}, (err, data) =>{
  
@@ -80,44 +82,50 @@ router.get('/sendE', (req, res) =>{
         //为true 说明已经激活 无需在激活
         if(data.userActive) return res.json({"msg": "绑定该邮箱的账户已经激活，无需重复激活", "code": 1})
 
-        //获取验证码
-        const checkCode = Math.random().toString().slice(-6)
+        //查看验证码是否已经发送
+        emailInfo.findOne({userId}, (err, data) =>{
 
-        /*
-        *@function 向数据库插入验证码信息
-        *@params userId 即用户的 id
-        *@params checkCode 验证码
-        */
-        emailInfo.create({limeTime: new Date(), checkCode, userId: data._id, checkTag: CREGISTER}, (err, createDate) =>{
- 
-            // 插入验证码失败
-            if(!createDate) return res.json({"msg": "获取验证码失败，请重新获取", "code": -1})
-             //设置定时时间 24小时 因为mongodb 60s查询一下过期文档 因此 删除会有一点延时
-            emailInfo.createIndexes(emailSchema.index({limeTime : 1}, {expires:60}),
-                function(err, info){
-                    
-                    // 创建一个邮件对象
-                    const mail = {
-                        // 发件人
-                        from: '车神寻物网<651762920@qq.com>', //昵称<发件人邮箱>
-                        // 主题
-                        subject: '激活验证码',
-                        // 收件人
-                        to:email,//收件人邮箱
-                        // 邮件内容，HTML格式
-                        text: `您的激活验证码为：${checkCode}, 请24小时内有效，请谨慎保管。` //可以是链接，也可以是验证码
-                    }
+            // 已经发送 且有效 无需再次发送
+            if(data) return res.json({"msg": "该邮箱的验证码已经发送，可查看邮箱获取验证码", "code": 304})
 
-                    //发送邮箱
-                    sendEmail(mail)
-                    //插入数据成功 此时需要返回数据库的 userId 输入验证码的时候需要带上 查询验证码
-                    // res.json({"msg": "注册成功, 请先激活", "code": 200})
-                    res.send('60s')//完成搞定
+            // 没有发送或者验证码已经失效 获取验证码
+            const checkCode = Math.random().toString().slice(-6)
+
+            /*
+            *@function 向数据库插入验证码信息
+            *@params userId 即用户的 id
+            *@params checkCode 验证码
+            */
+            emailInfo.create({limeTime: new Date(), checkCode, userId: data._id, checkTag: CREGISTER}, (err, createDate) =>{
+    
+                // 插入验证码失败
+                if(!createDate) return res.json({"msg": "获取验证码失败，请重新获取", "code": -1})
+                //设置定时时间 24小时 因为mongodb 60s查询一下过期文档 因此 删除会有一点延时
+                emailInfo.createIndexes(emailSchema.index({limeTime : 1}, {expires:60}),
+                    function(err, info){
+                        
+                        // 创建一个邮件对象
+                        const mail = {
+                            // 发件人
+                            from: '车神寻物网<651762920@qq.com>', //昵称<发件人邮箱>
+                            // 主题
+                            subject: '激活验证码',
+                            // 收件人
+                            to:email,//收件人邮箱
+                            // 邮件内容，HTML格式
+                            text: `您的激活验证码为：${checkCode}, 请24小时内有效，请谨慎保管。` //可以是链接，也可以是验证码
+                        }
+
+                        //发送邮箱
+                        sendEmail(mail)
+                        //插入数据成功 此时需要返回数据库的 userId 输入验证码的时候需要带上 查询验证码
+                        // res.json({"msg": "注册成功, 请先激活", "code": 200})
+                        res.send('60s')//完成搞定
+                })
             })
         })
     })
 })
-
 
 /*
 * @function 获取客户端的输入的验证码 查询数据库是否正确
@@ -134,14 +142,16 @@ router.get('/checkE', (req, res) =>{
         //不存在 提示
         if(!data) return res.json({"msg": "验证码不存在或者已失效，请重新获取", "code": 0})
         
-        //存在 验证是否正确
+        //存在 验证是否正确 重新激活
         if(checkCode != data.checkCode) return res.json({"msg": "验证码错误", "code": 1})
 
         // 验证码正确 激活成功 删除验证码
-        emailInfo.remove({userId, checkTag: CREGISTER}, (err, removeData) =>{
-
+        emailInfo.deleteOne({userId, checkTag: CREGISTER}, (err, deleteData) =>{
+            //此时删除验证码失败 需要重新激活
+            if(deleteData.deletedCount.length <=0) return res.json({"msg": "激活失败，请重新输入验证码", "code": -1})
+            // /激活成功
+            res.json({"msg": "验证码正确，激活成功", "code": 200})
         })
-        res.json({"msg": "验证码正确，激活成功", "code": 200})
     })
 })
 
@@ -169,6 +179,7 @@ router.get('/hjj', (req, res) =>{
 
 
 router.get('/hj', (req, res) =>{
+    // 官方推荐 不再使用remove
     emailInfo.deleteOne({checkTag: CREGISTER}, (err, removeData) =>{
         console.log(removeData)
         res.send('删除')
