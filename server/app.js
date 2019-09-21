@@ -26,7 +26,7 @@ const re_lo = require('./router/login_register.js')
 app.use(bodyParser.urlencoded({ extended: false, limit: '20000kb'}))
 app.use(bodyParser.json({"limit": "20000kb"}))
 
-app.use(cookieParser('hj'))
+app.use(cookieParser())
 
 //session 向浏览器返回数据才能 获取得到
 app.use(session({

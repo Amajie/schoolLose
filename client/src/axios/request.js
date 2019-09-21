@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const service = axios.create({
-    baseURL: 'http://localhost:7070',  // 这里即为 url 加上 这里baseURL  即指定了域名和端口 
+    baseURL: 'http://192.168.43.124:7070',  // 这里即为 url 加上 这里baseURL  即指定了域名和端口 
     timeout: 5000  //请求超时时间
 })
 
@@ -15,7 +15,7 @@ service.interceptors.request.use(config =>{
 
     //此时需要token 后台判断是否需要 token 
     config.headers['Authorization'] = localStorage.token
-    
+    // console.log(config)
     return config
 }, error =>{
     console.log('超时')

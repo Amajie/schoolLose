@@ -18,6 +18,7 @@
     "multer": "^1.4.1"
   },
   "devDependencies": {
+    "md5": "^2.2.1",
     "nodemailer": "^6.3.0"
   }
 }

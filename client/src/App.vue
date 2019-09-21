@@ -6,7 +6,11 @@
 
 <script>
 export default {
-  name: 'App'
+  name: 'App',
+  created(){
+    console.log(this.dAlert)
+  },
+
 }
 </script>
 

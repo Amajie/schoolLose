@@ -1,29 +1,48 @@
-// The Vue build version to load with the `import` command
-// (runtime-only or standalone) has been set in webpack.base.conf with an alias.
+
 import Vue from 'vue'
+
 import App from './App'
 import router from './router'
-
 import store from './store'
 
-import {Button, Icon, NavBar,
-  Field, CellGroup, Cell,
-  RadioGroup, Radio,
-  Checkbox, CheckboxGroup} from 'vant'
+//vant ui库的封装
+import {dConfirm, dAlert, tText} from './components/vant/vant.js'
+Vue.prototype.dConfirm = dConfirm// 确认 取消消息框
+Vue.prototype.dAlert = dAlert// 确认消息框
+Vue.prototype.tText = tText// 轻提示
 
+//请求函数的封装
+import {register, sendEmailCode, checkEmailCode, login} from './axios/api.js'
+Vue.prototype.register = register//发送注册请求
+Vue.prototype.sendEmailCode = sendEmailCode//发送邮箱验证码
+Vue.prototype.checkEmailCode = checkEmailCode//发送 输入的 验证码
+Vue.prototype.login = login//发送 登陆请求
+
+// 密码加密 
+import {decrypt, encrypt} from './assets/crypto/encrypt.js'
+Vue.prototype.decrypt = decrypt// 解密
+Vue.prototype.encrypt = encrypt// 加密
+
+// ui view组件库
+import {Button, Icon, NavBar,
+Field, CellGroup, Cell,
+RadioGroup, Radio,
+Checkbox, CheckboxGroup,
+Tabbar, TabbarItem} from 'vant'
 Vue.use(Button)
-Vue.use(Icon)
-Vue.use(NavBar)
-Vue.use(Field)
-Vue.use(CellGroup)
-Vue.use(Cell)
-Vue.use(RadioGroup)
-Vue.use(Radio)
-Vue.use(CheckboxGroup)
-Vue.use(Checkbox)
+  .use(Icon)
+  .use(NavBar)
+  .use(Field)
+  .use(CellGroup)
+  .use(Cell)
+  .use(RadioGroup)
+  .use(Radio)
+  .use(CheckboxGroup)
+  .use(Checkbox)
+  .use(TabbarItem)
+  .use(Tabbar)
 
 Vue.config.productionTip = false
-
 new Vue({
   el: '#app',
   components: { App },

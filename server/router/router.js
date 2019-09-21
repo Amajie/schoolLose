@@ -8,7 +8,7 @@ router.get('/', (req, res) =>{
 
 //---------------------------------------------------------->
 
-router.get('/md', (req, res) =>{
+router.get('/send', (req, res) =>{
     console.log(req.headers)
     res.json({"msg": "获取session----> router"})
 })

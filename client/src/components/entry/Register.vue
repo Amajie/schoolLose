@@ -32,6 +32,7 @@
                         type="password"
                         label="密码"
                         required
+                        clearable
                         size="large"
                         placeholder="请输入密码"
                     />
@@ -41,6 +42,7 @@
                         type="email"
                         label="邮箱"
                         required
+                        clearable
                         size="large"
                         placeholder="请输入qq邮箱"
                     />
@@ -70,9 +72,8 @@
 </template>
 
 <script>
-import {register} from '../../axios/api.js'
+
 import {mapState} from 'vuex'
-import {dConfirm, dAlert, tText} from '../vant/vant.js'
 export default {
     name: 'Register',
     data(){
@@ -104,7 +105,8 @@ export default {
 
             //获取数据
             const {userName, password, email,
-             userType, regEmail, $router} = this
+             userType, regEmail, $router, tText,
+             dConfirm, dAlert, register} = this
 
             //验证 用户填写的信息是否正确
             if(!userName){
@@ -134,8 +136,11 @@ export default {
                 userType
             }).then(res =>{
                 const {code} = res.data
-                if(code === 0){
-                    dAlert('用户名或者邮箱已被使用，请您换一个再试试')
+
+                if(code === 1){
+                    dAlert('该用户名已被使用，请您换一个再试试')
+                }else if(code === 0){// 注册失败
+                    dAlert('该电子邮箱已被使用，请您换一个再试试')
                 }else if(code === 200){// 激活账户
                     dConfirm('提示', '注册成功，需要激活才能登陆，是否激活账号?').then(() =>{
                         // 把邮箱传递过去

@@ -17,7 +17,7 @@
             <!-- 用户名 -->
             <van-cell-group>
                 <van-field
-                    v-model="username"
+                    v-model="userName"
                     required
                     clearable
                     label="用户名"
@@ -30,6 +30,7 @@
                     type="password"
                     label="密码"
                     required
+                    clearable
                     size="large"
                     placeholder="请输入密码"
                 />
@@ -44,7 +45,7 @@
             </div>
         </div>
          <div class="login-btn">
-            <van-button @click.native="api" type="info" size="large">登陆</van-button>
+            <van-button @click.native="handleLogin" type="info" size="large">登陆</van-button>
         </div>
     </div>
 </template>
@@ -55,7 +56,7 @@ export default {
     name: 'Login',
     data(){
         return {
-            username: '',
+            userName: '',
             password: '',
             remember: false
         }
@@ -69,6 +70,32 @@ export default {
         backToRegister(){
             this.$router.push('/register')
         },
+
+        /**
+         * @function 处理登陆逻辑                                    
+         * 
+         */
+        handleLogin(){
+            
+            //获取数据
+            const {userName, password, remember,
+                tText, login} = this
+            if(!userName){
+                return tText('用户名不能为空')
+            }else if(!password){
+                return tText('密码不能为空')
+            }
+
+            login({
+                userName,
+                password,
+                remember
+            }).then(res =>{
+                console.log(res)
+            })
+
+        },
+
          //测试axios的拦截器
         api(){
 
