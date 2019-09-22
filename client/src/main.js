@@ -5,6 +5,14 @@ import App from './App'
 import router from './router'
 import store from './store'
 
+//样式文件
+import './assets/less/index.less'
+
+
+//cookie
+import cookie from 'vue-cookies'
+Vue.prototype.cookie = cookie
+
 //vant ui库的封装
 import {dConfirm, dAlert, tText} from './components/vant/vant.js'
 Vue.prototype.dConfirm = dConfirm// 确认 取消消息框
@@ -22,6 +30,7 @@ Vue.prototype.login = login//发送 登陆请求
 import {decrypt, encrypt} from './assets/crypto/encrypt.js'
 Vue.prototype.decrypt = decrypt// 解密
 Vue.prototype.encrypt = encrypt// 加密
+
 
 // ui view组件库
 import {Button, Icon, NavBar,

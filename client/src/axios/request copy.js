@@ -2,7 +2,8 @@ import axios from 'axios'
 
 const service = axios.create({
     //baseURL: process.env.BASE_URL,  // api的base_url 即为具体url
-    baseURL: 'http://localhost:7070',  // 这里即为 url 加上 这里baseURL  即指定了域名和端口 
+    //baseURL: 'http://localhost:7070',  // 这里即为 url 加上 这里baseURL  即指定了域名和端口 
+    baseURL: '/api',  // 这里即为 url 加上 这里baseURL  即指定了域名和端口 
     timeout: 5000  //请求超时时间
 })
 

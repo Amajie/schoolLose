@@ -32,11 +32,11 @@ export default new Router({
       name: 'CheckEmail',
       component: CheckEmail
     },
-
     //内容
     {
       path: '/',
       name: 'Wrap',
+      redirect: '/home',
       component: Wrap,
       children:[
         {

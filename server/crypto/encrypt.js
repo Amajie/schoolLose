@@ -15,17 +15,17 @@ const CryptoJS = require('crypto-js')
  * @params const iv = CryptoJS.enc.Utf8.parse('ABCDEF1234123412')   //十六位十六进制数作为密钥偏移量
  */
 
-
-let key = ''
-let iv = ''
-
 /**
  * @function 解密
  * @param {*} w 待解密的密文 
  * @param {*} key  密钥 与加密密钥一样
  * @param {*} iv   密钥偏移量 与加密密钥偏移量一样
  */
-export const decrypt = ({w, f}) =>{
+
+ let key = ''
+ let iv = ''
+
+exports.decrypt = ({w, f}) =>{
 
 
     getTag(f)
@@ -45,7 +45,7 @@ export const decrypt = ({w, f}) =>{
  * @param {*} key 密钥 与解密密钥一样
  * @param {*} iv  密钥偏移量 与解密密钥偏移量一样
  */
-export const encrypt = ({w, f}) =>{
+exports.encrypt = ({w, f}) =>{
 
 
     getTag(f)

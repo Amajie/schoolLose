@@ -7,18 +7,20 @@ const cookieParser = require('cookie-parser')
 const app = express()
 
 //解决跨域
-app.all('*',function (req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
-    // res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
-    res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
-    if (req.method == 'OPTIONS') {
-        res.send(200)
-    }
-    else {
-        next()
-    }
-})
+// app.all('*',function (req, res, next) {
+//     // res.header('Access-Control-Allow-Origin', '*');
+//     res.header('Access-Control-Allow-Origin', 'http://192.168.43.124:8080/');
+//     res.header('Access-Control-Allow-Credentials: true')
+//     // res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With');
+//     res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
+//     res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+//     if (req.method == 'OPTIONS') {
+//         res.send(200)
+//     }
+//     else {
+//         next()
+//     }
+// })
 
 const router = require('./router/router.js')
 const re_lo = require('./router/login_register.js')

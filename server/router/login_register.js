@@ -8,10 +8,14 @@ const sendEmail = require('../nodemailer/nodemailer.js')
 //个人信息表
 const userInfo = require('../mongodb/userInfo.js')
 //邮箱 验证码信息表
-const emailInfo = require('../mongodb/email.js').emailInfo
-const emailSchema = require('../mongodb/email.js').emailSchema
+const {emailInfo, emailSchema} = require('../mongodb/email.js')
 //邮箱验证码的类型
 const {CREGISTER} = require('./CONST.js')
+
+//加密与解密
+const {decrypt, encrypt} = require('../crypto/encrypt.js')
+
+const maxAge = 1000*6
 
 
 /**
@@ -29,7 +33,6 @@ router.post('/register', (req, res) =>{
    const {userName, email, password} = req.body
    
    req.body.password = md5(password)
-   
    
    //使用或查询
    userInfo.findOne({$or:[
@@ -62,8 +65,12 @@ router.post('/register', (req, res) =>{
  * 
  *@function 用户登陆
  *  1 获取 用户的登陆用户名 密码 以及 是否记住密码
- *  2 解密 不需要解密   
- * 
+ *  2 验证 用户名 或者密码是否正确
+ *      1 错误 提示密码错误
+ *      2 正确 则看是否记住密码
+ *          1 记住密码 设置cookie 用户名 以及加密的 密码 过期时间为 30天   
+ *          2 不记住密码 不设置 cookie 用户名 以及密码这些信息
+ *      3 返回token
  */
    
 router.get('/login', (req, res) =>{
@@ -80,8 +87,8 @@ router.get('/login', (req, res) =>{
         //验证密码是否正确
         if(data.password != md5(password)) return res.json({"msg": "密码错误", "code": 0})
 
-        //密码正确 成功登陆
-        res.json({"msg": "密码正确", "code": 200})
+        //密码正确
+        res.json({"msg": "密码正确，登陆成功", "code": 200})
     })
 })
 

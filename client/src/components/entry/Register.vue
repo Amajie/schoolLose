@@ -5,11 +5,11 @@
             <div class="header">
                 <van-nav-bar
                     title="注册"
-                    left-text="首页"
-                    right-text="登陆"
+                    left-text="登陆"
+                    right-text="激活"
                     left-arrow
-                    @click-left="backToHome"
-                    @click-right="backToLogin"
+                    @click-left="backToLogin"
+                    @click-right="backToActive"
                 />
             </div>
             <div class="logo">
@@ -64,9 +64,6 @@
             <div class="register-btn">
                 <van-button @click.native="handleRegister" type="info" size="large">注册</van-button>
             </div>
-            <div class="active-user">
-                <router-link to="/cemail">账户激活</router-link>
-            </div>
         </div>
     </div>
 </template>
@@ -91,13 +88,13 @@ export default {
     },
     methods:{
         //返回首页按钮
-        backToHome(){
-           tText('nnn')
+        backToLogin(){
+           this.$router.replace('/login')
         },
 
         //前往登陆
-        backToLogin(){
-            this.$router.push('/login')
+        backToActive(){
+            this.$router.replace('/cEmail')
         },
         
         // 处理注册 逻辑
@@ -106,7 +103,8 @@ export default {
             //获取数据
             const {userName, password, email,
              userType, regEmail, $router, tText,
-             dConfirm, dAlert, register} = this
+             dConfirm, dAlert, register,
+             encrypt} = this
 
             //验证 用户填写的信息是否正确
             if(!userName){
@@ -131,7 +129,7 @@ export default {
             
             register({
                 userName,
-                password,
+                password: encrypt({w: password, f: 'w'}),
                 email,
                 userType
             }).then(res =>{
@@ -174,11 +172,6 @@ export default {
         .register-btn{
             padding: 0 1%;
             margin-top: 10px;
-        }
-        .active-user{
-            text-align: right;
-            margin: 10px 0;
-            padding-right: 2%;
         }
     }
 }

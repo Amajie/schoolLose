@@ -58,13 +58,19 @@ export default {
         return {
             userName: '',
             password: '',
-            remember: false
+            remember: false,
+            che_in: '',//cookie 用户名
+            che_id: ''//cookie 密码
         }
+    },
+    created(){
+        //记住密码自动登陆
+        this.handleAuto()
     },
     methods:{
         //返回首页按钮
         backToHome(){
-            alert('hj')
+            this.$router.replace('/')
         },
         //前往登陆
         backToRegister(){
@@ -78,29 +84,58 @@ export default {
         handleLogin(){
             
             //获取数据
-            const {userName, password, remember,
-                tText, login} = this
+            const {userName, password, remember, dAlert,
+                tText, login, encrypt, cookie, che_in, che_id} = this
+
             if(!userName){
                 return tText('用户名不能为空')
             }else if(!password){
                 return tText('密码不能为空')
             }
 
+            //加密密码
+            const enPaw = encrypt({w: password, f: 'w'})
+
             login({
                 userName,
-                password,
+                password: enPaw,
                 remember
             }).then(res =>{
-                console.log(res)
+                const {code} = res.data
+
+                if(code === -1) return dAlert('该用户不存在')
+                if(code === 0) return dAlert('密码错误')
+
+                //没有记住密码 或者 cookie存在 无需设置 cookie
+                if(!remember || (che_in && che_id)) return console.log('欢迎再次登陆')
+
+                console.log('首次登陆')
+                // 设置 cookie
+                cookie.set('che_in', encrypt({w: userName, f: 'w'}), 20)
+                cookie.set('che_id', enPaw, 20)
             })
 
         },
 
-         //测试axios的拦截器
-        api(){
+        /**
+         * @function 处理自动登陆
+         * 
+         */
+        handleAuto(){
 
-           localStorage.setItem('token', 'che-hj')
-            
+            this.che_in = this.cookie.get('che_in')
+            this.che_id = this.cookie.get('che_id')
+
+            // cookie不存在 用户名 和密码 无需自动登陆
+            if(!(this.che_in && this.che_id)) return
+
+            //解密 自动 同步到文本框
+            this.userName = this.decrypt({w: this.che_in, f: 'w'})
+            this.password = this.decrypt({w: this.che_id, f: 'w'})
+            this.remember = true
+
+            //调用登陆函数
+            this.handleLogin()
         }
     }
 }
