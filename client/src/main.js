@@ -31,13 +31,16 @@ import {decrypt, encrypt} from './assets/crypto/encrypt.js'
 Vue.prototype.decrypt = decrypt// 解密
 Vue.prototype.encrypt = encrypt// 加密
 
+//svg 图片的使用
+import IconSvg from 'vue2-svg-icon/Icon.vue'
+Vue.component('icon', IconSvg)
 
 // ui view组件库
 import {Button, Icon, NavBar,
 Field, CellGroup, Cell,
 RadioGroup, Radio,
 Checkbox, CheckboxGroup,
-Tabbar, TabbarItem} from 'vant'
+Tabbar, TabbarItem, Row, Col} from 'vant'
 Vue.use(Button)
   .use(Icon)
   .use(NavBar)
@@ -50,6 +53,8 @@ Vue.use(Button)
   .use(Checkbox)
   .use(TabbarItem)
   .use(Tabbar)
+  .use(Row)
+  .use(Col)
 
 Vue.config.productionTip = false
 new Vue({

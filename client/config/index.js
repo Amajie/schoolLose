@@ -16,7 +16,7 @@ module.exports = {
         target: 'http://192.168.43.124:7070',  // 接口域名
         changeOrigin: true,  //是否跨域
         pathRewrite: {
-            '^/api': ''   //需要rewrite重写的,
+            '^/api': ''   //需要rewrite重写的 这里会拼接到域名后面
         }  
       }
     },

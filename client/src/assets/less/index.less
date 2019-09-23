@@ -84,6 +84,21 @@ h1,h2,h3,h4,h5,h6, p{
     padding: 0px;
 }
 
+.top-line::after{
+    position: absolute;
+    content: '';
+    width: 100%;
+    left: 0;
+    top: 0;
+    height: 1px;
+    background-color: #ebedf0;
+    -webkit-transform: scale(1,.5);
+    transform: scale(1,.5);
+    -webkit-transform-origin: center bottom;
+    transform-origin: center bottom;
+}
+
+
 //导航栏的下划线
 .van-hairline--bottom::after{
     border: 0;

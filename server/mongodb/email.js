@@ -22,11 +22,12 @@ const emailSchema = new Schema({
     *@params register 激活账户
     *
     */
-   checkTag:{
+    checkTag:{
         type: String,
         required: true
     }
 })
+
 
 exports.emailInfo = mongoose.model('emailCode', emailSchema)
 exports.emailSchema = emailSchema

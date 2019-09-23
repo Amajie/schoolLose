@@ -4,7 +4,6 @@
         <van-tabbar
             fixed
             route
-            safe-area-inset-bottom
             v-model="active">
             <van-tabbar-item replace to='/home' name="home" icon="home-o">首页</van-tabbar-item>
             <van-tabbar-item replace to='/info' name="info" icon="chat-o">消息</van-tabbar-item>

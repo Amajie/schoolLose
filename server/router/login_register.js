@@ -15,8 +15,6 @@ const {CREGISTER} = require('./CONST.js')
 //加密与解密
 const {decrypt, encrypt} = require('../crypto/encrypt.js')
 
-const maxAge = 1000*6
-
 
 /**
 * @function 用户注册
@@ -26,8 +24,6 @@ const maxAge = 1000*6
 *       2 没有 密码使用md5加密 再插入注册数据
 *   3 注册成功 则提示用户可以跳转页面激活账户
 */
-
-
 router.post('/register', (req, res) =>{
    
    const {userName, email, password} = req.body
@@ -61,6 +57,7 @@ router.post('/register', (req, res) =>{
    })
 })
 
+
 /**
  * 
  *@function 用户登陆
@@ -71,8 +68,7 @@ router.post('/register', (req, res) =>{
  *          1 记住密码 设置cookie 用户名 以及加密的 密码 过期时间为 30天   
  *          2 不记住密码 不设置 cookie 用户名 以及密码这些信息
  *      3 返回token
- */
-   
+ */ 
 router.get('/login', (req, res) =>{
     const {userName, password, remember} = req.query
 
@@ -92,6 +88,7 @@ router.get('/login', (req, res) =>{
     })
 })
 
+
 /**
 * @function 获取客户端的邮箱 发送邮箱验证码 
 *   1 获取激活的邮箱账户
@@ -100,13 +97,10 @@ router.get('/login', (req, res) =>{
 *       1 已经发送 无需再次发送
 *       2 没有发送 获取验证码
 *   5 验证码插入数据库 并发送邮箱验证码 并设置验证码24小时内有效 在这24小时无需要在发送
-*
-*
 */
 router.get('/sendE', (req, res) =>{
     //获取激活邮箱
     const {email} = req.query
-
     //查看账户 是否绑定账户 是否已经激活
     userInfo.findOne({email}, (err, data) =>{
         
@@ -175,7 +169,6 @@ router.get('/checkE', (req, res) =>{
 
         // 修改用户为激活状态
         userInfo.updateOne({_id: checkId}, {userActive: true}, (err, upData) =>{
-            console.log(upData)
             // 激活失败
             if(upData.nModified <= 0) return res.json({"msg": "激活失败，请重新输入验证码", "code": -1})
 
@@ -200,6 +193,7 @@ router.get('/hjj', (req, res) =>{
         //     //插入数据成功
         //     res.send('插入成功')
         // })
+
         emailInfo.createIndexes(emailSchema.index({limeTime : 1}, {expires:60}), function(err, info){
             console.log('info---->' +info)
             console.log('err---->' +err)
@@ -223,7 +217,6 @@ router.get('/hj', (req, res) =>{
 })
 
 router.get('/cookie', (req, res) =>{
-
     if(req.cookies.userName){
         console.log(req.cookies.userName)
         res.send('再次欢迎你')
@@ -231,26 +224,11 @@ router.get('/cookie', (req, res) =>{
         res.cookie('userName', '车神-黄杰', {maxAge:5000})
         res.send('欢迎你')
     }
-
 })
 
 function getToken(id){
     return (Math.random() + Date.now() + id).toString(36)
 }
 
-function getEmailCode(to){
-    
-    // 创建一个邮件对象
-    return {
-        // 发件人
-        from: '车神寻物网<651762920@qq.com>', //昵称<发件人邮箱>
-        // 主题
-        subject: '激活验证码',
-        // 收件人
-        to,//收件人邮箱
-        // 邮件内容，HTML格式
-        text: `您的激活验证码为：${Math.random().toString().slice(-6)}, 请谨慎保管。` //可以是链接，也可以是验证码
-    }
-}
 
 module.exports = router
