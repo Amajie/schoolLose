@@ -51,25 +51,19 @@
                 <div class="cell-wrap">
                     <div class="cell-list">
                         <div class="cell-item">
-                            <router-link to="/collect">
-                                <p><icon name="collect" :w="svgWH" :h="svgWH"></icon></p>
-                                <p class="text">我的收藏</p>
-                                <p><van-icon size="20" color="#ccc" name="arrow"/></p>
-                            </router-link>
+                            <img src="../../../assets/person/collect.png" alt="">
+                            <van-cell title-class="text" title="我的收藏" is-link>
+                            </van-cell>
                         </div>
                         <div class="cell-item">
-                            <router-link to="/about">
-                                <p><icon name="about" :w="svgWH" :h="svgWH"></icon></p>
-                                <p class="text">投诉建议</p>
-                                <p><van-icon size="20" color="#ccc" name="arrow"/></p>
-                            </router-link>
+                            <img src="../../../assets/person/complaint.png" alt="">
+                            <van-cell title-class="text" title="投诉建议" is-link>
+                            </van-cell>
                         </div>
                         <div class="cell-item">
-                            <router-link to="/complaint">
-                                <p><icon name="complaint" :w="svgWH" :h="svgWH"></icon></p>
-                                <p class="text">关于车神寻物</p>
-                                <p><van-icon size="20" color="#ccc" name="arrow"/></p>
-                            </router-link>
+                            <img src="../../../assets/person/about.png" alt="">
+                            <van-cell title-class="text" title="关于车神寻物" is-link>
+                            </van-cell>
                         </div>
                     </div>
                 </div>
@@ -89,8 +83,14 @@ export default {
         }
     },
     methods:{
-        add(){
-            alert('设置或者添加')
+        add(event){
+            const {target} = event
+            target.parentNode.style.backgroundColor="#f2f3f5"
+        },
+
+        remove(event){
+             const {target} = event
+            target.parentNode.style.backgroundColor="#fff"
         },
 
         /**
@@ -166,32 +166,24 @@ export default {
              .cell-wrap{
                 .cell-list{
                     .cell-item{
+                        position: relative;
                         border-radius: 10px;
                         overflow: hidden;
                         margin: 10px 0;
-                        a{
-                            display: flex;
-                            width: 100%;
-                            background: #fff;
-                            padding: 12px 0;
-                            padding-left: 10px;
-                            box-sizing: border-box;
-                            border-bottom: 1px solid #f6f6f6;
-                            //每一行的样式
-                            p{
-                                display: flex;
-                                flex-direction: column;
-                                justify-content: center;
-                            }
-                            .text{
-                                flex: 5;
-                                font-size: 20px;
-                                color: #333;
-                                padding-left: 10px;
-                            }
-                            i{
-                                display: flex;
-                            }
+                        .text{
+                            font-size: 19px;
+                            color: #333;
+                            padding-left: 30px;
+                        }
+                        img{
+                            position: absolute;
+                            left: 0;
+                            top: 50%;
+                            margin-left: 10px;
+                            margin-top: -15px;
+                            width: 30px;
+                            height: 30px;
+                            z-index: 100000;
                         }
                     }
                 }

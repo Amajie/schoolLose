@@ -1,0 +1,30 @@
+{
+  "id": "",
+  "name": "",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "6150025",
+      "name": "关于",
+      "font_class": "guanyu",
+      "unicode": "e636",
+      "unicode_decimal": 58934
+    },
+    {
+      "icon_id": "6150364",
+      "name": "收 藏",
+      "font_class": "shoucang",
+      "unicode": "e62f",
+      "unicode_decimal": 58927
+    },
+    {
+      "icon_id": "6498073",
+      "name": "投诉",
+      "font_class": "tousu",
+      "unicode": "e651",
+      "unicode_decimal": 58961
+    }
+  ]
+}

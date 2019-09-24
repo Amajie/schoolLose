@@ -66,6 +66,16 @@ html{
         }
         #wrap{
             height: 100%;
+            .header{
+                //导航栏的下划线
+                .van-hairline--bottom::after{
+                    border: 0;
+                }
+
+                [class*=van-hairline]::after{
+                    border: 0;
+                }
+            }
             #person{
                 height: 100%;
                 .van-nav-bar{
@@ -98,13 +108,4 @@ h1,h2,h3,h4,h5,h6, p{
     transform-origin: center bottom;
 }
 
-
-//导航栏的下划线
-.van-hairline--bottom::after{
-    border: 0;
-}
-
-[class*=van-hairline]::after{
-    border: 0;
-}
 

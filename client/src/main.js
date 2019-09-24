@@ -35,12 +35,16 @@ Vue.prototype.encrypt = encrypt// 加密
 import IconSvg from 'vue2-svg-icon/Icon.vue'
 Vue.component('icon', IconSvg)
 
+// 字体图标库
+import './assets/iconfont/iconfont.css'
+
 // ui view组件库
 import {Button, Icon, NavBar,
 Field, CellGroup, Cell,
 RadioGroup, Radio,
 Checkbox, CheckboxGroup,
-Tabbar, TabbarItem, Row, Col} from 'vant'
+Tabbar, TabbarItem, Row, Col,
+Search, Grid, GridItem} from 'vant'
 Vue.use(Button)
   .use(Icon)
   .use(NavBar)
@@ -55,6 +59,9 @@ Vue.use(Button)
   .use(Tabbar)
   .use(Row)
   .use(Col)
+  .use(Search)
+  .use(GridItem)
+  .use(Grid)
 
 Vue.config.productionTip = false
 new Vue({
