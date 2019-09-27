@@ -2,15 +2,15 @@
     <div id="register">
         <!-- 注册信息填写 -->
         <div class="register-wrap">
-            <div class="header">
+            <div class="header lr">
                 <van-nav-bar
                     title="注册"
-                    left-text="登陆"
-                    right-text="激活"
-                    left-arrow
                     @click-left="backToLogin"
                     @click-right="backToActive"
-                />
+                >
+                    <van-icon slot="right" color="#fff" >激活</van-icon>
+                    <van-icon slot="left" color="#fff" >登陆</van-icon>
+                </van-nav-bar>
             </div>
             <div class="logo">
                 <img src="../../assets/logo.jpg" alt="">
@@ -67,9 +67,7 @@
         </div>
     </div>
 </template>
-
 <script>
-
 import {mapState} from 'vuex'
 export default {
     name: 'Register',

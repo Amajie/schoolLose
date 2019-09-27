@@ -1,13 +1,14 @@
 <template>
     <div id="check">
-        <div class="header">
+        <div class="header r">
             <van-nav-bar
                 title="激活账户"
                 left-text="取消"
-                left-arrow
                 size="large"
                 @click-left="backReject"
-            />
+            >
+                <van-icon name="arrow-left" slot="left" size="2em" color="#fff" />
+            </van-nav-bar>
         </div>
         <!-- 验证注册 -->
         <div class="wrap">
@@ -19,7 +20,7 @@
                         </van-cell-group>
                     </div>
                     <div class="btn">
-                        <van-button @click.native="handleEmail" type="info" :square="true" size="large">获取验证码</van-button>
+                        <van-button @click.native="handleEmail" type="info" :square="true" block>获取验证码</van-button>
                     </div>
                 </div>
             </transition>
@@ -31,7 +32,7 @@
                         </van-cell-group>
                     </div>
                     <div class="check-btn">
-                        <van-button type="primary" :disabled="confirmBtn" @click.native="handleCheckCode" :square="true" size="large">激活</van-button>
+                        <van-button type="primary" :disabled="confirmBtn" @click.native="handleCheckCode" :square="true" block>激活</van-button>
                     </div>
                 </div>
             </transition>

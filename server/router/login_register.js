@@ -15,6 +15,9 @@ const {CREGISTER} = require('./CONST.js')
 //加密与解密
 const {decrypt, encrypt} = require('../crypto/encrypt.js')
 
+//生成和解析token
+const {createToken} = require('../checkToken/jwt.js')
+
 
 /**
 * @function 用户注册
@@ -70,7 +73,7 @@ router.post('/register', (req, res) =>{
  *      3 返回token
  */ 
 router.get('/login', (req, res) =>{
-    const {userName, password, remember} = req.query
+    const {userName, password} = req.query
 
     userInfo.findOne({$or:[
         {userName},
@@ -80,11 +83,16 @@ router.get('/login', (req, res) =>{
         // 用户名 或者 电子邮箱错误错误
         if(!data) return res.json({"msg": "该用户不存在", "code": -1})
 
+        if(!data.userActive) return res.json({"msg": "该用户还没有激活", "code": 1})
+
+
         //验证密码是否正确
         if(data.password != md5(password)) return res.json({"msg": "密码错误", "code": 0})
 
-        //密码正确
-        res.json({"msg": "密码正确，登陆成功", "code": 200})
+        // 密码正确 获取token
+        const {userName, email, _id} = data
+        const token = createToken({userName, email, userId: _id})
+        res.json({"msg": "密码正确，登陆成功", "code": 200, token})
     })
 })
 
@@ -132,13 +140,32 @@ router.get('/sendE', (req, res) =>{
     
                 // 插入验证码失败
                 if(!createDate) return res.json({"msg": "获取验证码失败，请重新获取", "code": -1})
-                //设置定时时间 24小时 因为mongodb 60s查询一下过期文档 因此 删除会有一点延时
+                //设置定时时间 24小时 因为mongodb 60s查询一下过期文档 因此 删除会有一点延时 试一下 这个是否可以删除
+                
+                
+                //发送邮箱
+                // sendEmail(email) //这里可以走通 但是此时不需要发送邮箱 直接看数据库获取验证码 测试即可
+                //插入数据成功 此时需要返回数据库的 checkId 输入验证码的时候需要带上 查询验证码
+                // res.json({"msg": "验证码已经发送，请注意查收", "code": 200, checkCode, checkId})
+
+
                 emailInfo.createIndexes(emailSchema.index({limeTime : 1}, {expires:120}),
-                    function(err, info){                        
-                        
-                        console.log(email)
+                    function(err, info){
+                                                
+                        // 创建一个邮件对象
+                        const mail = {
+                            // 发件人
+                            from: '车神寻物网<651762920@qq.com>', //昵称<发件人邮箱>
+                            // 主题
+                            subject: '激活验证码',
+                            // 收件人
+                            to: email,
+                            // 邮件内容，也可以为HTML格式
+                            text: `您的激活验证码为：${checkCode}, 请24小时内有效，请谨慎保管。` //可以是链接，也可以是验证码
+                        }
+                        console.log(mail)
                         //发送邮箱
-                        // sendEmail(email) //这里可以走通 但是此时不需要发送邮箱 直接看数据库获取验证码 测试即可
+                        // sendEmail(mail) //这里可以走通 但是此时不需要发送邮箱 直接看数据库获取验证码 测试即可
                         //插入数据成功 此时需要返回数据库的 checkId 输入验证码的时候需要带上 查询验证码
                         res.json({"msg": "验证码已经发送，请注意查收", "code": 200, checkCode, checkId})
                 })
@@ -205,6 +232,9 @@ router.get('/hjj', (req, res) =>{
 
 
 router.get('/hj', (req, res) =>{
+
+
+    req.session.name = '车神'
     const mf = md5('huangjie')
     const mm = md5('huangjie')
     res.send(mf+'----'+mm)
@@ -216,6 +246,13 @@ router.get('/hj', (req, res) =>{
     })
 })
 
+router.post('/text', (req, res) =>{
+    console.log(req.headers['jie412.com-token'])
+    res.status(200).json({
+        success: false,
+        message: '没有提供token！'
+    })
+})
 router.get('/cookie', (req, res) =>{
     if(req.cookies.userName){
         console.log(req.cookies.userName)

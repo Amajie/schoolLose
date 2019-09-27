@@ -1,14 +1,14 @@
 <template>
     <div id="login">
-        <div class="header">
+        <div class="header lr">
             <van-nav-bar
                 title="车神登陆"
-                left-text="首页"
-                right-text="注册"
-                left-arrow
                 @click-left="backToHome"
                 @click-right="backToRegister"
-            />
+            >
+                <van-icon slot="right" color="#fff" >注册</van-icon>
+                <van-icon slot="left" color="#fff" >首页</van-icon>
+            </van-nav-bar>
         </div>
         <div class="logo">
             <img src="../../assets/logo1.jpg" alt="">
@@ -84,7 +84,7 @@ export default {
         handleLogin(){
             
             //获取数据
-            const {userName, password, remember, dAlert,
+            const {userName, password, remember, $router, dAlert, dConfirm,
                 tText, login, encrypt, cookie, che_in, che_id} = this
 
             if(!userName){
@@ -102,19 +102,25 @@ export default {
                 remember
             }).then(res =>{
                 const {code} = res.data
-
+                console.log(res)
                 if(code === -1) return dAlert('该用户不存在')
+                if(code === 1) return dConfirm('提示', '该用户还没有激活').then(() =>{
+                    $router.replace({name: 'CheckEmail'})
+                }).catch(() =>{
+                    console.log('清空文本框')
+                })
                 if(code === 0) return dAlert('密码错误')
+                
+                // 设置token
 
-                //没有记住密码 或者 cookie存在 无需设置 cookie
+                //没有记住密码 或者 cookie存在 无需设置 cookie 之后在跳转到首页
                 if(!remember || (che_in && che_id)) return console.log('欢迎再次登陆')
 
-                console.log('首次登陆')
+                console.log('首次登陆')   
                 // 设置 cookie
                 cookie.set('che_in', encrypt({w: userName, f: 'w'}), 20)
                 cookie.set('che_id', enPaw, 20)
             })
-
         },
 
         /**

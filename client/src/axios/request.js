@@ -26,6 +26,7 @@ service.interceptors.request.use(config =>{
 
     //此时需要token 后台判断是否需要 token 
     // config.headers['Authorization'] = localStorage.token
+    config.headers['jie412.com-token'] = 'che-hj'
     return config
 }, error =>{
     console.log('超时')

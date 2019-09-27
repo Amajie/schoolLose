@@ -56,3 +56,54 @@ export const login = params =>{
         params
     })
 }
+
+
+/**
+ * @function 用户名的修改
+ * @param {*} data 发送的数据
+ */
+export const cName = data =>{
+    return service({
+        url: '/cn',
+        method: 'post',
+        data
+    })
+}
+
+/**
+ * @function 密码的修改
+ * @param {*} data 发送的数据
+ */
+export const cPaw = data =>{
+    return service({
+        url: '/cp',
+        method: 'post',
+        data
+    })
+}
+
+
+/**
+ * @function 邮箱的修改
+ * @param {*} data 发送的数据
+ */
+export const cEmail = data =>{
+    return service({
+        url: '/ce',
+        method: 'post',
+        data
+    })
+}
+
+
+/**
+ * @function 邮箱的修改
+ * @param {*} data 发送的数据
+ */
+export const text = data =>{
+    return service({
+        url: '/text',
+        method: 'post',
+        data
+    })
+}

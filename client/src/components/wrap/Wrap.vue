@@ -24,6 +24,6 @@ export default {
 
 <style lang="less" scoped>
 #wrap{
-
+    height: 100%;
 }
 </style>

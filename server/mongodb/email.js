@@ -28,6 +28,16 @@ const emailSchema = new Schema({
     }
 })
 
+const emailInfo = mongoose.model('emailCode', emailSchema)
+const expires = 60
 
-exports.emailInfo = mongoose.model('emailCode', emailSchema)
+// // 这里虽然可以 但是 但是不是很理想
+// emailInfo.createIndexes(emailSchema.index({limeTime : 1}, {expires}),
+//     function(err, info){                        
+//         console.log(`验证吗已经插入, 定时${expires}秒`)
+
+// })
+
+
+exports.emailInfo = emailInfo
 exports.emailSchema = emailSchema

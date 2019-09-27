@@ -1,12 +1,14 @@
 <template>
     <div id="person">
-        <div class="header">
+        <div class="header b">
             <van-nav-bar
-                @click-left="add"
+                @click-left="() => $router.replace('/set')"
                 @click-right="add"
+                :border="false"
             >
                 <van-icon name="add-o" slot="right" size="2em" color="#fff" />
-                <van-icon name="setting-o" slot="left" size="2em" color="#fff" />
+                <!-- 这里可以设置一个小红点 说明信息没有完善 -->
+                <van-icon name="setting-o" slot="left" dot size="2em" color="#fff" />
             </van-nav-bar>
         </div>
         <div class="p-wrap">
@@ -53,16 +55,34 @@
                         <div class="cell-item">
                             <img src="../../../assets/person/collect.png" alt="">
                             <van-cell title-class="text" title="我的收藏" is-link>
+                                <van-icon
+                                    slot="right-icon"
+                                    name="arrow"
+                                    color="#969799"
+                                    style="line-height: inherit;"
+                                />
                             </van-cell>
                         </div>
                         <div class="cell-item">
                             <img src="../../../assets/person/complaint.png" alt="">
                             <van-cell title-class="text" title="投诉建议" is-link>
+                                <van-icon
+                                    slot="right-icon"
+                                    name="arrow"
+                                    color="#969799"
+                                    style="line-height: inherit;"
+                                />
                             </van-cell>
                         </div>
                         <div class="cell-item">
                             <img src="../../../assets/person/about.png" alt="">
                             <van-cell title-class="text" title="关于车神寻物" is-link>
+                                <van-icon
+                                    slot="right-icon"
+                                    name="arrow"
+                                    color="#969799"
+                                    style="line-height: inherit;"
+                                />
                             </van-cell>
                         </div>
                     </div>
@@ -84,8 +104,7 @@ export default {
     },
     methods:{
         add(event){
-            const {target} = event
-            target.parentNode.style.backgroundColor="#f2f3f5"
+            alert('车神')
         },
 
         remove(event){
@@ -108,7 +127,7 @@ export default {
 <style lang="less" scoped>
 #person{
     height: 100%;
-    background: #f5f5f5;
+    background-color: #f5f5f5;
     overflow: auto;
     .p-wrap{
         padding-bottom: 88px;

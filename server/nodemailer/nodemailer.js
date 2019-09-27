@@ -16,19 +16,7 @@ const config = {
 var transporter = nodemailer.createTransport(config)
 
 // 发送邮件
-function sendEmail(to){
-    // 创建一个邮件对象
-    const mail = {
-        // 发件人
-        from: '车神寻物网<651762920@qq.com>', //昵称<发件人邮箱>
-        // 主题
-        subject: '激活验证码',
-        // 收件人
-        to,
-        // 邮件内容，也可以为HTML格式
-        text: `您的激活验证码为：${checkCode}, 请24小时内有效，请谨慎保管。` //可以是链接，也可以是验证码
-    }
-
+function sendEmail(mail){
     //发送邮件
     transporter.sendMail(mail, function(error, info){
         if(error) {

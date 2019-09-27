@@ -20,11 +20,18 @@ Vue.prototype.dAlert = dAlert// 确认消息框
 Vue.prototype.tText = tText// 轻提示
 
 //请求函数的封装
-import {register, sendEmailCode, checkEmailCode, login} from './axios/api.js'
+import {register, sendEmailCode, checkEmailCode, login,
+  cName, cPaw, cEmail, text} from './axios/api.js'
 Vue.prototype.register = register//发送注册请求
 Vue.prototype.sendEmailCode = sendEmailCode//发送邮箱验证码
 Vue.prototype.checkEmailCode = checkEmailCode//发送 输入的 验证码
 Vue.prototype.login = login//发送 登陆请求
+Vue.prototype.cName = cName//发送 用户名修改请求
+Vue.prototype.cPaw = cPaw//发送 密码修改请求
+Vue.prototype.cEmail = cEmail//发送 密码修改请求
+
+
+Vue.prototype.text = text//发送 密码修改请求
 
 // 密码加密 
 import {decrypt, encrypt} from './assets/crypto/encrypt.js'
