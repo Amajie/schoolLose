@@ -95,9 +95,32 @@ export const cEmail = data =>{
     })
 }
 
+/**
+ * @function 个人信息的修改
+ * @param {*} data 发送的数据
+ */
+export const cInfo = data =>{
+    return service({
+        url: '/ci',
+        method: 'post',
+        data
+    })
+}
+/**
+ * @function 个人信息的获取
+ * @param {*} params 发送的数据
+ */
+export const fInfo = params =>{
+    return service({
+        url: '/fi',
+        method: 'post',
+        params
+    })
+}
+
 
 /**
- * @function 邮箱的修改
+ * @function 测试
  * @param {*} data 发送的数据
  */
 export const text = data =>{

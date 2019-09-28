@@ -24,7 +24,6 @@ const app = express()
 
 const router = require('./router/router.js')
 const re_lo = require('./router/login_register.js')
-const set_info = require('./router/set_info.js')
 
 app.use(bodyParser.urlencoded({ extended: false, limit: '20000kb'}))
 app.use(bodyParser.json({"limit": "20000kb"}))
@@ -50,7 +49,6 @@ app.use(function(req, res, next){
 
 app.use(router)
 app.use(re_lo)
-app.use(set_info)
 
 
 app.listen(7070, function(){

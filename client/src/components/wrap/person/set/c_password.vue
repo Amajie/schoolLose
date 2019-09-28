@@ -58,6 +58,8 @@ export default {
                 return tText('新密码长度过短')
             }else if(password.length > 16){
                 return tText('新密码长度过长')
+            }else if(password === oldPassword){
+                return tText('新密码不能和当前密码相同')
             }
 
             cPaw({

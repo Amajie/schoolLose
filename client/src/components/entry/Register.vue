@@ -127,7 +127,7 @@ export default {
             
             register({
                 userName,
-                password: encrypt({w: password, f: 'w'}),
+                password: encrypt(password),
                 email,
                 userType
             }).then(res =>{

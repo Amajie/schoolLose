@@ -6,8 +6,12 @@ html{
         height: 100%;
         #app{
             height: 100%;
-            //导航栏的颜色
 
+            //搜索框两边的padding值
+            .van-search{
+                padding: 10px 7px;
+            }
+            //导航栏的颜色
             //登陆 和注册专用
             .lr{//绿色
                 .van-nav-bar{
@@ -23,7 +27,6 @@ html{
                     }
                 }
             }
-
             .b{//蓝色
                 .van-nav-bar{
                     background-color: #008fff;
@@ -51,6 +54,17 @@ html{
                     }
                     .van-nav-bar__title{
                         color: #fff;
+                    }
+                }
+            }
+            #home{
+                .header{
+                    > div{
+                        width: 100%;
+                        .van-sticky{
+                            display: flex;
+                            background-color: #008fff;
+                        }
                     }
                 }
             }

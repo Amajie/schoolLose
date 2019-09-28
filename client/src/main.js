@@ -21,7 +21,7 @@ Vue.prototype.tText = tText// 轻提示
 
 //请求函数的封装
 import {register, sendEmailCode, checkEmailCode, login,
-  cName, cPaw, cEmail, text} from './axios/api.js'
+  cName, cPaw, cEmail, cInfo, fInfo, text} from './axios/api.js'
 Vue.prototype.register = register//发送注册请求
 Vue.prototype.sendEmailCode = sendEmailCode//发送邮箱验证码
 Vue.prototype.checkEmailCode = checkEmailCode//发送 输入的 验证码
@@ -29,6 +29,9 @@ Vue.prototype.login = login//发送 登陆请求
 Vue.prototype.cName = cName//发送 用户名修改请求
 Vue.prototype.cPaw = cPaw//发送 密码修改请求
 Vue.prototype.cEmail = cEmail//发送 密码修改请求
+Vue.prototype.cEmail = cEmail//发送 密码修改请求
+Vue.prototype.cInfo = cInfo//发送 个人信息的修改
+Vue.prototype.fInfo = fInfo//发送 个人信息的获取
 
 
 Vue.prototype.text = text//发送 密码修改请求
@@ -48,10 +51,11 @@ import './assets/iconfont/iconfont.css'
 // ui view组件库
 import {Button, Icon, NavBar,
 Field, CellGroup, Cell,
-RadioGroup, Radio,
+RadioGroup, Radio, Picker, Popup,
 Checkbox, CheckboxGroup,
 Tabbar, TabbarItem, Row, Col,
-Search, Grid, GridItem} from 'vant'
+Search, Grid, GridItem, Tab, Tabs,
+Sticky} from 'vant'
 Vue.use(Button)
   .use(Icon)
   .use(NavBar)
@@ -60,6 +64,8 @@ Vue.use(Button)
   .use(Cell)
   .use(RadioGroup)
   .use(Radio)
+  .use(Picker)
+  .use(Popup)
   .use(CheckboxGroup)
   .use(Checkbox)
   .use(TabbarItem)
@@ -69,6 +75,9 @@ Vue.use(Button)
   .use(Search)
   .use(GridItem)
   .use(Grid)
+  .use(Tab)
+  .use(Tabs)
+  .use(Sticky)
 
 Vue.config.productionTip = false
 new Vue({

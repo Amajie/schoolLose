@@ -51,7 +51,8 @@
 </template>
 
 <script>
-import {register} from '../../axios/api.js' 
+import {register} from '../../axios/api.js'
+import {mapMutations} from 'vuex'
 export default {
     name: 'Login',
     data(){
@@ -68,9 +69,14 @@ export default {
         this.handleAuto()
     },
     methods:{
+        ...mapMutations([
+            'setState'
+        ]),
         //返回首页按钮
         backToHome(){
-            this.$router.replace('/')
+            this.$router.replace('/').catch(error =>{
+                console.log(error)
+            })
         },
         //前往登陆
         backToRegister(){
@@ -82,44 +88,60 @@ export default {
          * 
          */
         handleLogin(){
-            
+
             //获取数据
-            const {userName, password, remember, $router, dAlert, dConfirm,
+            const {userName, remember, $router, $route, dAlert, dConfirm,
                 tText, login, encrypt, cookie, che_in, che_id} = this
+
+            let password = this.password
 
             if(!userName){
                 return tText('用户名不能为空')
             }else if(!password){
                 return tText('密码不能为空')
+            }else if(che_in && che_id){
+                password = che_id
+            }else{
+                password = encrypt(password)
             }
-
-            //加密密码
-            const enPaw = encrypt({w: password, f: 'w'})
 
             login({
                 userName,
-                password: enPaw,
+                password,
                 remember
             }).then(res =>{
-                const {code} = res.data
-                console.log(res)
+                const {code, token} = res.data
+                
                 if(code === -1) return dAlert('该用户不存在')
                 if(code === 1) return dConfirm('提示', '该用户还没有激活').then(() =>{
                     $router.replace({name: 'CheckEmail'})
                 }).catch(() =>{
-                    console.log('清空文本框')
+
+                    //清空输入内容
+                    this.userName = ''
+                    this.password = ''
                 })
+
                 if(code === 0) return dAlert('密码错误')
                 
                 // 设置token
+                localStorage.setItem('token', token)
+
+                // 此时跳转指定路由
+                if($route.query.redirect){
+                    $router.replace($route.query.redirect)
+                }else{
+                //否则跳转到首页
+                    $router.replace('/home')
+                }
 
                 //没有记住密码 或者 cookie存在 无需设置 cookie 之后在跳转到首页
                 if(!remember || (che_in && che_id)) return console.log('欢迎再次登陆')
 
                 console.log('首次登陆')   
                 // 设置 cookie
-                cookie.set('che_in', encrypt({w: userName, f: 'w'}), 20)
-                cookie.set('che_id', enPaw, 20)
+                cookie.set('che_in', encrypt(userName), 1200)
+                cookie.set('che_id', password, 1200)
             })
         },
 
@@ -136,12 +158,10 @@ export default {
             if(!(this.che_in && this.che_id)) return
 
             //解密 自动 同步到文本框
-            this.userName = this.decrypt({w: this.che_in, f: 'w'})
-            this.password = this.decrypt({w: this.che_id, f: 'w'})
-            this.remember = true
+            this.userName = this.decrypt(this.che_in)
+            this.password = this.encrypt(this.che_id).slice(0, 13)//截取12显示即可
 
-            //调用登陆函数
-            this.handleLogin()
+            this.remember = true//这里可以不设置
         }
     }
 }

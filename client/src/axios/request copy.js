@@ -13,7 +13,7 @@ service.interceptors.request.use(config =>{
 
     // config.headers.token = 'id序列'   不能直接设置 token取名字 因为请求头已经规定了什么变量
     // 后台也已经允许什么请求头可以传到后台
-    config.headers['Authorization'] = 'che-hj'//注意请求头不能出现中文 不然会报错
+    config.headers['Authorization'] = localStorage.getItem('token')//注意请求头不能出现中文 不然会报错
     // console.log(config.headers.common)
     return config
 }, error =>{

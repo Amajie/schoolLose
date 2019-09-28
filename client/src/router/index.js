@@ -17,25 +17,41 @@ import CName from '../components/wrap/person/set/c_name.vue'
 import CPassword from '../components/wrap/person/set/c_password.vue'
 import CEmail from '../components/wrap/person/set/c_email.vue'
 import CInfo from '../components/wrap/person/set/c_info.vue'
+
+//个人中心
+import Center from '../components/wrap/person/page/center.vue'
+
+import store from '../store.js'
+
+
 Vue.use(Router)
 
-export default new Router({
+const router =  new Router({
   mode: 'history',
   routes: [
     // 登陆注册
     {
       path: '/login',
       name: 'Login',
+      meta: {
+        noRequireToken: true,
+      },
       component: Login
     },
     {
       path: '/register',
       name: 'Register',
+      meta: {
+        noRequireToken: true,
+      },
       component: Register
     },
     {
       path: '/cemail',
       name: 'CheckEmail',
+      meta: {
+        noRequireToken: true,
+      },
       component: CheckEmail
     },
     //内容
@@ -48,6 +64,9 @@ export default new Router({
         {
           path: 'home',
           name: 'Home',
+          meta: {
+            noRequireToken: true,
+          },
           component: Home
         },
         {
@@ -92,6 +111,30 @@ export default new Router({
       name: 'CInfo',
       component: CInfo
     },
-
+    //个人中心
+    {
+      path: '/center',
+      name: 'Center',
+      meta: {
+        noRequireToken: true,
+      },
+      component: Center
+    }
   ]
 })
+
+
+router.beforeEach((to, from, next) => {
+  
+  // 不需要权限 或者权限存在 不需要重新登陆 后面在有逻辑 在使用 if...else
+  if (to.meta.noRequireToken || localStorage.getItem('token')) return next()
+
+  // 否则 跳转到登陆页面 并保存当前路由信息
+  next({
+    path: '/login',
+    query: {redirect: to.fullPath}
+  })
+}) 
+
+
+export default router

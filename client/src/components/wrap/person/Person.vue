@@ -14,7 +14,7 @@
         <div class="p-wrap">
             <!-- 登陆注册头像 -->
             <div class="p-person">
-                <router-link to="/login" class="p-person-opa">
+                <router-link to="/center" class="p-person-opa">
                     <van-row type="flex" justify="center">
                         <van-col span="8">
                             <!-- 头像 -->
@@ -88,7 +88,7 @@
                     </div>
                 </div>
                 <div class="logout-wrap" @click="logoutCount">   
-                    <van-button type="danger" size="large">退出当前帐号</van-button>
+                    <van-button type="danger" block>退出当前帐号</van-button>
                 </div>
             </div>
         </div>
@@ -131,11 +131,10 @@ export default {
     overflow: auto;
     .p-wrap{
         padding-bottom: 88px;
-         .p-person{
+        .p-person{
             background: #008fff;
             padding: 15px;
             .p-person-opa{
-
                 .peoson_img{
                     > img{
                         width: 100%;

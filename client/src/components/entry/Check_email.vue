@@ -105,6 +105,7 @@ export default {
             //发送请求
             sendEmailCode({email}).then(res =>{
                 const {code, checkId} = res.data
+                
                 if(code === 0) return dAlert('该邮箱没有绑定用户，请确认后再试!')
 
                 if(code === 1) return dAlert('该用户已经激活，无需重复激活!')

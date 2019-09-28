@@ -1,6 +1,8 @@
 import axios from 'axios'
 
 import qs from 'qs'
+import router from '../router/index.js'
+import store from '../store.js'
 
 // axios.defaults.withCredentials = true
 
@@ -20,13 +22,13 @@ service.interceptors.request.use(config =>{
 
     // 后台也已经允许什么请求头可以传到后台
     //注意请求头不能出现中文
-    //此时发送到后台的 都是文本 boolean数据发送不了 只能约定了
+
     config.method.toLowerCase() === 'post' ?
         config.data = qs.stringify({...config.data}): config.params = {...config.params}
 
     //此时需要token 后台判断是否需要 token 
-    // config.headers['Authorization'] = localStorage.token
-    config.headers['jie412.com-token'] = 'che-hj'
+    config.headers['jie412.com-token'] = localStorage.getItem('token')
+
     return config
 }, error =>{
     console.log('超时')
@@ -34,10 +36,30 @@ service.interceptors.request.use(config =>{
 
 //响应处理
 service.interceptors.response.use(response =>{
-    // 这里限制 某些url 不需要 token 根据数据返回是 code 是否为 55555
+    
     return response
 }, error =>{
-    console.log(111+error)
+    const {status} = error.response
+
+    switch(status){
+        /**
+         * 1 此时表示 token存在 但是已经过期
+         * 2 删除 token 跳转到登陆页面上
+         * 3 跳转到登陆页面 并获取当前的路由信息(router.currentRoute.fullPath) 
+         *      当登陆成功后跳转到该路由下
+         */
+        case 401:  
+            //删除token
+            store.commit('removeToken')
+            // 前往登陆 获取路由信息 登陆成功自动跳转
+            router.replace({
+                path:'login',
+                query: {redirect: router.currentRoute.fullPath}
+            })
+        break
+    }
+
+    return Promise.reject(error.response.data)
 })
 
 

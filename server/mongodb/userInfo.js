@@ -22,29 +22,43 @@ var userSchema = new Schema({
         type: String,
         required: true// 0 表示 学生 1 表示 老师
     },
-    gender:{ //性别
-        type: String,
-        default: ''
-    },
     headerImg:{
         type: String,
         default: ''
     }, //给他一张默认的图片
-    userId:{ //学号 
+    userActive:{
+        type: Boolean,
+        default: false//false 未激活 true 已经激活
+    },
+
+// 一下信息统一修改
+    name:{
         type: String,
         default: ''
     },
-    college:{ //学院
+    stId:{ //学号 或者教工号
+        type: String,
+        default: ''
+    },
+    gender:{ //性别
+        type: String,
+        default: ''
+    },
+    courtyard:{ //学院
+        type: String,
+        default: ''
+    },
+    major:{ //专业
+        type: String,
+        default: ''
+    },
+    classes:{// 班级
         type: String,
         default: ''
     },
     address:{ //宿舍地址 类型为老师 直接设置 闽师大 即可
         type: String,
         default: ''
-    },
-    userActive:{
-        type: Boolean,
-        default: false//false 未激活 true 已经激活
     }
 })
 

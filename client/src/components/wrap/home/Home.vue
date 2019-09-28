@@ -1,21 +1,23 @@
 <template>
     <div id="home">
         <div class="header">
-            <div class="seach">
-                <van-search
-                    placeholder="请输入搜索关键词"
-                    shape="round"
-                    background="#008fff"
-                />
-            </div>
-            <div class="left">
-                <div v-if="isLogin" class="active-no">
-                    <span>登陆</span>
+            <van-sticky>
+                <div class="seach">
+                    <van-search
+                        placeholder="请输入搜索关键词"
+                        shape="round"
+                        background="#008fff"
+                    />
                 </div>
-                <div v-if="!isLogin" class="active">
-                    <icon name="user_active" :w="svg" :h="svg"></icon>
+                <div class="left">
+                    <div v-if="isLogin" class="active-no">
+                        <span>登陆</span>
+                    </div>
+                    <div v-if="!isLogin" class="active">
+                        <icon name="user_active" :w="svg" :h="svg"></icon>
+                    </div>
                 </div>
-            </div>
+            </van-sticky>
         </div>
         <div class="nav-wrap">
             <div class="nav-list">
@@ -58,8 +60,7 @@ export default {
 <style lang="less" scoped>
 #home{
     .header{
-        display: flex;
-        background-color: #008fff;
+        
         .seach{
             flex: 1;
         }
@@ -67,7 +68,7 @@ export default {
             display: flex;
             flex-direction: column;
             justify-content: center;
-            margin-right: 10px;
+            margin-right: 7px;
             .active-no{
                 color: #fff;
             }

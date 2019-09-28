@@ -26,21 +26,14 @@ exports.checkToken = (req, res, next) =>{
      *      2 存在 解析token 获取相应的信息
      */
 
-     // 拿取token
-     const token = req.headers['jie412.com-token']
-
-
-     // 无效token 同意返回一个标识 表示无效token
-     if(!token) return res.status(200).json({
-        success: false,
-        message: '服务器拒绝访问'
-    })
+     // 拿取token 此时不需要判断token是否为 null或者undefined 前端判断即可
+    const token = req.headers['jie412.com-token']
 
     // 否则解析token
     jwt.verify(token, secretKey, (err, decoded) =>{
-
-        //说明token的信息有误
-        if(err) return res.json({ success: false, message: 'token信息错误.'})
+        //解析错误 说明为无效token 此时应该要去登陆页面
+        if(err) return res.status(401).json({success: false, msg: 'token信息错误.'})
+        // if(err) return res.json({success: false, msg: 'token信息错误.'})
 
         //否则 decoded即为解析完毕的token 可以把数据保存在 req中
         req.userName = decoded.userName

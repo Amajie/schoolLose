@@ -16,8 +16,8 @@ const CryptoJS = require('crypto-js')
  */
 
 
-let key = ''
-let iv = ''
+const key = CryptoJS.enc.Utf8.parse("nihju34hhasdfk12")
+const iv =  CryptoJS.enc.Utf8.parse("jasdfk99omaskd1m")
 
 /**
  * @function 解密
@@ -25,16 +25,13 @@ let iv = ''
  * @param {*} key  密钥 与加密密钥一样
  * @param {*} iv   密钥偏移量 与加密密钥偏移量一样
  */
-export const decrypt = ({w, f}) =>{
-
-
-    getTag(f)
+export const decrypt = (w) =>{
 
     const encryptedHexStr = CryptoJS.enc.Hex.parse(w)
     const hex = CryptoJS.enc.Base64.stringify(encryptedHexStr)
     const decrypt = CryptoJS.AES.decrypt(hex, key,{ iv,
         mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7})
-
+        
     // 密码
     return decrypt.toString(CryptoJS.enc.Utf8).toString()
 }
@@ -45,30 +42,13 @@ export const decrypt = ({w, f}) =>{
  * @param {*} key 密钥 与解密密钥一样
  * @param {*} iv  密钥偏移量 与解密密钥偏移量一样
  */
-export const encrypt = ({w, f}) =>{
-
-
-    getTag(f)
+export const encrypt = (w) =>{
 
     let srcs = CryptoJS.enc.Utf8.parse(w)
     let encrypted = CryptoJS.AES.encrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 })
 
     //返回密文
     return encrypted.ciphertext.toString().toUpperCase()
-}
-
-
-function getTag(f){
-    //写
-    if(f === 'w'){
-        key = CryptoJS.enc.Utf8.parse("huangjie412comhj")
-        iv =  CryptoJS.enc.Utf8.parse("jiehttpwww412com")
-        return
-    }
-
-    //读
-    key = CryptoJS.enc.Utf8.parse("nihju34hhasdfk12")
-    iv =  CryptoJS.enc.Utf8.parse("jasdfk99omaskd1m")
 }
 
 
