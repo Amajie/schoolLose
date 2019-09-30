@@ -42,7 +42,7 @@
     </div>
 </template>
 <script>
-import {mapState} from 'vuex'
+import {mapState, mapMutations} from 'vuex'
 export default {
     data(){
         return{
@@ -52,14 +52,16 @@ export default {
     },
     computed:{
         ...mapState([
-            'regEmail'
+            'regEmail',
         ])
     },
     methods:{
+        ...mapMutations([
+            'setUserData'
+        ]),
         changeEmail(){
-            
             const {email, password, cEmail, tText,
-             regEmail, encrypt} = this
+             regEmail, encrypt, setUserData} = this
             //验证 用户填写的信息是否正确
             if(!password){
                 return tText('密码不能为空')
@@ -72,7 +74,7 @@ export default {
             //发送请求
             cEmail({
                 email, 
-                password: encrypt({w: password, f: 'w'})
+                password: encrypt(password)
             }).then(res =>{
 
                 const {code} = res.data
@@ -80,9 +82,10 @@ export default {
                 if(code === 1) return tText('该用户不存在')
                 if(code === 0) return tText('密码输入错误')
                 if(code === -1) return tText('修改失败，请稍后再试')
-                tText('修改密码成功，要跳转登陆页面')
+                tText('修改邮箱成功，要跳转登陆页面')
                 this.password = ''
                 this.email = ''
+                setUserData({...this.$store.state.userData, email})
             })
             
 

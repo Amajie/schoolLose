@@ -28,6 +28,9 @@ const re_lo = require('./router/login_register.js')
 app.use(bodyParser.urlencoded({ extended: false, limit: '20000kb'}))
 app.use(bodyParser.json({"limit": "20000kb"}))
 
+ //暴漏静态资源文件 暴漏之后我们可以通过域名访问该文件下的资源
+ app.use(express.static('p'))
+
 app.use(cookieParser())
 
 //session 向浏览器返回数据才能 获取得到

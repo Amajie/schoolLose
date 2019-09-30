@@ -5,6 +5,7 @@
                 title="设置"
                 @click-left="() => $router.replace('/person')"
                 left-arrow
+                :border="false"
             >
                 <van-icon name="arrow-left" slot="left" size="2em" color="#fff" />
             </van-nav-bar>
@@ -70,12 +71,9 @@ export default {
     },
     methods:{
         logoutCount(){
-            const {text} = this
-
-            text({name: '车神-黄杰'}).then(res =>{
-                console.log(res)
-            })
+            alert('账号退出')
         }
+      
     }
 }
 </script>
@@ -84,7 +82,7 @@ export default {
 #setting{
     height: 100%;
     background-color: #f5f5f5;
-     .cell-nav{
+    .cell-nav{
          height: 100%;
         padding: 0 2%;
         margin-top: 10px;
@@ -108,7 +106,7 @@ export default {
                     margin-top: -15px;
                     width: 30px;
                     height: 30px;
-                    z-index: 100000;
+                    z-index: 10;
                 }
             }
         }

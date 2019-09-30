@@ -28,6 +28,7 @@
 </template>
 
 <script>
+import {mapMutations} from 'vuex'
 export default {
     data(){
         return{
@@ -35,8 +36,12 @@ export default {
         }
     },
     methods:{
+        
+        ...mapMutations([
+            'setUserData'
+        ]),
         changeName(){
-            const {userName, cName, tText} = this
+            const {userName, cName, tText, setUserData} = this
 
             //验证 用户名是否输入正确
             if(!userName){
@@ -56,7 +61,7 @@ export default {
                 if(code === -1) return tText('修改失败，请稍后再试')
                 
                 tText('修改用户名成功')
-                this.userName = ''
+                setUserData({...this.$store.state.userData, userName})
             })
         }
     }

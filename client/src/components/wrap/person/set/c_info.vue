@@ -86,7 +86,7 @@
     </div>
 </template>
 <script>
-import {mapState} from 'vuex'
+import {mapState, mapMutations} from 'vuex'
 export default {
     data(){
         return{
@@ -112,25 +112,23 @@ export default {
     },
     created(){
 
-        /**
-         * @function 获取个人信息的内容 并设置为 this相应的值
-         */
-        this.fInfo().then(res =>{
-            const {code, userData} = res.data
-            if(code === 200){
-                for(let key in userData){
-                    this[key] = userData[key]
-                }
-            }
-        })
+        //设置个人信息 在表中
+        const {userData} = this
+        for(let key in userData){
+            this[key] = userData[key]
+        }
     },
     computed:{
         ...mapState([
             'courtyardData',
-            'majorData'
+            'majorData',
+            'userData'
         ])
     },
     methods:{
+        ...mapMutations([
+            'setUserData'
+        ]),
         /**
          * @function 处理专业选项
          *  1 应该只有学院选择了 才能选择专业
@@ -168,7 +166,7 @@ export default {
          */
         handleInfo(){
             //获取相应的数据
-            const {name, stId, gender, courtyard, $router,
+            const {name, stId, gender, courtyard, $router, setUserData,
                 major, classes, address, cInfo, tText, dAlert} = this
 
             //发送请求
@@ -179,7 +177,11 @@ export default {
                 const {code} = res.data
                 if(code === 0) return tText('修改失败，请稍后再试')
                 if(code === 200) return dAlert('操作成功').then(() =>{
-                    $router.replace('/set')
+                    
+                    setUserData({...this.$store.state.userData,
+                        name, stId, gender, courtyard,
+                        major, classes, address
+                    })
                 })
             })
             

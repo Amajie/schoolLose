@@ -22,7 +22,7 @@ var userSchema = new Schema({
         type: String,
         required: true// 0 表示 学生 1 表示 老师
     },
-    headerImg:{
+    avater:{
         type: String,
         default: ''
     }, //给他一张默认的图片

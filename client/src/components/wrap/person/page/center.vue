@@ -27,7 +27,7 @@
                             <van-col span="6">
                                 <!-- 头像 -->
                                 <div class="item">
-                                    <img src="../../../../assets/init.png" alt="">
+                                    <img class="hi" :src="userData.avater" />
                                 </div>
                             </van-col>
                             <van-col span="12">
@@ -98,19 +98,77 @@
                     <p>werew</p>
                 </van-tab>
                 <van-tab title="拾获发布">内容 2</van-tab>
-                <van-tab title="个人信息">内容 3</van-tab>
+                <van-tab title="个人信息">
+                    <div class="info-wrap">
+                        <div class="info-list">
+                            <!-- 信息填写 -->
+                            <van-cell-group>
+                                <van-field
+                                    readonly
+                                    label="姓名"
+                                    v-model="userData.name"
+                                />
+                                <van-field
+                                    readonly
+                                    label="学号"
+                                    v-model="userData.stId"
+                                />
+                                <van-field
+                                    readonly
+                                    label="性别"
+                                    v-model="userData.gender"
+                                />
+                                <van-field
+                                    readonly
+                                    label="学院"
+                                    v-model="userData.courtyard"
+                                />
+                                <van-field
+                                    readonly
+                                    label="专业"
+                                    v-model="userData.major"
+                                />
+                                <van-field
+                                    readonly
+                                    label="班级"
+                                    v-model="userData.classes"
+                                />
+
+                                <van-field
+                                    readonly
+                                    label="宿舍地址"
+                                    v-model="userData.address"
+                                />
+                                <van-field
+                                    readonly
+                                    label="邮箱"
+                                    v-model="userData.email"
+                                />
+                            </van-cell-group>
+                        </div>
+                    </div>
+                </van-tab>
             </van-tabs>
         </div>
     </div>
 </template>
 
 <script>
+import {mapState} from 'vuex'
 export default {
     data(){
         return{
             svg: 30,
             active: 0
         }
+    },
+    computed:{
+        ...mapState([
+            'userData'
+        ])
+    },
+    created(){
+        console.log(this.userData)
     },
     methods:{
         add_info(){
@@ -122,6 +180,7 @@ export default {
 
 <style lang="less" scoped>
 #center{
+    height: 100%;
     .t{
         background-color: #ff0000;
         .header{
@@ -150,9 +209,10 @@ export default {
                         height: 100%;
                         flex-direction: column;
                         justify-content: center;
-                         > img{
-                            width: 100%;
-                            max-width: 60px;
+                        .hi{
+                            width: 60px;
+                            height: 60px;
+                            border-radius: 50%;
                         }
                         .un{
                             color: #ebedf0;
@@ -164,7 +224,10 @@ export default {
         }
     }
     .b{
-        
+      .info-wrap{
+          padding: 0 1%;
+          padding-bottom: 10px;
+      }
     }
 }
 </style>

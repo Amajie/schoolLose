@@ -1,7 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import axios from 'axios'
-
 
 Vue.use(Vuex)
 import { Toast, Dialog} from 'vant'
@@ -62,15 +60,25 @@ const store = new Vuex.Store({
             '新闻传播学院':['广播电视学', '广告学', '编辑出版学', '广播电视编导'],
             '马克思主义学院':['思想政治教育'],
         },
-        regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$")
+        regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"),
+        userData: {}
+
     },
     mutations: {
         //删除token
         removeToken(state){
             localStorage.removeItem('token')
         },
-        setState(state, token){
-            state.token = token
+        //设置 state属性
+        setState(state, setState){
+            for(let item in setState){
+                state[item] = setState[item]
+            }
+        },
+
+        // 设置某个 用户的个人信息
+        setUserData(state, userData){
+            state.userData = userData
         }
     },
     actions:{

@@ -21,7 +21,7 @@ Vue.prototype.tText = tText// 轻提示
 
 //请求函数的封装
 import {register, sendEmailCode, checkEmailCode, login,
-  cName, cPaw, cEmail, cInfo, fInfo, text} from './axios/api.js'
+  cName, cPaw, cEmail, cInfo, fInfo, upAvater, text} from './axios/api.js'
 Vue.prototype.register = register//发送注册请求
 Vue.prototype.sendEmailCode = sendEmailCode//发送邮箱验证码
 Vue.prototype.checkEmailCode = checkEmailCode//发送 输入的 验证码
@@ -32,7 +32,7 @@ Vue.prototype.cEmail = cEmail//发送 密码修改请求
 Vue.prototype.cEmail = cEmail//发送 密码修改请求
 Vue.prototype.cInfo = cInfo//发送 个人信息的修改
 Vue.prototype.fInfo = fInfo//发送 个人信息的获取
-
+Vue.prototype.upAvater = upAvater//发送 头像的修改
 
 Vue.prototype.text = text//发送 密码修改请求
 
@@ -40,6 +40,7 @@ Vue.prototype.text = text//发送 密码修改请求
 import {decrypt, encrypt} from './assets/crypto/encrypt.js'
 Vue.prototype.decrypt = decrypt// 解密
 Vue.prototype.encrypt = encrypt// 加密
+
 
 //svg 图片的使用
 import IconSvg from 'vue2-svg-icon/Icon.vue'
@@ -55,7 +56,8 @@ RadioGroup, Radio, Picker, Popup,
 Checkbox, CheckboxGroup,
 Tabbar, TabbarItem, Row, Col,
 Search, Grid, GridItem, Tab, Tabs,
-Sticky} from 'vant'
+Sticky, ImagePreview, ActionSheet, 
+Uploader, Loading, Notify} from 'vant'
 Vue.use(Button)
   .use(Icon)
   .use(NavBar)
@@ -78,6 +80,11 @@ Vue.use(Button)
   .use(Tab)
   .use(Tabs)
   .use(Sticky)
+  .use(ImagePreview)
+  .use(ActionSheet)
+  .use(Uploader)
+  .use(Loading)
+  .use(Notify)
 
 Vue.config.productionTip = false
 new Vue({

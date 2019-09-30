@@ -120,6 +120,20 @@ export const fInfo = params =>{
 
 
 /**
+ * @function 头像的上传
+ * @param {*} data 发送的数据
+ */
+export const upAvater = data =>{
+    
+    return service({
+        url: '/upAvatar',
+        method: 'post',
+        data
+    })
+}
+
+
+/**
  * @function 测试
  * @param {*} data 发送的数据
  */

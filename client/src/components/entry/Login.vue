@@ -70,7 +70,7 @@ export default {
     },
     methods:{
         ...mapMutations([
-            'setState'
+            'setUserData'
         ]),
         //返回首页按钮
         backToHome(){
@@ -78,7 +78,7 @@ export default {
                 console.log(error)
             })
         },
-        //前往登陆
+        //前往注册
         backToRegister(){
             this.$router.push('/register')
         },
@@ -91,7 +91,7 @@ export default {
 
             //获取数据
             const {userName, remember, $router, $route, dAlert, dConfirm,
-                tText, login, encrypt, cookie, che_in, che_id} = this
+                tText, login, encrypt, cookie, che_in, che_id, setUserData} = this
 
             let password = this.password
 
@@ -110,7 +110,8 @@ export default {
                 password,
                 remember
             }).then(res =>{
-                const {code, token} = res.data
+                const {code, token, userData} = res.data
+                console.log(userData)
                 
                 if(code === -1) return dAlert('该用户不存在')
                 if(code === 1) return dConfirm('提示', '该用户还没有激活').then(() =>{
@@ -134,6 +135,9 @@ export default {
                 //否则跳转到首页
                     $router.replace('/home')
                 }
+
+                //设置保存在 store 的个人信息 userInfo
+                setUserData(userData)
 
                 //没有记住密码 或者 cookie存在 无需设置 cookie 之后在跳转到首页
                 if(!remember || (che_in && che_id)) return console.log('欢迎再次登陆')

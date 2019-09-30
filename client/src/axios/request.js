@@ -23,8 +23,8 @@ service.interceptors.request.use(config =>{
     // 后台也已经允许什么请求头可以传到后台
     //注意请求头不能出现中文
 
-    config.method.toLowerCase() === 'post' ?
-        config.data = qs.stringify({...config.data}): config.params = {...config.params}
+    // config.method.toLowerCase() === 'post' ?
+    //     config.data = qs.stringify({...config.data}): config.params = {...config.params}
 
     //此时需要token 后台判断是否需要 token 
     config.headers['jie412.com-token'] = localStorage.getItem('token')

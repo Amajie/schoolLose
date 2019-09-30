@@ -76,20 +76,34 @@ exports.enter = {
             {userName},
             {email:userName}
         ]}, (err, data) =>{
-    
+            
             // 用户名 或者 电子邮箱错误错误
             if(!data) return res.json({"msg": "该用户不存在", "code": -1})
+
+            const {
+                userName, email, _id, userType, 
+                avater, name, stId, gender, userActive, 
+                courtyard, major, classes, address   
+            } = data
     
-            if(!data.userActive) return res.json({"msg": "该用户还没有激活", "code": 1})
+            if(!userActive) return res.json({"msg": "该用户还没有激活", "code": 1})
     
     
             //验证密码是否正确
             if(data.password != md5(password)) return res.json({"msg": "密码错误", "code": 0})
     
             // 密码正确 获取token
-            const {userName, email, _id} = data
             const token = createToken({userName, email, userId: _id})
-            res.json({"msg": "密码正确，登陆成功", "code": 200, token})
+
+            res.json({
+                "msg": "密码正确，登陆成功", "code": 200, 
+                token, 
+                userData: {
+                    userName, email, userType, 
+                    avater, name, stId, gender, 
+                    courtyard, major, classes, address   
+                }
+            })
         })
     },
 
@@ -321,7 +335,6 @@ exports.cUserInfo = {
         })
     
     },
-
 
     /**
      * @function 个人信息的获取

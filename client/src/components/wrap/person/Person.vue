@@ -14,22 +14,22 @@
         <div class="p-wrap">
             <!-- 登陆注册头像 -->
             <div class="p-person">
-                <router-link to="/center" class="p-person-opa">
+                <div @click="$router.replace('/center')" class="p-person-opa">
                     <van-row type="flex" justify="center">
                         <van-col span="8">
                             <!-- 头像 -->
-                            <div class="peoson_img">
-                                <img src="../../../assets/init.png" alt="">
+                            <div class="peoson_img" @click.stop="show_img_action = true">
+                                <img  :key="avater" :src="avater">
                             </div>
                         </van-col>
                         <van-col span="16">
                               <!--未登陆显示信息 -->
                               <div class="person_info">
-                                  <h2 class="t">车神-黄杰</h2>
+                                  <h2 class="t">{{userData.userName}}</h2>
                               </div>
                         </van-col>
                     </van-row>
-                </router-link>
+                </div>
             </div>
             <div class="cell-nav">
                 <div class="nav-wrap">
@@ -92,26 +92,64 @@
                 </div>
             </div>
         </div>
+        <div class="action-opa">
+            <van-action-sheet
+                v-model="show_img_action"
+                :actions="actions"
+                :round="true"
+                :close-on-click-action="true"
+                @select="onSelect"
+            />
+        </div>
+        <div class="show_himg" @click="add">
+            <van-image-preview
+                v-model="show_img"
+                :images="bigAvater"
+                :showIndex="false"
+                >
+            </van-image-preview>
+       </div>
     </div>
 </template>
 
 <script>
+import {mapMutations, mapState} from 'vuex'
 export default {
     data(){
         return{
             svgWH: 25,
+            show_img_action: false,
+            actions: [
+                {name:'查看大头像', id: 1},
+                {name:'更换头像', id: 2}
+            ],
+            show_img: false,
+            bigAvater: [
+                'http://192.168.43.124:7070/av/init.png'
+            ],
+            avater: require('../../../assets/init.png')
         }
     },
+    computed:{
+        ...mapState([
+            'userData'
+        ])
+    },
+    created(){
+        
+        if(this.userData.avater){
+            this.avater = this.userData.avater
+            this.bigAvater[0] = this.avater
+        }
+
+    },
     methods:{
+        ...mapMutations([
+            'setUserData'
+        ]),
         add(event){
             alert('车神')
         },
-
-        remove(event){
-             const {target} = event
-            target.parentNode.style.backgroundColor="#fff"
-        },
-
         /**
          * @function 退出当前登陆
          *  1 退出当前账号 不只是路由的跳转
@@ -120,7 +158,14 @@ export default {
          */
         logoutCount(){
             this.$router.replace('/login')
-        }
+        },
+                //这个是 上拉菜单选项框
+        onSelect(item){
+            console.log(this.userData)
+            const {id, show_img} = item
+            if(id === 1) return this.show_img = !show_img
+            if(id === 2) return this.$router.replace('/cimg')
+        },
     }
 }
 </script>
@@ -137,7 +182,9 @@ export default {
             .p-person-opa{
                 .peoson_img{
                     > img{
-                        width: 100%;
+                        width: 85px;
+                        height: 85px;
+                        border-radius: 50%;
                         max-width: 85px;
                     }
                 }
@@ -201,7 +248,7 @@ export default {
                             margin-top: -15px;
                             width: 30px;
                             height: 30px;
-                            z-index: 100000;
+                            z-index: 10;
                         }
                     }
                 }
