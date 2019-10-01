@@ -20,7 +20,7 @@ var userSchema = new Schema({
     },
     userType: {
         type: String,
-        required: true// 0 表示 学生 1 表示 老师
+        required: true// 学生 老师
     },
     avater:{
         type: String,

@@ -57,7 +57,7 @@ Checkbox, CheckboxGroup,
 Tabbar, TabbarItem, Row, Col,
 Search, Grid, GridItem, Tab, Tabs,
 Sticky, ImagePreview, ActionSheet, 
-Uploader, Loading, Notify} from 'vant'
+Uploader, Loading, Notify, Switch} from 'vant'
 Vue.use(Button)
   .use(Icon)
   .use(NavBar)
@@ -85,6 +85,7 @@ Vue.use(Button)
   .use(Uploader)
   .use(Loading)
   .use(Notify)
+  .use(Switch)
 
 Vue.config.productionTip = false
 new Vue({

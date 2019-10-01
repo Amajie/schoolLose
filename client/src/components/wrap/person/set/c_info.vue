@@ -28,7 +28,7 @@
                     />
                     <van-field
                         readonly
-                        clearable
+                        clickable
                         label="性别"
                         :value="gender"
                         placeholder="选择性别"

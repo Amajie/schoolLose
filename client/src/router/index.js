@@ -21,6 +21,7 @@ import CInfo from '../components/wrap/person/set/c_info.vue'
 //个人中心
 import Center from '../components/wrap/person/page/center.vue'
 import Cimg from '../components/wrap/person/page/change_himg.vue'
+import Releasedata from '../components/wrap/person/releaseData/release.vue'
 
 import store from '../store.js'
 
@@ -126,6 +127,15 @@ const router =  new Router({
       path: '/cimg',
       name: 'Cimg',
       component: Cimg
+    },
+    //消息的发布
+    {
+      path: '/redata',
+      name: 'Releasedata',
+      meta: {
+        noRequireToken: true,
+      },
+      component: Releasedata
     },
     
   ]

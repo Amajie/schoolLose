@@ -148,7 +148,7 @@ export default {
             'setUserData'
         ]),
         add(event){
-            alert('车神')
+            this.$router.replace('/redata')
         },
         /**
          * @function 退出当前登陆

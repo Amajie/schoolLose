@@ -120,6 +120,11 @@
                                 />
                                 <van-field
                                     readonly
+                                    label="身份"
+                                    v-model="userData.userType"
+                                />
+                                <van-field
+                                    readonly
                                     label="学院"
                                     v-model="userData.courtyard"
                                 />
