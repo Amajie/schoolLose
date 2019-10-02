@@ -156,6 +156,7 @@ export default {
                 return tText('请选择物品的类型')
             }
 
+
             //发请求
             reObject({
                 objectWay, objectAddress, objectTime: new Date(objectTime).getTime(),
