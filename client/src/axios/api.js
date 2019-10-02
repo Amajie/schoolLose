@@ -134,6 +134,19 @@ export const upAvater = data =>{
 
 
 /**
+ * @function 寻物消息的发布
+ * @param {*} data 发送的数据
+ */
+export const reObject = data =>{
+    return service({
+        url: '/reObject',
+        method: 'post',
+        data
+    })
+}
+
+
+/**
  * @function 测试
  * @param {*} data 发送的数据
  */

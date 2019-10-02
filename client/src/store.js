@@ -61,7 +61,35 @@ const store = new Vuex.Store({
             '马克思主义学院':['思想政治教育'],
         },
         regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"),
-        userData: {}
+        userData: {},
+        type_nav: {
+            ['校园卡']:{name: 'school_car', url: '/', id: 43},
+            ['借书证']:{name: 'library_card', url: '/', id: 54},
+            ['身份证']:{name: 'id_car', url: '/', id: 56},
+            ['手机']:{name: 'phone', url: '/', id: 12},
+            ['耳机']:{name: 'headset', url: '/', id: 94},
+            ['U盘']:{name: 'usb_drive', url: '/', id: 73},
+            ['首饰']:{name: 'jewelry', url: '/', id: 84},
+            ['眼镜']:{name: 'glasses', url: '/', id: 71},
+            ['手表']:{name: 'watch', url: '/', id: 99},
+            ['书籍']:{name: 'book', url: '/', id: 34},
+            ['水杯']:{name: 'water', url: '/', id: 10},
+            ['雨伞']:{name: 'umbrella', url: '/', id: 77}
+        },
+        type_list: [
+            '校园卡',
+            '借书证',
+            '身份证',
+            '手机',
+            '耳机',
+            'U盘',
+            '首饰',
+            '眼镜',
+            '手表',
+            '书籍',
+            '水杯',
+            '雨伞'
+        ]
 
     },
     mutations: {

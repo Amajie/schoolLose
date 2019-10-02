@@ -21,7 +21,8 @@ Vue.prototype.tText = tText// 轻提示
 
 //请求函数的封装
 import {register, sendEmailCode, checkEmailCode, login,
-  cName, cPaw, cEmail, cInfo, fInfo, upAvater, text} from './axios/api.js'
+  cName, cPaw, cEmail, cInfo, fInfo, upAvater, reObject,
+  text} from './axios/api.js'
 Vue.prototype.register = register//发送注册请求
 Vue.prototype.sendEmailCode = sendEmailCode//发送邮箱验证码
 Vue.prototype.checkEmailCode = checkEmailCode//发送 输入的 验证码
@@ -33,6 +34,7 @@ Vue.prototype.cEmail = cEmail//发送 密码修改请求
 Vue.prototype.cInfo = cInfo//发送 个人信息的修改
 Vue.prototype.fInfo = fInfo//发送 个人信息的获取
 Vue.prototype.upAvater = upAvater//发送 头像的修改
+Vue.prototype.reObject = reObject//发送 寻物消息
 
 Vue.prototype.text = text//发送 密码修改请求
 
@@ -57,7 +59,8 @@ Checkbox, CheckboxGroup,
 Tabbar, TabbarItem, Row, Col,
 Search, Grid, GridItem, Tab, Tabs,
 Sticky, ImagePreview, ActionSheet, 
-Uploader, Loading, Notify, Switch} from 'vant'
+Uploader, Loading, Notify, Switch,
+DatetimePicker} from 'vant'
 Vue.use(Button)
   .use(Icon)
   .use(NavBar)
@@ -86,6 +89,7 @@ Vue.use(Button)
   .use(Loading)
   .use(Notify)
   .use(Switch)
+  .use(DatetimePicker)
 
 Vue.config.productionTip = false
 new Vue({

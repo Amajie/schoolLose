@@ -22,9 +22,9 @@
         <div class="nav-wrap">
             <div class="nav-list">
                 <van-grid clickable :column-num="4">
-                    <van-grid-item :to="item.url" v-for="(item, index) in nav_list" :key="index">
+                    <van-grid-item :to="item.url" v-for="(item, key, index) in type_nav" :key="index">
                         <icon :name="item.name" :w="svg" :h="svg"></icon>
-                        <span>{{item.text}}</span>
+                        <span>{{key}}</span>
                     </van-grid-item>
                 </van-grid>
             </div>
@@ -33,26 +33,18 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
     data(){
         return{
             svg: 35,
             isLogin: false,
-            nav_list: [
-                {text: '校园卡', name: 'school_car', url: '/', id: 66},
-                {text: '借书证', name: 'library_card', url: '/', id: 66},
-                {text: '身份证', name: 'id_car', url: '/', id: 66},
-                {text: '手机', name: 'phone', url: '/', id: 66},
-                {text: '耳机', name: 'headset', url: '/', id: 66},
-                {text: 'U盘', name: 'usb_drive', url: '/', id: 66},
-                {text: '首饰', name: 'jewelry', url: '/', id: 66},
-                {text: '眼镜', name: 'glasses', url: '/', id: 66},
-                {text: '手表', name: 'watch', url: '/', id: 66},
-                {text: '书籍', name: 'book', url: '/', id: 66},
-                {text: '水杯', name: 'water', url: '/', id: 66},
-                {text: '雨伞', name: 'umbrella', url: '/', id: 66},
-            ]
         }
+    },
+    computed:{
+        ...mapState([
+            'type_nav'
+        ])
     }
 }
 </script>

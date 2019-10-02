@@ -42,6 +42,7 @@ router.post('/ce', checkToken, cUserInfo.cUserEmail)
 router.post('/ci', checkToken, cUserInfo.cUserInfo)
 router.post('/fi', checkToken, cUserInfo.fUserInfo)
 
+//头像的上传
 router.post('/upAvatar', checkToken, upload.single("avater"), (req, res) =>{
 
     if(req.file.filename) {
@@ -53,5 +54,13 @@ router.post('/upAvatar', checkToken, upload.single("avater"), (req, res) =>{
         })
     }
 })
+
+router.post('/reObject', (req, res) =>{
+    console.log(req.body)
+
+    res.json({"msg": "哈哈哈", "code": 200})
+})
+
+
 
 module.exports = router
