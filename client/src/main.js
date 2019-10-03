@@ -15,7 +15,7 @@ Vue.prototype.cookie = cookie
 
 //vant ui库的封装
 import {dConfirm, dAlert, tText} from './components/vant/vant.js'
-Vue.prototype.dConfirm = dConfirm// 确认 取消消息框
+Vue.prototype.dConfirm = dConfirm// 确认 取消 消息框
 Vue.prototype.dAlert = dAlert// 确认消息框
 Vue.prototype.tText = tText// 轻提示
 

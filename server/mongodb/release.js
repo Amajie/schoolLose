@@ -4,7 +4,7 @@ const Schema = mongoose.Schema
 
 mongoose.connect("mongodb://localhost/slose", { useNewUrlParser: true })
 
-const emailSchema = new Schema({
+const reSchema = new Schema({
     userId: {// 楼主id
         type: Object,
         required: true
@@ -13,7 +13,7 @@ const emailSchema = new Schema({
         type: String,
         required: true
     },
-    objectTime: {//时间
+    objectTime: {// 拾取 或者丢失 时间
         type: String,
         required: true
     },
@@ -21,23 +21,26 @@ const emailSchema = new Schema({
         type: String,
         required: true
     },
-    objectTag: {// 标志着是否完成
+    objectWay: {// 拾取 还是丢失
         type: String,
         required: true
     },
-    objectWay: {// 拾取 还是丢失
+    sendTime: {// 发布时间
         type: String,
         required: true
     },
     objectImg: {// 物品图片
         type: Array,
-        default: []
+        required: true
     },
     objectDesc: {// 说明
         type: String,
         default: ''
-    }
+    },
+    objectTag: {//标志着是否完成
+        type: String,
+        default: '0'// 0就是没有完成 1 完成了
+    },
 })
 
-exports.emailInfo = mongoose.model('emailCode', emailSchema)
-exports.emailSchema = emailSchema
+module.exports = mongoose.model('release', reSchema)

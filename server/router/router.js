@@ -2,6 +2,8 @@
 const express = require('express')
 const router = express.Router()
 
+const http = require('http')
+
 const multer = require('multer')
 const storage = multer.diskStorage({
      //存储的位置
@@ -27,6 +29,7 @@ const {enter, cUserInfo} = require('../api/api.js')
 const {checkToken} = require('../checkToken/jwt.js')
 
 const userInfo = require('../mongodb/userInfo.js')
+const reInfo = require('../mongodb/release.js')
 
 // 注册、登陆、发送激活验证码、验证验证码是否正确
 router.post('/register', enter.register)
@@ -55,12 +58,42 @@ router.post('/upAvatar', checkToken, upload.single("avater"), (req, res) =>{
     }
 })
 
-router.post('/reObject', (req, res) =>{
-    console.log(req.body)
+/**
+ * @function 这里是插入发布消息的数据
+ *  1 首先获取一个唯一的id 标志着该消息
+ *  2 插入数据
+ *  3 返回 提示
+ */
+router.post('/reObject', checkToken, upload.array('objectImg', 3), (req, res) =>{
 
-    res.json({"msg": "哈哈哈", "code": 200})
+    let objectImg = null
+    // 如果有值 上传图片则
+    if(req.files.length){
+        objectImg = req.files.map(item =>{
+            return `http://192.168.43.124:7070/av/${item.filename}`
+        })
+    //否则显示默认图片
+    }else{
+        objectImg = ['http://192.168.43.124:7070/av/init.png']
+    }
+
+    reInfo.create({
+        ...req.body, 
+        objectId: getId(), //可以直接获取 不需要定义一个函数
+        userId: req.userId,// 这个userId 如果要根据 _id查找用户的消息 应该是一个对象
+        objectImg
+    },(err, upData) =>{
+        if(!upData) return res.json({"msg": "发布失败", "code": 0})
+        
+        //此时返回数据
+        res.json({"msg": "发布成功", "code": 200})
+    })
 })
 
+
+function getId(){
+    return (Math.random() + Date.now()).toString(36)
+}
 
 
 module.exports = router

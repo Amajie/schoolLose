@@ -65,7 +65,13 @@
                     </van-cell-group>
                 </div>
                 <div class="uploader-img">
-                    <van-uploader v-model="objectImg" :max-count="3" upload-text="最多3张"/>
+                    <van-uploader 
+                        v-model="objectImg"
+                        :max-count="3"
+                        upload-text="最多3张"
+                        :after-read="afterRead"
+                        :before-read="beforeRead"    
+                    />
                 </div>
             </div>
             <div class="selectDate">
@@ -121,11 +127,12 @@ export default {
             maxTime: new Date(),
             minTime: new Date(`${new Date().getFullYear()-4}-01-01`),//后四年
             showDate: false,
-            showType: false,// 
+            showType: false,
         }
     },
     created(){
-        
+        // 这里应该根据路由来决定 是添加消息 还是修改消息
+        // 修改 消息就要 获取相应的数据
     },
     computed:{
         ...mapState([
@@ -134,6 +141,17 @@ export default {
         ])
     },
     methods:{
+
+        //图片读取前调用
+        beforeRead(file){
+            return true
+        },
+        //图片读取完毕 限制图片个数为 1
+        afterRead(){
+            console.log(this.objectImg)
+        },
+
+
         //时间确认
         selectConfirm(val){
             this.showDate = !this.showDate
@@ -142,10 +160,12 @@ export default {
         // 处理数据的提交
         handleSubmit(){
 
+            let formData = new FormData()
+            //获取方式
             this.objectWay = this.type? '丢失': '拾获'
 
            const {objectWay, objectAddress, objectTime, 
-            objectType, objectDesc, objectImg, reObject, tText} = this
+            objectType, objectDesc, objectImg, reObject, tText, dAlert} = this
 
             // 以下是必须填写的
             if(!objectAddress){
@@ -157,12 +177,22 @@ export default {
             }
 
 
-            //发请求
-            reObject({
-                objectWay, objectAddress, objectTime: new Date(objectTime).getTime(),
-                objectType, objectDesc
-            }).then(res =>{
-                console.log(res)
+            formData.append('objectWay', objectWay)
+            formData.append('objectAddress', objectAddress)
+            formData.append('objectTime', new Date(objectTime).getTime())
+            formData.append('sendTime', new Date().getTime())
+            formData.append('objectType', objectType)
+            formData.append('objectDesc', objectDesc)
+            // 获取图片数组
+            this.objectImg.forEach(item => {
+                formData.append('objectImg', item.file)
+            })
+
+            reObject(formData).then(res =>{
+                const {code} = res.data
+                if(code === 0) return dAlert('发布失败, 请稍后再试')
+
+                dAlert('发布成功')
             })
         }
     }
