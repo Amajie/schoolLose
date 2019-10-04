@@ -105,6 +105,10 @@
             <div class="submit">
                 <van-button type="primary" @click.native="handleSubmit" square block>提交</van-button>
             </div>
+            <div class="chang_explain">
+                <span class="chang_explain_title">注意：</span>
+                <span class="chang_explain_text">以上信息必须填写才能发布相关信息，走读学生，宿舍地址请填写: 校外居住</span>
+            </div>
         </div>
     </div>
 </template>
@@ -212,6 +216,17 @@ export default {
                 padding: 10px;
                 margin: 10px 0;
                 border: 1px solid #f0f3f6;
+            }
+        }
+        .chang_explain{
+            margin: 10px 0;
+            padding: 0 2%;
+            .chang_explain_title{
+                color: red;
+            }
+            .chang_explain_text{
+                color: #9fa0a2;
+                line-height: 25px;
             }
         }
     }

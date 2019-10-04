@@ -78,7 +78,7 @@
             <div class="info-btn" @click="handleInfo">
                 <van-button type="danger" block>保存</van-button>
             </div>
-             <div class="chang_explain">
+            <div class="chang_explain">
                 <span class="chang_explain_title">注意：</span>
                 <span class="chang_explain_text">以上信息必须填写才能发布相关信息，走读学生，宿舍地址请填写: 校外居住</span>
             </div>

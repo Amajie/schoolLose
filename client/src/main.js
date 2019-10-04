@@ -60,7 +60,8 @@ Tabbar, TabbarItem, Row, Col,
 Search, Grid, GridItem, Tab, Tabs,
 Sticky, ImagePreview, ActionSheet, 
 Uploader, Loading, Notify, Switch,
-DatetimePicker} from 'vant'
+DatetimePicker, List, PullRefresh,
+DropdownMenu, DropdownItem} from 'vant'
 Vue.use(Button)
   .use(Icon)
   .use(NavBar)
@@ -90,6 +91,10 @@ Vue.use(Button)
   .use(Notify)
   .use(Switch)
   .use(DatetimePicker)
+  .use(List)
+  .use(PullRefresh)
+  .use(DropdownMenu)
+  .use(DropdownItem)
 
 Vue.config.productionTip = false
 new Vue({
