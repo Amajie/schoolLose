@@ -3,7 +3,7 @@
         <div class="header r">
             <van-nav-bar
                 title="消息发布"
-                @click-left="() => $router.replace('/center')"
+                @click-left="$router.replace(`/c/center/${$route.params.cheId}`)"
                 :border="false"
             >
                 <van-icon name="arrow-left" slot="left" size="2em" color="#fff" />
@@ -24,6 +24,25 @@
                 <div class="info">
                      <van-cell-group>
                         <van-field
+                            readonly
+                            clickable
+                            label="物品类型"
+                            size="large"
+                            required
+                            v-model="objectType"
+                            placeholder="选择物品的类型"
+                            @click.native="showType = !showType"
+                        />
+                        <van-field
+                            clearable
+                            required
+                            label="物品名称"
+                            size="large"
+                            :maxlength="15"
+                            v-model="objectName"
+                            placeholder="例如: 雨伞(限15字)"
+                        />
+                        <van-field
                             clearable
                             required
                             label="地点"
@@ -41,16 +60,6 @@
                             v-model="objectTime"
                             placeholder="丢失或者拾获时间点"
                             @click.native="showDate = !showDate"
-                        />
-                        <van-field
-                            readonly
-                            clickable
-                            label="物品类型"
-                            size="large"
-                            required
-                            v-model="objectType"
-                            placeholder="选择物品的类型"
-                            @click.native="showType = !showType"
                         />
                         <van-field
                             v-model="objectDesc"
@@ -119,11 +128,12 @@ export default {
     data(){
         return {
             type: true, // true 即为失主 false 为拾主
-            objectAddress: '',
+            objectName: '',
+            objectAddress: '达南502袋子',
             objectTime: '',
             objectType: '',
             objectWay: '',
-            objectDesc: '',
+            objectDesc: '16电子1班值日生捡到的，请联系手机号1876003022',
             objectImg: [],
             loseFlag: 'info',
             pickFlag: 'default',
@@ -145,10 +155,14 @@ export default {
         ])
     },
     methods:{
-
         //图片读取前调用
         beforeRead(file){
-            return true
+            console.log(file.type)
+            if(file.type === 'image/png' || file.type === 'image/jpeg' || 
+                file.type === 'image/bmp') return true
+
+            this.dAlert('只能上传jpeg、png、bmp格式的图片') 
+            return false
         },
         //图片读取完毕 限制图片个数为 1
         afterRead(){
@@ -166,9 +180,9 @@ export default {
 
             let formData = new FormData()
             //获取方式
-            this.objectWay = this.type? '丢失': '拾获'
+            this.objectWay = this.type? '0': '1'
 
-           const {objectWay, objectAddress, objectTime, 
+           const {objectName, objectWay, objectAddress, objectTime, 
             objectType, objectDesc, objectImg, reObject, tText, dAlert} = this
 
             // 以下是必须填写的
@@ -181,6 +195,7 @@ export default {
             }
 
 
+            formData.append('objectName', objectName)
             formData.append('objectWay', objectWay)
             formData.append('objectAddress', objectAddress)
             formData.append('objectTime', new Date(objectTime).getTime())

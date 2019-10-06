@@ -2,8 +2,8 @@
     <div id="person">
         <div class="header b">
             <van-nav-bar
-                @click-left="() => $router.replace('/set')"
-                @click-right="add"
+                @click-left="$router.replace('/set')"
+                @click-right="$router.replace(`/c/redata/${userData.cheId}`)"
                 :border="false"
             >
                 <van-icon name="add-o" slot="right" size="2em" color="#fff" />
@@ -14,12 +14,12 @@
         <div class="p-wrap">
             <!-- 登陆注册头像 -->
             <div class="p-person">
-                <div @click="$router.replace('/center')" class="p-person-opa">
+                <div @click="$router.replace(`/c/center/${userData.cheId}`)" class="p-person-opa">
                     <van-row type="flex" justify="center">
                         <van-col span="8">
                             <!-- 头像 -->
                             <div class="peoson_img" @click.stop="show_img_action = true">
-                                <img  :key="avater" :src="avater">
+                                <img :src="userData.avater">
                             </div>
                         </van-col>
                         <van-col span="16">
@@ -34,7 +34,7 @@
             <div class="cell-nav">
                 <div class="nav-wrap">
                     <div class="nav-list">
-                        <div @click="add" class="nav-item">
+                        <div class="nav-item">
                             <p>12</p>
                             <span>失主发布</span>
                         </div>
@@ -101,7 +101,7 @@
                 @select="onSelect"
             />
         </div>
-        <div class="show_himg" @click="add">
+        <div class="show_himg">
             <van-image-preview
                 v-model="show_img"
                 :images="bigAvater"
@@ -124,10 +124,7 @@ export default {
                 {name:'更换头像', id: 2}
             ],
             show_img: false,
-            bigAvater: [
-                'http://192.168.43.124:7070/av/init.png'
-            ],
-            avater: require('../../../assets/init.png')
+            bigAvater: [],
         }
     },
     computed:{
@@ -136,20 +133,12 @@ export default {
         ])
     },
     created(){
-        
-        if(this.userData.avater){
-            this.avater = this.userData.avater
-            this.bigAvater[0] = this.avater
-        }
-
+        this.bigAvater[0] = this.userData.avater
     },
     methods:{
         ...mapMutations([
             'setUserData'
         ]),
-        add(event){
-            this.$router.replace('/redata')
-        },
         /**
          * @function 退出当前登陆
          *  1 退出当前账号 不只是路由的跳转
@@ -161,7 +150,6 @@ export default {
         },
                 //这个是 上拉菜单选项框
         onSelect(item){
-            console.log(this.userData)
             const {id, show_img} = item
             if(id === 1) return this.show_img = !show_img
             if(id === 2) return this.$router.replace('/cimg')

@@ -24,7 +24,7 @@ var userSchema = new Schema({
     },
     avater:{
         type: String,
-        default: ''
+        default: 'http://192.168.43.124:7070/av/init.png'
     }, //给他一张默认的图片
     userActive:{
         type: Boolean,

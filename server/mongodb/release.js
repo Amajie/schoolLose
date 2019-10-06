@@ -5,11 +5,15 @@ const Schema = mongoose.Schema
 mongoose.connect("mongodb://localhost/slose", { useNewUrlParser: true })
 
 const reSchema = new Schema({
-    userId: {// 楼主id
+    objectUserId: {// 楼主id
         type: Object,
         required: true
     },
     objectId: {// 消息id
+        type: String,
+        required: true
+    },
+    objectName: {// 物品的具体名称
         type: String,
         required: true
     },
@@ -22,6 +26,10 @@ const reSchema = new Schema({
         required: true
     },
     objectWay: {// 拾取 还是丢失
+        type: String,
+        required: true
+    },
+    objectType: {// 类型
         type: String,
         required: true
     },

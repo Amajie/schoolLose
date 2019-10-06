@@ -19,9 +19,11 @@ import CEmail from '../components/wrap/person/set/c_email.vue'
 import CInfo from '../components/wrap/person/set/c_info.vue'
 
 //个人中心
-import Center from '../components/wrap/person/page/center.vue'
+import CWrap from '../components/wrap/person/page/c_wrap.vue'
 import Cimg from '../components/wrap/person/page/change_himg.vue'
-import Releasedata from '../components/wrap/person/releaseData/release.vue'
+import Center from '../components/wrap/person/my_center/center.vue'
+import Releasedata from '../components/wrap/person/my_center/release.vue'
+import Deatil from '../components/wrap/person/my_center/detail.vue'
 
 import store from '../store.js'
 
@@ -115,12 +117,42 @@ const router =  new Router({
     },
     //个人中心
     {
-      path: '/center',
-      name: 'Center',
+      path: '/c',
+      name: 'CWrap',
+      redirect: '/c/center',
       meta: {
         noRequireToken: true,
       },
-      component: Center
+      component: CWrap,
+      children:[
+        // 个人首页
+        {
+          path: 'center/:cheId',
+          name: 'Center',
+          meta: {
+            noRequireToken: true,
+          },
+          component: Center
+        },
+        //消息的发布
+        {
+          path: 'redata/:cheId',
+          name: 'Releasedata',
+          meta: {
+            noRequireToken: true,
+          },
+          component: Releasedata
+        },
+        //消息的详情页
+        {
+          path: 'detail/:cheId/:objectId',
+          name: 'Deatil',
+          meta: {
+            noRequireToken: true,
+          },
+          component: Deatil
+        },
+      ]
     },
     //头像上传
     {
@@ -128,16 +160,10 @@ const router =  new Router({
       name: 'Cimg',
       component: Cimg
     },
-    //消息的发布
     {
-      path: '/redata',
-      name: 'Releasedata',
-      meta: {
-        noRequireToken: true,
-      },
-      component: Releasedata
+      path: '*',
+      redirect: '/home',
     },
-    
   ]
 })
 

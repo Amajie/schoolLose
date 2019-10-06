@@ -111,7 +111,6 @@ export default {
         }
     },
     created(){
-
         //设置个人信息 在表中
         const {userData} = this
         for(let key in userData){

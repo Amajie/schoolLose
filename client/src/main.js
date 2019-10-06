@@ -22,7 +22,7 @@ Vue.prototype.tText = tText// 轻提示
 //请求函数的封装
 import {register, sendEmailCode, checkEmailCode, login,
   cName, cPaw, cEmail, cInfo, fInfo, upAvater, reObject,
-  text} from './axios/api.js'
+  gInfo, getDetail, text} from './axios/api.js'
 Vue.prototype.register = register//发送注册请求
 Vue.prototype.sendEmailCode = sendEmailCode//发送邮箱验证码
 Vue.prototype.checkEmailCode = checkEmailCode//发送 输入的 验证码
@@ -32,9 +32,11 @@ Vue.prototype.cPaw = cPaw//发送 密码修改请求
 Vue.prototype.cEmail = cEmail//发送 密码修改请求
 Vue.prototype.cEmail = cEmail//发送 密码修改请求
 Vue.prototype.cInfo = cInfo//发送 个人信息的修改
-Vue.prototype.fInfo = fInfo//发送 个人信息的获取
+Vue.prototype.fInfo = fInfo//发送 个人信息的获取  （这里没有用到）
 Vue.prototype.upAvater = upAvater//发送 头像的修改
 Vue.prototype.reObject = reObject//发送 寻物消息
+Vue.prototype.gInfo = gInfo//发送 寻物消息
+Vue.prototype.getDetail = getDetail//发送 详情页
 
 Vue.prototype.text = text//发送 密码修改请求
 
@@ -61,7 +63,8 @@ Search, Grid, GridItem, Tab, Tabs,
 Sticky, ImagePreview, ActionSheet, 
 Uploader, Loading, Notify, Switch,
 DatetimePicker, List, PullRefresh,
-DropdownMenu, DropdownItem} from 'vant'
+DropdownMenu, DropdownItem, Image,
+Swipe, SwipeItem, Lazyload} from 'vant'
 Vue.use(Button)
   .use(Icon)
   .use(NavBar)
@@ -95,6 +98,10 @@ Vue.use(Button)
   .use(PullRefresh)
   .use(DropdownMenu)
   .use(DropdownItem)
+  .use(Image)
+  .use(Swipe)
+  .use(SwipeItem)
+  .use(Lazyload)
 
 Vue.config.productionTip = false
 new Vue({

@@ -4,7 +4,7 @@
 *@get 请求 数据为 params
 *@post 请求 数据为 data
 */
-import service from './request.js'
+import {entryService, sendService} from './request.js'
 
 
 /**
@@ -12,7 +12,7 @@ import service from './request.js'
  * @param {*} data 发送的数据
  */
 export const register = data =>{
-    return service({
+    return sendService({
         url: '/register',
         method: 'post',
         data
@@ -25,7 +25,7 @@ export const register = data =>{
  * @param {*} params 发送的数据
  */
 export const sendEmailCode = params =>{
-    return service({
+    return sendService({
         url: '/sendE',
         method: 'get',
         params
@@ -38,7 +38,7 @@ export const sendEmailCode = params =>{
  */
 
 export const checkEmailCode = params =>{
-    return service({
+    return sendService({
         url: '/checkE',
         method: 'get',
         params
@@ -50,7 +50,7 @@ export const checkEmailCode = params =>{
  * @param {*} params 发送的数据
  */
 export const login = params =>{
-    return service({
+    return sendService({
         url: '/login',
         method: 'get',
         params
@@ -63,7 +63,7 @@ export const login = params =>{
  * @param {*} data 发送的数据
  */
 export const cName = data =>{
-    return service({
+    return sendService({
         url: '/cn',
         method: 'post',
         data
@@ -75,7 +75,7 @@ export const cName = data =>{
  * @param {*} data 发送的数据
  */
 export const cPaw = data =>{
-    return service({
+    return sendService({
         url: '/cp',
         method: 'post',
         data
@@ -88,7 +88,7 @@ export const cPaw = data =>{
  * @param {*} data 发送的数据
  */
 export const cEmail = data =>{
-    return service({
+    return sendService({
         url: '/ce',
         method: 'post',
         data
@@ -100,7 +100,7 @@ export const cEmail = data =>{
  * @param {*} data 发送的数据
  */
 export const cInfo = data =>{
-    return service({
+    return sendService({
         url: '/ci',
         method: 'post',
         data
@@ -111,7 +111,7 @@ export const cInfo = data =>{
  * @param {*} params 发送的数据
  */
 export const fInfo = params =>{
-    return service({
+    return entryService({
         url: '/fi',
         method: 'post',
         params
@@ -125,7 +125,7 @@ export const fInfo = params =>{
  */
 export const upAvater = data =>{
     
-    return service({
+    return sendService({
         url: '/upAvatar',
         method: 'post',
         data
@@ -138,10 +138,34 @@ export const upAvater = data =>{
  * @param {*} data 发送的数据
  */
 export const reObject = data =>{
-    return service({
+    return sendService({
         url: '/reObject',
         method: 'post',
         data
+    })
+}
+
+
+/**
+ * @function 消息的查找
+ * @param {*} params 发送的数据
+ */
+export const gInfo = params =>{
+    return entryService({
+        url: '/fInfo',
+        method: 'get',
+        params
+    })
+}
+/**
+ * @function 消息详情页
+ * @param {*} data 发送的数据
+ */
+export const getDetail = params =>{
+    return entryService({
+        url: '/fDetailInfo',
+        method: 'get',
+        params
     })
 }
 
@@ -151,7 +175,7 @@ export const reObject = data =>{
  * @param {*} data 发送的数据
  */
 export const text = data =>{
-    return service({
+    return entryService({
         url: '/text',
         method: 'post',
         data

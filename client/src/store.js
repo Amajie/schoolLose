@@ -6,6 +6,10 @@ import { Toast, Dialog} from 'vant'
 const store = new Vuex.Store({
     state:{
         token: '',
+        lodingETag: false,
+        lodingSTag: false,
+        regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"),
+        userData: {},
         //学院
         courtyardData: [
             '物理与信息工程学院',
@@ -24,7 +28,6 @@ const store = new Vuex.Store({
             '新闻传播学院',
             '马克思主义学院',
         ],
-
         //专业
         majorData: {
             '物理与信息工程学院':[
@@ -60,8 +63,6 @@ const store = new Vuex.Store({
             '新闻传播学院':['广播电视学', '广告学', '编辑出版学', '广播电视编导'],
             '马克思主义学院':['思想政治教育'],
         },
-        regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"),
-        userData: {},
         type_nav: {
             ['校园卡']:{name: 'school_car', url: '/', id: 43},
             ['借书证']:{name: 'library_card', url: '/', id: 54},

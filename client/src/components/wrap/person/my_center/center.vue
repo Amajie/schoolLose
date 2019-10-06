@@ -17,7 +17,7 @@
                     <!-- <div @click="$router.replace('/person')" class="left">
                         <icon name="tip" :w="svg" :h="svg"></icon>
                     </div> -->
-                    <div @click="add_info" class="left">
+                    <div @click="$router.replace(`/c/redata/${cheId}`)" class="left">
                         <icon name="add_info" :w="svg" :h="svg"></icon>
                     </div>
                 </div>
@@ -25,12 +25,20 @@
             <div class="c">
                 <div class="center-wrap">
                     <div class="center">
-                        <router-link to="/center" class="center-opa">
+                        <div class="center-opa">
                             <van-row type="flex" justify="center">
                                 <van-col span="6">
                                     <!-- 头像 -->
                                     <div class="item">
-                                        <img class="hi" :src="userData.avater" />
+                                        <!-- <img class="hi" :src="userData.avater" /> -->
+                                        <van-image
+                                            round
+                                            width="60"
+                                            height="60"
+                                            fit="contain"
+                                            :src="userData.avater"
+                                        />
+
                                     </div>
                                 </van-col>
                                 <van-col span="12">
@@ -48,7 +56,7 @@
                                     </div>
                                 </van-col>
                             </van-row>
-                        </router-link>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -59,28 +67,34 @@
                 :finished="finished"
                 finished-text="没有更多了"
                 @load="onLoad"
+                :immediate-check="false"
                 >
-                <van-cell clickable>
+                <van-cell @click.native="toDetail(index)" clickable v-for="(item, index) in infoData" :key="index">
                     <div class="shop_data_item">
                         <div class="item_img">
-                            <img src="../../../../assets/logo1.jpg">
+                            <!-- <img :src="item.objectImg[0]?item.objectImg[0]: 'http://192.168.43.124:7070/av/init.png'"> -->
+                            <van-image
+                                width="100"
+                                height="100"
+                                fit="cover"
+                                radius="5"
+                                :src="item.objectImg[0]?item.objectImg[0]: 'http://192.168.43.124:7070/av/init.png'"
+                            />
                         </div>
                         <div class="item_info">
                             <!-- 标题 -->
                             <div class="info_title">
                                 <p>
-                                    <span class="title_p">身份证</span>
-                                    <span class="title_name">车神-黄杰</span>
+                                    <span class="title_p">{{item.objectType}}</span>
+                                    <span class="title_name">{{userName}}</span>
                                 </p>
-                                <p class="info_like" style="background:red;">丢</p>
+                                <p :class="{info_like: true, lose: item.objectWay === '0'}">{{item.objectWay === '0'? '丢': '拾'}}</p>
                             </div>
                             <!-- 评分 -->
                             <div class="info_rate">
                                 <p class="rate_num">
                                     <icon name="desc" :w="15" :h="15"></icon>
-                                    <span>
-                                        暂无说明
-                                    </span>
+                                    <span>{{item.objectDesc}}</span>
                                 </p>
                             </div>
                             <!-- 配送 -->
@@ -91,87 +105,7 @@
                                 </div> -->
                                 <div class="tack_heng">
                                     <icon name="time" :w="15" :h="15"></icon>
-                                <span>2019-12-12</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </van-cell>
-                <van-cell clickable>
-                    <div class="shop_data_item">
-                        <div class="item_img">
-                            <img src="../../../../assets/logo.jpg">
-                        </div>
-                        <div class="item_info">
-                            <!-- 标题 -->
-                            <div class="info_title">
-                                <p>
-                                    <span class="title_p">校园卡</span>
-                                    <span class="title_name">车神-黄杰</span>
-                                </p>
-                                <p class="info_like">
-                                    拾
-                                </p>
-                            </div>
-                            <!-- 评分 -->
-                            <div class="info_rate">
-                                <p class="rate_num">
-                                    <icon name="desc" :w="15" :h="15"></icon>
-                                    <span>
-                                        通过container属性可以指定组件的容器，
-                                        页面滚动时，组件会始终保持在容器范围
-                                    </span>
-                                </p>
-                            </div>
-                            <!-- 配送 -->
-                            <div class="info_tack">
-                                <!-- <div class="user">
-                                <icon name="phone" :w="12" :h="12"></icon>
-                                <span>车神-黄杰</span>
-                                </div> -->
-                                <div class="tack_heng">
-                                    <icon name="time" :w="15" :h="15"></icon>
-                                <span>2019-12-12</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </van-cell>
-                <van-cell clickable>
-                    <div class="shop_data_item">
-                        <div class="item_img">
-                            <img src="../../../../assets/lose.png">
-                        </div>
-                        <div class="item_info">
-                            <!-- 标题 -->
-                            <div class="info_title">
-                                <p>
-                                    <span class="title_p">校园卡</span>
-                                    <span class="title_name">车神-黄杰</span>
-                                </p>
-                                <p class="info_like">
-                                    拾
-                                </p>
-                            </div>
-                            <!-- 评分 -->
-                            <div class="info_rate">
-                                <p class="rate_num">
-                                    <icon name="desc" :w="15" :h="15"></icon>
-                                    <span>
-                                        通过container属性可以指定组件的容器，
-                                        页面滚动时，组件会始终保持在容器范围
-                                    </span>
-                                </p>
-                            </div>
-                            <!-- 配送 -->
-                            <div class="info_tack">
-                                <!-- <div class="user">
-                                <icon name="phone" :w="12" :h="12"></icon>
-                                <span>车神-黄杰</span>
-                                </div> -->
-                                <div class="tack_heng">
-                                    <icon name="time" :w="15" :h="15"></icon>
-                                <span>2019-12-12</span>
+                                <span>{{item.sendTime | showTime}}</span>
                                 </div>
                             </div>
                         </div>
@@ -245,7 +179,10 @@ export default {
             list: [],
             loading: false,
             finished: false,
-            num:4
+            infoData: [],
+            cheId: '',
+            userName: '',
+
         }
     },
     computed:{
@@ -254,26 +191,49 @@ export default {
         ])
     },
     created(){
-        console.log(this.userData)
+        
+        /**
+         *  此时这里 需要判断一下如果路由传递过来的 id
+         */
+        this.cheId = this.$route.params.cheId
+
+        // 此时应该定义在函数上 当拉到底端的时候再次调用
+        this.gInfo({cheId: this.cheId}).then(res =>{
+            const {code, data} = res.data
+            if(code === 0){
+                
+                //此时这里没有数据 应该友好显示
+                console.log('没有数据，应该友好显示')
+                return
+            }
+
+            this.infoData = data[0].infoData
+            this.userName = data[0].userName
+
+            console.log(this.infoData)
+            console.log(this.userName)
+        })
     },
     methods:{
-        add_info(){
-            this.$router.replace('/redata')
+        onLoad() {
+            /**
+             * 注意 
+             *      此时要想显示 加载loading 设置this.loading = true
+             *      此时要想显示 要想不再触发 onLoad事件 设置 this.finished = true
+             */
+            console.log('触发')
         },
-         onLoad() {
-            // 异步更新数据
-            setTimeout(() => {
-                for (let i = 0; i < 10; i++) {
-                this.list.push(this.list.length + 1)
-                }
-                // 加载状态结束
-                this.loading = false
+        toDetail(index){
+            // $router.replace('/c/detail')
+            const {infoData, $router, cheId} = this
 
-                // 数据全部加载完成
-                if (this.list.length >= 40) {
-                this.finished = true
-                }
-            }, 500)
+            $router.replace(`/c/detail/${cheId}/${infoData[index].objectId}`)
+        }
+    },
+    filters:{
+        showTime(time){
+            const data = new Date(Number(time))
+            return `${data.getFullYear()}-${('0'+data.getMonth()).slice(-2)}-${('0'+data.getDate()).slice(-2)}`
         }
     }
 }
@@ -338,10 +298,8 @@ export default {
             display: flex;
             padding-left: 10px;
             .item_img{
-                flex: 1;
-                > img{
-                    width: 100%;
-                }
+                height: 100px;
+                width: 100px;
             }
             .item_info{
                 flex: 4;
@@ -373,13 +331,15 @@ export default {
                         border-radius: 10px;
                         color: #fff;
                     }
+                    .lose{
+                        background-color: red;
+                    }
                 }
                 //评分
                 .info_rate{
                     font-size: 12px;
                     .rate_num{
                         span{
-                            margin: 0 3px;
                             line-height: 18px;
                             color: #666;
                         }

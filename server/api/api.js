@@ -99,7 +99,7 @@ exports.enter = {
                 "msg": "密码正确，登陆成功", "code": 200, 
                 token, 
                 userData: {
-                    userName, email, userType, 
+                    userName, email, userType, cheId: _id,
                     avater, name, stId, gender, 
                     courtyard, major, classes, address   
                 }
