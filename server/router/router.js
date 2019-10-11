@@ -153,6 +153,24 @@ router.get('/fDetailInfo', (req, res) =>{
 
 })
 
+
+const hjInfo = require('../mongodb/hj.js')
+router.get('/hj', (req, res) =>{
+    console.log(req.query)
+    hjInfo.create({name: 'hjj', array:[{name: '车神1', age: 53}]}, (err, data) =>{
+        res.send('插入成功')
+    })
+})
+router.get('/hjj', (req, res) =>{
+    hjInfo.update({'array.name': '我是黄杰', 'array.age': 23}, {$set:{'array.$.name': '黄家驹'}}, (err, data) =>{
+        console.log(data)
+    })
+})
+router.get('/hjjj', (req, res) =>{
+    const s = hjInfo.find({})
+    console.log(s)
+})
+
 //消息的查找
 //http://192.168.43.124:7070/f
 router.get('/f', (req, res) =>{

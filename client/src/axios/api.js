@@ -4,7 +4,7 @@
 *@get 请求 数据为 params
 *@post 请求 数据为 data
 */
-import {entryService, sendService} from './request.js'
+import {entryService, sendService, notService} from './request.js'
 
 
 /**

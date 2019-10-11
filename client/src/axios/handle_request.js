@@ -3,7 +3,7 @@
 import store from '../store.js'
 import router from '../router/index.js'
 
-export const request = (config, tag) =>{
+export const request = ({config, tag, notLoad}) =>{
 
     // 后台也已经允许什么请求头可以传到后台
     //注意请求头不能出现中文
@@ -12,7 +12,8 @@ export const request = (config, tag) =>{
     //     config.data = qs.stringify({...config.data}): config.params = {...config.params}
 
     // tag --> true 全白  false   透明
-    store.commit('setState', {
+
+    !notLoad && store.commit('setState', {
         lodingETag: tag,
         lodingSTag: !tag
     })
@@ -30,6 +31,7 @@ export const requestError = () =>{
 
 
 export const response = response =>{
+
     store.commit('setState', {
         lodingETag: false,
         lodingSTag: false
