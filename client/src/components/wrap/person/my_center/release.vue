@@ -2,11 +2,12 @@
     <div id="release">
         <div class="header r">
             <van-nav-bar
-                title="消息发布"
-                @click-left="$router.replace(`/c/center/${$route.params.cheId}`)"
+                :title="headerTitle"
+                @click-left="$router.go(-1)"
                 :border="false"
             >
                 <van-icon name="arrow-left" slot="left" size="2em" color="#fff" />
+                <van-icon name="cross" slot="right" size="2em" color="#fff" />
             </van-nav-bar>
         </div>
         <div class="release-wrap">
@@ -14,10 +15,10 @@
                 <div class="type">
                     <van-row>
                         <van-col span="12">
-                            <van-button block :type="type? 'info': 'default'" @click.native="type=true" square>我是失主</van-button>
+                            <van-button block :type="objectWay === '0'? 'info': 'default'" @click.native="objectWay = '0'" square>我是失主</van-button>
                         </van-col>
                         <van-col span="12">
-                            <van-button block :type="type? 'default': 'info'" @click.native="type=false" square>我是拾主</van-button>
+                            <van-button block :type="objectWay === '1'? 'info': 'default'" @click.native="objectWay = '1'" square>我是拾主</van-button>
                         </van-col>
                     </van-row>
                 </div>
@@ -127,16 +128,15 @@ import {mapState} from 'vuex'
 export default {
     data(){
         return {
-            type: true, // true 即为失主 false 为拾主
+            headerTitle: '消息发布',
             objectName: '',
             objectAddress: '达南502袋子',
             objectTime: '',
             objectType: '',
-            objectWay: '',
+            objectWay: '0',
+            sendTime: '',
             objectDesc: '16电子1班值日生捡到的，请联系手机号1876003022',
             objectImg: [],
-            loseFlag: 'info',
-            pickFlag: 'default',
             currentDate: new Date(),
             maxTime: new Date(),
             minTime: new Date(`${new Date().getFullYear()-4}-01-01`),//后四年
@@ -145,19 +145,53 @@ export default {
         }
     },
     created(){
-        // 这里应该根据路由来决定 是添加消息 还是修改消息
-        // 修改 消息就要 获取相应的数据
+        this.handleCreated()
     },
     computed:{
         ...mapState([
             'type_nav',
-            'type_list'
+            'type_list',
+            'userData',
+            'detailData'
         ])
     },
     methods:{
+        //初始化一些数据
+        handleCreated(){
+            const {meta, params} = this.$route
+            const {userData, detailData} = this
+            this.reType = meta.reType
+            //此时要判断 用户的id是否正确 不正确即跳转到404页面
+            if(params.cheId != userData.cheId){
+                console.log('用户id不相等，跳转到404页面')
+            }
+            //此时是添加
+            if(meta.reType) return console.log('添加数据')
+
+            /**
+             * 1 设置标题
+             * 2 先判断当前的消息是否为detailData保存的消息
+             *      1 不是 添加新的数据 消息id有错 直接显示消息添加
+             *      2 是 遍历循环设置数据
+             * 
+             */
+            this.headerTitle = '消息编辑'
+            this.objectId = params.objectId
+
+            for(let item in detailData){
+                this[item] = detailData[item]
+                if(item === 'objectImg'){
+                    this.objectImg = detailData[item].map(url =>{
+                        return {url}
+                    })
+                }else if(item === 'objectTime'){
+                    this.objectTime = this.showTime(detailData[item])
+                }
+            }
+
+        },
         //图片读取前调用
         beforeRead(file){
-            console.log(file.type)
             if(file.type === 'image/png' || file.type === 'image/jpeg' || 
                 file.type === 'image/bmp') return true
 
@@ -168,8 +202,6 @@ export default {
         afterRead(){
             console.log(this.objectImg)
         },
-
-
         //时间确认
         selectConfirm(val){
             this.showDate = !this.showDate
@@ -179,11 +211,9 @@ export default {
         handleSubmit(){
 
             let formData = new FormData()
-            //获取方式
-            this.objectWay = this.type? '0': '1'
 
-           const {objectName, objectWay, objectAddress, objectTime, 
-            objectType, objectDesc, objectImg, reObject, tText, dAlert} = this
+            const {objectName, objectWay, objectAddress, objectTime, 
+            objectType, objectDesc, objectImg, tText} = this
 
             // 以下是必须填写的
             if(!objectAddress){
@@ -199,12 +229,33 @@ export default {
             formData.append('objectWay', objectWay)
             formData.append('objectAddress', objectAddress)
             formData.append('objectTime', new Date(objectTime).getTime())
-            formData.append('sendTime', new Date().getTime())
             formData.append('objectType', objectType)
             formData.append('objectDesc', objectDesc)
-            // 获取图片数组
+
+            if(this.reType) return this.addData(formData)
+
+            this.upData(formData)
+        },
+
+        //添加数据
+        addData(formData){
+            /**
+             * 图片上传 分为编辑 还是添加
+             *  1 添加
+             *      直接获取file对象上传即可
+             *  2 编辑
+             *      此时需要判断里面的图片是全部为 url 还是用户有选取图片
+             *          1 url 直接不需要上传 直接拼接在 objectImg
+             *          1 选取 那这就要
+             */
+
+            const {objectImg, reObject, dAlert} = this
+
+            // 发布的时间不能更新
+            formData.append('sendTime', new Date().getTime())
+
             this.objectImg.forEach(item => {
-                formData.append('objectImg', item.file)
+                formData.append('objectPic', item.file)
             })
 
             reObject(formData).then(res =>{
@@ -213,6 +264,43 @@ export default {
 
                 dAlert('发布成功')
             })
+        },
+        //更新数据
+        upData(formData){
+            
+            const {objectImg, dAlert, objectId, sendTime, upObject} = this
+            let arrImg = []
+
+            // 发布的时间不能更新
+            formData.append('sendTime', sendTime)
+            //消息的id 路由参数传递
+            formData.append('objectId', objectId)
+            this.objectImg.forEach(item => {
+                if(item.file) return formData.append('objectPic', item.file)
+                arrImg.push(item.url)
+                console.log(item)
+            })
+
+            formData.append('objectImg', JSON.stringify(arrImg))
+            
+            upObject(formData).then(res =>{
+                const {code} = res.data
+                if(code === 0) return dAlert('发布失败, 请稍后再试')
+
+                dAlert('发布成功')
+            })
+
+        },
+         /**
+         * tag 为true 即为显示年月日 小时 分
+         *      false 即为显示年月日
+         */
+        showTime(time, tag){
+            const data = new Date(Number(time))
+            if(!tag) return `${data.getFullYear()}-${('0'+data.getMonth()).slice(-2)}-${('0'+data.getDate()).slice(-2)}`
+            return `${data.getFullYear()}-${('0'+data.getMonth()).slice(-2)}-${('0'+data.getDate()).slice(-2)} 
+                            ${('0'+data.getHours()).slice(-2)}:
+                            ${('0'+data.getMinutes()).slice(-2)}`
         }
     }
 }

@@ -17,7 +17,7 @@
                     <!-- <div @click="$router.replace('/person')" class="left">
                         <icon name="tip" :w="svg" :h="svg"></icon>
                     </div> -->
-                    <div @click="$router.replace(`/c/redata/${cheId}`)" class="left">
+                    <div @click="$router.push(`/c/redata/${cheId}`)" class="left">
                         <icon name="add_info" :w="svg" :h="svg"></icon>
                     </div>
                 </div>

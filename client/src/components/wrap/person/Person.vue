@@ -3,7 +3,7 @@
         <div class="header b">
             <van-nav-bar
                 @click-left="$router.replace('/set')"
-                @click-right="$router.replace(`/c/redata/${userData.cheId}`)"
+                @click-right="$router.push(`/c/redata/${userData.cheId}`)"
                 :border="false"
             >
                 <van-icon name="add-o" slot="right" size="2em" color="#fff" />

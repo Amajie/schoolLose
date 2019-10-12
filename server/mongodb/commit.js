@@ -10,38 +10,21 @@ var commitSchema = new Schema({
         required: true
     },
     fromId:{
-        type: String,
+        type: Object,
         required: true
     },
     toId:{
+        type: Object,
+        default: ""
+    },
+    commit:{
         type: String,
         required: true
     },
-    commit:{
+    commitTime:{
         type: String,
         required: true
     }
 })
 
 module.exports = mongoose.model('commit', commitSchema)
-
-
-{/* <div class="commit-wrap">
-<div class="c-in">
-    <van-field v-show="reject_replay" :placeholder="commitHolder"
-        @focus="reject_replay = false">
-        <van-button slot="button" size="small" type="info" 
-            v-show="toId" 
-        >取消回复</van-button>
-    </van-field>
-
-    <van-field v-model="commit" v-show="!reject_replay" :placeholder="commitHolder"
-        type="textarea"
-        autosize
-        rows="1"
-        @focus="reject_replay = false"
-        @blur="reject_replay = true">
-            <van-button slot="button" size="small" type="info">发表</van-button>
-    </van-field>
-</div>
-</div> */}

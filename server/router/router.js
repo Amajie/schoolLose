@@ -36,6 +36,7 @@ const {checkToken} = require('../checkToken/jwt.js')
 
 const userInfo = require('../mongodb/userInfo.js')
 const reInfo = require('../mongodb/release.js')
+const commitInfo = require('../mongodb/commit.js')
 
 // 注册、登陆、发送激活验证码、验证验证码是否正确
 router.post('/register', enter.register)
@@ -70,7 +71,7 @@ router.post('/upAvatar', checkToken, upload.single("avater"), (req, res) =>{
  *  2 插入数据
  *  3 返回 提示
  */
-router.post('/reObject', checkToken, upload.array('objectImg', 3), (req, res) =>{
+router.post('/reObject', checkToken, upload.array('objectPic', 3), (req, res) =>{
 
     let objectImg = null
     // 如果有值 上传图片则
@@ -90,6 +91,34 @@ router.post('/reObject', checkToken, upload.array('objectImg', 3), (req, res) =>
         objectImg
     },(err, upData) =>{
         if(!upData) return res.json({"msg": "发布失败", "code": 0})
+        
+        //此时返回数据
+        res.json({"msg": "发布成功", "code": 200})
+    })
+})
+
+/**
+ * @function 这里是发布消息的更新
+ */
+router.post('/upObject', checkToken, upload.array('objectPic', 3), (req, res) =>{
+
+    // 因为是数组 因此也不需要在重新设置
+    let objectImg = JSON.parse(req.body.objectImg)
+
+    // 如果有值 上传图片则
+    if(req.files.length){
+        req.files.map(item =>{
+            objectImg.push(`http://192.168.43.124:7070/av/${item.filename}`)
+        })
+    // 此时只能说 用户删除了所有的图片 显示默认的图片
+    }else if(!objectImg.length){
+        objectImg = ['http://192.168.43.124:7070/av/init.png']
+    }
+
+    //消息的 id不用在此获取上传过来
+    reInfo.updateOne({objectUserId: mongoose.Types.ObjectId(req.userId)},
+    {...req.body, objectImg}, (err, upData) =>{
+        console.log(upData)
         
         //此时返回数据
         res.json({"msg": "发布成功", "code": 200})
@@ -140,7 +169,9 @@ router.get('/fInfo', (req, res) =>{
     })
 })
 
+// 详情页的查找
 router.get('/fDetailInfo', (req, res) =>{
+    // 此时需要判断以下 这个userId是否符合情况
     const {objectId, objectUserId} = req.query
 
     reInfo.findOne({objectId, objectUserId: mongoose.Types.ObjectId(objectUserId)}, (err, data) =>{
@@ -153,6 +184,88 @@ router.get('/fDetailInfo', (req, res) =>{
 
 })
 
+// 留言的插入
+router.post('/rCommit', (req, res) =>{
+    console.log(req.body)
+    let {toId, fromId} = req.body
+    if(toId){
+        toId = mongoose.Types.ObjectId(toId)
+    }
+
+    commitInfo.create({
+        ...req.body,
+        toId,
+        fromId: mongoose.Types.ObjectId(fromId)
+    }, (err, data) =>{
+        if(!data) return res.json({"msg": "留言失败", "code": 0})
+        
+        res.json({"msg":"留言成功", "code": 200, "commitData": data})
+    })
+})
+// 留言的查询
+router.get('/fCommit', (req, res) =>{
+    //这里 要根据这个 数据
+    const {infoId} = req.query
+    console.log(infoId)
+    commitInfo.aggregate([
+        {
+            $lookup:{
+                from: 'users',
+                localField: 'fromId',
+                foreignField: '_id',
+                as: 'commitData'
+            }
+        },
+        {
+            $lookup:{
+                from: 'users',
+                localField: 'toId',
+                foreignField: '_id',
+                as: 'replayData'
+            }
+        },
+        {$match:{infoId}},
+        { $unwind: "$commitData" }
+    ], function(err, data){
+
+        if(!data) return res.json({"msg": "获取评论失败", "code": -1})
+
+        if(data.length === 0) return res.json({"msg": "暂无评论", "code": 0})
+
+        const commitData = data.map((item, index, array) =>{
+            const {fromId, toId, commit, commitTime, commitData, replayData} = item
+
+            const replayUserInfo = replayData[0]
+            let arrData = {}
+            arrData.fromId = fromId
+            arrData.toId = toId
+            arrData.commit = commit
+            arrData.commitTime = commitTime
+
+            // 评论人的信息 评论人的信息 id不需要了 与上面的fromId 和 toId相同
+            // arrData.fromCheId = commitData._id
+            arrData.fromUserName = commitData.userName
+            arrData.fromAvater = commitData.avater
+            // arrData.toCheId = ''
+            arrData.toUserName = ''
+            arrData.toAvater = ''
+            // 没值直接返回
+            if(!replayUserInfo) return arrData
+
+            //否则返回数据
+            return {
+                ...arrData, 
+                // toCheId: replayUserInfo._id,
+                toUserName: replayUserInfo.userName,
+                toAvater: replayUserInfo.avater,
+            }
+        })
+
+        res.json({"msg": "获取评论成功", "code": 200, commitData})
+    })
+
+})
+
 
 const hjInfo = require('../mongodb/hj.js')
 router.get('/hj', (req, res) =>{
@@ -161,6 +274,7 @@ router.get('/hj', (req, res) =>{
         res.send('插入成功')
     })
 })
+
 router.get('/hjj', (req, res) =>{
     hjInfo.update({'array.name': '我是黄杰', 'array.age': 23}, {$set:{'array.$.name': '黄家驹'}}, (err, data) =>{
         console.log(data)

@@ -145,6 +145,18 @@ export const reObject = data =>{
     })
 }
 
+/**
+ * @function 寻物消息的更新
+ * @param {*} data 发送的数据
+ */
+export const upObject = data =>{
+    return sendService({
+        url: '/upObject',
+        method: 'post',
+        data
+    })
+}
+
 
 /**
  * @function 消息的查找
@@ -164,6 +176,30 @@ export const gInfo = params =>{
 export const getDetail = params =>{
     return entryService({
         url: '/fDetailInfo',
+        method: 'get',
+        params
+    })
+}
+
+
+/**
+ * @function 写留言
+ * @param {*} data 发送的数据
+ */
+export const rCommit = data =>{
+    return sendService({
+        url: '/rCommit',
+        method: 'post',
+        data
+    })
+}
+/**
+ * @function 查找留言
+ * @param {*} params 发送的数据
+ */
+export const fCommit = params =>{
+    return notService({
+        url: '/fCommit',
         method: 'get',
         params
     })

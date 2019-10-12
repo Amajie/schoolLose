@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 Vue.use(Vuex)
-import { Toast, Dialog} from 'vant'
+
 const store = new Vuex.Store({
     state:{
         token: '',
@@ -10,6 +10,7 @@ const store = new Vuex.Store({
         lodingSTag: false,
         regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"),
         userData: {},
+        detailData:{},
         //学院
         courtyardData: [
             '物理与信息工程学院',
@@ -64,32 +65,24 @@ const store = new Vuex.Store({
             '马克思主义学院':['思想政治教育'],
         },
         type_nav: {
-            ['校园卡']:{name: 'school_car', url: '/', id: 43},
-            ['借书证']:{name: 'library_card', url: '/', id: 54},
-            ['身份证']:{name: 'id_car', url: '/', id: 56},
-            ['手机']:{name: 'phone', url: '/', id: 12},
-            ['耳机']:{name: 'headset', url: '/', id: 94},
-            ['U盘']:{name: 'usb_drive', url: '/', id: 73},
-            ['首饰']:{name: 'jewelry', url: '/', id: 84},
-            ['眼镜']:{name: 'glasses', url: '/', id: 71},
-            ['手表']:{name: 'watch', url: '/', id: 99},
-            ['书籍']:{name: 'book', url: '/', id: 34},
-            ['水杯']:{name: 'water', url: '/', id: 10},
-            ['雨伞']:{name: 'umbrella', url: '/', id: 77}
+            ['银行卡']:{name: 'home_school_car', url: '/', id: 43},
+            ['证件类']:{name: 'home_id_car', url: '/', id: 56},
+            ['电子产品']:{name: 'home_phone', url: '/', id: 12},
+            ['首饰']:{name: 'home_jewelry', url: '/', id: 84},
+            ['生活用品']:{name: 'home_life', url: '/', id: 71},
+            ['书籍']:{name: 'home_book', url: '/', id: 34},
+            ['宠物']:{name: 'home_pet', url: '/', id: 34},
+            ['其他']:{name: 'home_other', url: '/', id: 77}
         },
         type_list: [
-            '校园卡',
-            '借书证',
-            '身份证',
-            '手机',
-            '耳机',
-            'U盘',
+            '银行卡',
+            '证件类',
+            '电子产品',
             '首饰',
-            '眼镜',
-            '手表',
+            '生活用品',
             '书籍',
-            '水杯',
-            '雨伞'
+            '宠物',
+            '其他'
         ]
 
     },

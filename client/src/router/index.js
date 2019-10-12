@@ -140,6 +140,17 @@ const router =  new Router({
           name: 'Releasedata',
           meta: {
             noRequireToken: true,
+            reType: true
+          },
+          component: Releasedata
+        },
+        //消息的更新
+        {
+          path: 'updata/:cheId/:objectId',
+          name: 'Releasedata',
+          meta: {
+            noRequireToken: true,
+            reType: false
           },
           component: Releasedata
         },

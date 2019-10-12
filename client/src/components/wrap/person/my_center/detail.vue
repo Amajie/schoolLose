@@ -1,10 +1,10 @@
 <template>
     <div @click="handleBlur" id="detail">
          <div class="header">
-            <div @click="goCenter" class="left">
+            <div @click.stop="goCenter" class="left">
                 <icon name="detail_arrow" :w="svg" :h="svg"></icon>
             </div>
-            <div class="right">
+            <div @click.stop="showOption = true" class="right">
                 <icon name="more_right" :w="svg" :h="svg"></icon>
             </div>
         </div>
@@ -49,7 +49,11 @@
                 </div>
                 </van-sticky>
                 <div class="content">
-                    <div class="item" @click.stop="handleReplayItem">
+                    <div class="item" 
+                        @click.stop="handleReplayItem(index)"
+                        v-for="(item, index) in commitData"
+                        :key="index"
+                        >
                             <div class="item-info">
                             <div class="from">
                                 <van-image
@@ -57,191 +61,30 @@
                                         :height="h_img_size"
                                         round
                                         fit="cover"
-                                        src="https://img.yzcdn.cn/vant/cat.jpeg"
+                                        :src="item.fromAvater"
                                     />
                             </div>
 
-                            <div class="from-name name">车神-黄杰</div>
+                            <div class="from-name name">{{item.fromUserName}}</div>
                             
-                            <div class="replay-text">
+                            <div v-if="item.toId" class="replay-text">
                                 回复
                             </div>
                             <div class="to">
-                                    <van-image
-                                        :width="h_img_size"
-                                        :height="h_img_size"
-                                        round
-                                        fit="cover"
-                                        src="https://img.yzcdn.cn/vant/cat.jpeg"
-                                    />
-                            </div>
-                            <div class="to-name name">一个div</div>
-                            </div>
-                            <div class="item-commit">
-                                <p class="text">
-                                    让文字垂直居中对齐很简单，
-                                    只要给类添加宽度和高度和行
-                                    高就可以实现垂直居中对齐的效果
-                                </p>
-                                <p class="time-replay">
-                                    2019-19-21 12:33
-                                </p>
-                            </div>
-                    </div>
-                    <div class="item" @click.stop="handleReplayItem">
-                            <div class="item-info">
-                            <div class="from">
                                 <van-image
-                                        :width="h_img_size"
-                                        :height="h_img_size"
-                                        round
-                                        fit="cover"
-                                        src="https://img.yzcdn.cn/vant/cat.jpeg"
-                                    />
+                                    v-if="item.toId"
+                                    :width="h_img_size"
+                                    :height="h_img_size"
+                                    round
+                                    fit="cover"
+                                    :src="item.toAvater"
+                                />
                             </div>
-
-                            <div class="from-name name">车神-黄杰</div>
-                            
-                            <div class="replay-text">
-                                回复
-                            </div>
-                            <div class="to">
-                                    <van-image
-                                        :width="h_img_size"
-                                        :height="h_img_size"
-                                        round
-                                        fit="cover"
-                                        src="https://img.yzcdn.cn/vant/cat.jpeg"
-                                    />
-                            </div>
-                            <div class="to-name name">一个div</div>
+                            <div v-if="item.toId" class="to-name name">{{item.toUserName}}</div>
                             </div>
                             <div class="item-commit">
-                                <p class="text">
-                                    让文字垂直居中对齐很简单，
-                                    只要给类添加宽度和高度和行
-                                    高就可以实现垂直居中对齐的效果
-                                </p>
-                                <p class="time-replay">
-                                    2019-19-21 12:33
-                                </p>
-                            </div>
-                    </div>
-                    <div class="item" @click.stop="handleReplayItem">
-                            <div class="item-info">
-                            <div class="from">
-                                <van-image
-                                        :width="h_img_size"
-                                        :height="h_img_size"
-                                        round
-                                        fit="cover"
-                                        src="https://img.yzcdn.cn/vant/cat.jpeg"
-                                    />
-                            </div>
-
-                            <div class="from-name name">车神-黄杰</div>
-                            
-                            <div class="replay-text">
-                                回复
-                            </div>
-                            <div class="to">
-                                    <van-image
-                                        :width="h_img_size"
-                                        :height="h_img_size"
-                                        round
-                                        fit="cover"
-                                        src="https://img.yzcdn.cn/vant/cat.jpeg"
-                                    />
-                            </div>
-                            <div class="to-name name">一个div</div>
-                            </div>
-                            <div class="item-commit">
-                                <p class="text">
-                                    让文字垂直居中对齐很简单，
-                                    只要给类添加宽度和高度和行
-                                    高就可以实现垂直居中对齐的效果
-                                </p>
-                                <p class="time-replay">
-                                    2019-19-21 12:33
-                                </p>
-                            </div>
-                    </div>
-                    <div class="item" @click.stop="handleReplayItem">
-                            <div class="item-info">
-                            <div class="from">
-                                <van-image
-                                        :width="h_img_size"
-                                        :height="h_img_size"
-                                        round
-                                        fit="cover"
-                                        src="https://img.yzcdn.cn/vant/cat.jpeg"
-                                    />
-                            </div>
-
-                            <div class="from-name name">车神-黄杰</div>
-                            
-                            <div class="replay-text">
-                                回复
-                            </div>
-                            <div class="to">
-                                    <van-image
-                                        :width="h_img_size"
-                                        :height="h_img_size"
-                                        round
-                                        fit="cover"
-                                        src="https://img.yzcdn.cn/vant/cat.jpeg"
-                                    />
-                            </div>
-                            <div class="to-name name">一个div</div>
-                            </div>
-                            <div class="item-commit">
-                                <p class="text">
-                                    让文字垂直居中对齐很简单，
-                                    只要给类添加宽度和高度和行
-                                    高就可以实现垂直居中对齐的效果
-                                </p>
-                                <p class="time-replay">
-                                    2019-19-21 12:33
-                                </p>
-                            </div>
-                    </div>
-                    <div class="item" @click.stop="handleReplayItem">
-                            <div class="item-info">
-                            <div class="from">
-                                <van-image
-                                        :width="h_img_size"
-                                        :height="h_img_size"
-                                        round
-                                        fit="cover"
-                                        src="https://img.yzcdn.cn/vant/cat.jpeg"
-                                    />
-                            </div>
-
-                            <div class="from-name name">车神-黄杰</div>
-                            
-                            <div class="replay-text">
-                                回复
-                            </div>
-                            <div class="to">
-                                    <van-image
-                                        :width="h_img_size"
-                                        :height="h_img_size"
-                                        round
-                                        fit="cover"
-                                        src="https://img.yzcdn.cn/vant/cat.jpeg"
-                                    />
-                            </div>
-                            <div class="to-name name">一个div</div>
-                            </div>
-                            <div class="item-commit">
-                                <p class="text">
-                                    让文字垂直居中对齐很简单，
-                                    只要给类添加宽度和高度和行
-                                    高就可以实现垂直居中对齐的效果
-                                </p>
-                                <p class="time-replay">
-                                    2019-19-21 12:33
-                                </p>
+                                <p class="text">{{item.commit}}</p>
+                                <p class="time-replay">{{item.commitTime | showTime(true)}}</p>
                             </div>
                     </div>
                     <div class="commit-end">
@@ -258,8 +101,7 @@
                         autosize
                         rows="1"
                         clearable
-                        @focus="replayFocus"
-                        @blur="replayBlur">
+                        @focus="replayFocus">
                         <van-button slot="button" 
                             size="small" type="info" 
                             v-show="replayTag"
@@ -275,43 +117,61 @@
                 </div>
             </div>
         </div>
+        <div @click.stop class="more-option">
+            <van-action-sheet
+                v-model="showOption"
+                round
+                :close-on-click-action="true"
+                :actions="options"
+                @select="onSelect"
+            />
+        </div>
     </div>
 </template>
 
 <script>
 import {ImagePreview} from 'vant'
+import {mapState, mapMutations} from 'vuex'
 export default {
     data(){
         return {
             svg: 30,
             images: [],
-            detailData:{},
             h_img_size: 35,
             commit: '',
+            commitData: [],
             saveCommit: '',
             commitHolder: '我来说两句',
             toId: '',
             replayTag: false,
+            options:[
+                {name: '举报', id: 1},
+                {name: '转发', id: 2}
+            ],
+            showOption: false
         }
     },
     created(){
-         this.cheId = this.$route.params.cheId
-         this.objectId = this.$route.params.objectId
+        this.cheId = this.$route.params.cheId
+        this.objectId = this.$route.params.objectId
+        // 获取详细信息
+        this.handleGetDetail()
+        // 获取评论
+        this.handleGetCommit()
+        // 绑定一些数据
+        this.handleCreated()
+    },
+    computed:{
+        ...mapState([
+            'detailData',
+            'userData'
 
-         this.getDetail({
-             objectId: this.objectId,
-             objectUserId: this.cheId
-         }).then(res =>{
-             console.log(res.data.detailData)
-             const {code, detailData} = res.data
-             if(code === 0) return console.log('查找失败')
-             if(code === 200){
-                 this.detailData = detailData
-                 this.images = detailData.objectImg
-             }
-         })
+        ])
     },
     methods:{
+        ...mapMutations([
+            'setState'
+        ]),
         showBigImg(startPosition){
 
             const {images} = this
@@ -321,13 +181,57 @@ export default {
             })
         },
         goCenter(){
-            console.log(this.cheId)
             this.$router.replace(`/c/center/${this.cheId}`)
         },
+
+        //初始化一些数据
+        handleCreated(){
+            if(this.cheId != this.userData.cheId) return
+
+            this.options.push({name: '删除', id: 3})
+            this.options.push({name: '编辑', id: 4})
+            this.options.push({name: '添加', id: 5})
+        },
+        //获取详细信息
+        handleGetDetail(){
+            this.getDetail({
+                objectId: this.objectId,
+                objectUserId: this.cheId
+            }).then(res =>{
+                console.log(res.data.detailData)
+                const {code, detailData} = res.data
+                if(code === 0) return console.log('查找失败')
+                if(code === 200){
+                    this.images = detailData.objectImg
+                    this.setState({detailData})
+                 }
+            })
+        },
+        //获取评论数据
+        handleGetCommit(){
+            this.fCommit({
+                infoId: this.$route.params.objectId
+            }).then(res =>{
+                const {code, commitData} = res.data
+
+                if(code === 0) return this.tText('暂无评论')
+                if(code === -1) return this.tText('获取失败')
+
+                this.commitData = commitData
+
+                console.log(commitData)
+
+            })
+        },
+        // 统一处理点击输入框的时候 失去焦点
         handleBlur(){
             console.log('点击')
             // 隐藏发表按钮
             this.replayTag = false
+            if(this.commit){
+                this.saveCommit = this.commit
+                this.commit = ''
+            }
         },
         // 粘性布局 滚动事件
         handleScroll(){
@@ -344,25 +248,23 @@ export default {
             //如果存在备份 就显示
             if(this.saveCommit){
                 this.commit = this.saveCommit
-            }
-        },
-        //失去焦点
-        replayBlur(){
-
-            //如果存在 内容则备份
-            if(this.commit){
-                this.saveCommit = this.commit
-                this.commit = ''
-                console.log('备份')
+                this.saveCommit = ''
             }
         },
         //点击评论 回复
-        handleReplayItem(){
+        handleReplayItem(index){
+
+            this.targetData = this.commitData[index]
+            const {targetData, tText, $refs} = this
+
+            if(targetData.fromId === this.cheId) return tText('只能回复别人哟')
+
             //保持获取焦点
-            this.$refs.commitNode.focus()
+            $refs.commitNode.focus()
+
             // 如果点击当前的就不需要在设置
-            this.toId = '车神-黄杰'
-            this.commitHolder = `回复: 车神-黄杰`
+            this.toId = targetData.fromId
+            this.commitHolder = `回复: ${targetData.fromUserName}`
             //显示的取消回复
             this.replayTag = true
             //并且把之前的 评论内容清空
@@ -371,40 +273,101 @@ export default {
         },
         // 发表评论
         sendReplay(){
-            //保持获取焦点
-            this.$refs.commitNode.focus()
 
-            if(!this.commit){
+            const {$refs, commit, toId, cheId, objectId, 
+                    commitData, userData, targetData, setState} = this
+            
+            //保持获取焦点
+            $refs.commitNode.focus()
+            const commitTime = Date.now()
+            if(!commit){
                 return this.tText('请输入留言内容')
             }
 
-            console.log('设置')
-            /**
-             * 这里模拟了发布请求 这些都是发送请求成功之后做事情
-             */
-            setTimeout(() =>{
-                
+            this.rCommit({
+                infoId: objectId,
+                fromId: cheId,
+                toId,
+                commit,
+                commitTime
+            }).then(res =>{
+                console.log(res)
+                const {code} = res.data
+
+                if(code === 0) return tText('留言失败，请稍后再试')
+
+                let arrData = {}
+
+                arrData.fromId = cheId
+                arrData.toId = toId
+                arrData.commit = commit
+                arrData.commitTime = commitTime
+
+                // 评论人的信息
+                arrData.fromUserName = userData.userName
+                arrData.fromAvater = userData.avater
+                // 默认为空
+                arrData.toUserName = ''
+                arrData.toAvater = ''
+
+                // 回复 则赋值
+                if(toId){
+                    // 回复目标的信息的信息
+                    arrData.toUserName = targetData.fromUserName
+                    arrData.toAvater = targetData.fromAvater
+
+                }
+
+
+
+                //此时要把新的数据 添加早新的评论数组中
+                //要根据是回复还是 留言
                 this.commit = ''
                 this.saveCommit = ''
                 // 隐藏发布按钮
                 this.replayTag = false
-                // 失去焦点
-                this.$refs.commitNode.blur()
-            }, 1000)
+                this.commitData = [arrData, ...commitData]
+            })
         },
         //取消 回复
         rejectReplay(){
             //此时把toId 清空
             this.toId = ''
             this.commitHolder = '我来说两句'
+            // 清空目标人的信息
+            this.targetData = null
         },
-        //当点击
-        clickItem(){}
+
+        // 更多操作
+        onSelect(item, index){
+            switch(index){
+                case 0://举报
+                    break
+                case 1://转发
+                    break
+                case 2://删除
+                    break
+                case 3://编辑
+                    this.$router.push(`/c/updata/${this.cheId}/${this.objectId}`)
+                    break
+                case 4://添加
+                    this.$router.push(`/c/redata/${this.cheId}`)
+                    break
+            }
+        },
+
     },
     filters:{
-        showTime(time){
+        /**
+         * tag 为true 即为显示年月日 小时 分
+         *      false 即为显示年月日
+         */
+        showTime(time, tag){
             const data = new Date(Number(time))
-            return `${data.getFullYear()}-${('0'+data.getMonth()).slice(-2)}-${('0'+data.getDate()).slice(-2)}`
+            if(!tag) return `${data.getFullYear()}-${('0'+data.getMonth()).slice(-2)}-${('0'+data.getDate()).slice(-2)}`
+            return `${data.getFullYear()}-${('0'+data.getMonth()).slice(-2)}-${('0'+data.getDate()).slice(-2)} 
+                            ${('0'+data.getHours()).slice(-2)}:
+                            ${('0'+data.getMinutes()).slice(-2)}`
         }
     }
 }
