@@ -65,6 +65,7 @@ router.post('/upAvatar', checkToken, upload.single("avater"), (req, res) =>{
     }
 })
 
+
 /**
  * @function 这里是插入发布消息的数据
  *  1 首先获取一个唯一的id 标志着该消息
@@ -104,6 +105,10 @@ router.post('/upObject', checkToken, upload.array('objectPic', 3), (req, res) =>
 
     // 因为是数组 因此也不需要在重新设置
     let objectImg = JSON.parse(req.body.objectImg)
+    let objectId = req.body.objectId
+
+    // 此时删除这个消息 也可以不用删除 数据一样其他也会更新
+    // delete req.body.objectId
 
     // 如果有值 上传图片则
     if(req.files.length){
@@ -116,20 +121,44 @@ router.post('/upObject', checkToken, upload.array('objectPic', 3), (req, res) =>
     }
 
     //消息的 id不用在此获取上传过来
-    reInfo.updateOne({objectUserId: mongoose.Types.ObjectId(req.userId)},
-    {...req.body, objectImg}, (err, upData) =>{
+    reInfo.updateOne({
+        objectUserId: mongoose.Types.ObjectId(req.userId),
+        objectId
+    },{...req.body, objectImg}, (err, upData) =>{
         console.log(upData)
         
         //此时返回数据
         res.json({"msg": "发布成功", "code": 200})
     })
 })
+/**
+ * @function 这里是发布消息的删除
+ *          其实就是把字段 objectDelect 设置为 1
+ */
+router.get('/deObject', checkToken, (req, res) =>{
+    const {objectId} = req.query
 
-//消息的查找
+
+    //消息的 id不用在此获取上传过来
+    reInfo.updateOne({
+        objectUserId: mongoose.Types.ObjectId(req.userId),
+        objectId,
+    },
+    {objectDelect: '1'}, (err, upData) =>{
+       
+        if(!upData.n) return res.json({"msg": "删除失败", "code": 0})
+        //此时返回数据
+        res.json({"msg": "发布成功", "code": 200})
+    })
+})
+
+//个人中心 消息的查找
 router.get('/fInfo', (req, res) =>{
     const {cheId} = req.query
 
-    if(!mongoose.Types.ObjectId.isValid(cheId)) return res.status(404).json({success: false, msg: '访问的页面不存在'})
+    if(!cheId || (cheId && !mongoose.Types.ObjectId.isValid(cheId)))
+        return res.status(404).json({success: false, msg: '访问的页面不存在'})
+        
 
     userInfo.aggregate([
         {
@@ -150,6 +179,7 @@ router.get('/fInfo', (req, res) =>{
             userType: "$userType",
             avater: "$avater",
             userActive: "$userActive",
+            otherConcern: "$otherConcern",
             name: "$name",
             stId: "$stId",
             gender: "$gender",
@@ -160,22 +190,61 @@ router.get('/fInfo', (req, res) =>{
             infoData: "$infoData",
             _id: "$__v"
         }}
-    ], function(err, data){
+    ], (err, data) =>{
+
+        if(cheId && data[0].infoData.length === 0) return res.json({"msg": "暂无数据", "code": 0, data})
+
+        data[0].infoData = data[0].infoData.filter(item => item.objectDelect === '0')
 
         console.log(data)
-        if(cheId && data[0].infoData.length === 0) return res.json({"msg": "暂无数据", "code": 0, data})
 
         res.json({"msg": "查找成功", "code": 200, data})
     })
 })
+
+
+//首页 消息的查找
+router.get('/home_f_info', (req, res) =>{
+    reInfo.aggregate([
+        {
+            $lookup:{
+                from: 'users',
+                localField: 'objectUserId',
+                foreignField: '_id',
+                as: 'infoData'
+            }
+        },
+        { $unwind: "$infoData"},
+        {$project:{
+            objectId:"$objectId",
+            objectDesc:"$objectDesc",
+            objectName:"$objectName",
+            objectAddress:"$objectAddress",
+            sendTime:"$sendTime",
+            objectId:"$objectId",
+            objectType:"$objectType",
+            objectWay:"$objectWay",
+            objectImg:"$objectImg",
+            userName:"$infoData.userName",
+            cheId:"$infoData._id"
+        }}
+    ], (err, data) =>{
+        console.log(data)
+        res.json({"msg": "查找成功", "code": 200, homeData: data})
+    })
+})
+
 
 // 详情页的查找
 router.get('/fDetailInfo', (req, res) =>{
     // 此时需要判断以下 这个userId是否符合情况
     const {objectId, objectUserId} = req.query
 
-    reInfo.findOne({objectId, objectUserId: mongoose.Types.ObjectId(objectUserId)}, (err, data) =>{
-
+    reInfo.findOne({
+        objectId, 
+        objectDelect: '0',
+        objectUserId: mongoose.Types.ObjectId(objectUserId)
+    }, (err, data) =>{
         if(!data) return res.json({"msg": "查找失败", "code": 0})
 
         res.json({"msg": "查找成功", "code": 200, "detailData": data})

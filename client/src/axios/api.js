@@ -159,6 +159,20 @@ export const upObject = data =>{
 
 
 /**
+ * @function 寻物消息的删除
+ * @param {*} params 发送的数据
+ * @param {*} objectDelect 其实就是把该字段置为 1 即可
+ */
+export const deObject = params =>{
+    return sendService({
+        url: '/deObject',
+        method: 'get',
+        params
+    })
+}
+
+
+/**
  * @function 消息的查找
  * @param {*} params 发送的数据
  */
@@ -169,6 +183,8 @@ export const gInfo = params =>{
         params
     })
 }
+
+
 /**
  * @function 消息详情页
  * @param {*} data 发送的数据
@@ -181,6 +197,18 @@ export const getDetail = params =>{
     })
 }
 
+
+/**
+ * @function 首页消息的查找
+ * @param {*} params 发送的数据
+ */
+export const gHomeInfo = params =>{
+    return entryService({
+        url: '/home_f_info',
+        method: 'get',
+        params
+    })
+}
 
 /**
  * @function 写留言

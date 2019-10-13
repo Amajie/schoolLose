@@ -26,6 +26,14 @@ var userSchema = new Schema({
         type: String,
         default: 'http://192.168.43.124:7070/av/init.png'
     }, //给他一张默认的图片
+    myConcern:{
+        type: Array,
+        default: []
+    }, //我的关注列表
+    otherConcern:{
+        type: Array,
+        default: []
+    }, //他人关注列表
     userActive:{
         type: Boolean,
         default: false//false 未激活 true 已经激活

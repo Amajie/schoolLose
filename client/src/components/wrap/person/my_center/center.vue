@@ -3,7 +3,7 @@
         <van-sticky>
             <div class="t">
                 <div class="header">
-                    <div @click="$router.replace('/person')" class="right">
+                    <div @click="$router.go(-1)" class="right">
                         <icon name="left_arrow" :w="svg" :h="svg"></icon>
                     </div>
                     <div class="seach">
@@ -35,8 +35,8 @@
                                             round
                                             width="60"
                                             height="60"
-                                            fit="contain"
-                                            :src="userData.avater"
+                                            fit="cover"
+                                            :src="avater"
                                         />
 
                                     </div>
@@ -45,14 +45,15 @@
                                     <!--未登陆显示信息 -->
                                     <div class="item">
                                         <p class="un">
-                                            车神-黄杰
+                                            {{userName}}
                                         </p>
                                     </div>
                                 </van-col>
                                 <van-col span="3">
                                     <!--关注 -->
-                                    <div class="item" @click="loading=false">
-                                        <icon name="concern" :w="svg" :h="svg"></icon>
+                                    <div class="item" @click.stop="handleConcern" @click="loading=false">
+                                        <icon v-if="!concernTag" name="concern" :w="svg" :h="svg"></icon>
+                                        <icon v-else name="concern_active" :w="svg" :h="svg"></icon>
                                     </div>
                                 </van-col>
                             </van-row>
@@ -78,7 +79,7 @@
                                 height="100"
                                 fit="cover"
                                 radius="5"
-                                :src="item.objectImg[0]?item.objectImg[0]: 'http://192.168.43.124:7070/av/init.png'"
+                                :src="item.objectImg[0]"
                             />
                         </div>
                         <div class="item_info">
@@ -91,20 +92,20 @@
                                 <p :class="{info_like: true, lose: item.objectWay === '0'}">{{item.objectWay === '0'? '丢': '拾'}}</p>
                             </div>
                             <!-- 评分 -->
-                            <div class="info_rate">
-                                <p class="rate_num">
+                            <div class="info_desc">
+                                <p class="desc-content">
                                     <icon name="desc" :w="15" :h="15"></icon>
                                     <span>{{item.objectDesc}}</span>
                                 </p>
                             </div>
                             <!-- 配送 -->
                             <div class="info_tack">
-                                <!-- <div class="user">
-                                <icon name="phone" :w="12" :h="12"></icon>
-                                <span>车神-黄杰</span>
-                                </div> -->
+                                <div class="user">
+                                    <icon name="center_object" :w="12" :h="12"></icon>
+                                    <span>{{item.objectName}}</span>
+                                </div>
                                 <div class="tack_heng">
-                                    <icon name="time" :w="15" :h="15"></icon>
+                                    <icon name="center_time" :w="15" :h="15"></icon>
                                 <span>{{item.sendTime | showTime}}</span>
                                 </div>
                             </div>
@@ -182,6 +183,13 @@ export default {
             infoData: [],
             cheId: '',
             userName: '',
+            avater: '',
+            otherConcern: [],
+            /**
+             * 是否已经关注他标志位 此时应该是遍历它的关注列表来决定 我这里先写死
+             */
+            concernTag: false
+
 
         }
     },
@@ -200,6 +208,13 @@ export default {
         // 此时应该定义在函数上 当拉到底端的时候再次调用
         this.gInfo({cheId: this.cheId}).then(res =>{
             const {code, data} = res.data
+
+
+            console.log(data[0])
+            // 个人信息要获取
+            this.userName = data[0].userName
+            this.avater = data[0].avater
+            this.otherConcern = data[0].otherConcern
             if(code === 0){
                 
                 //此时这里没有数据 应该友好显示
@@ -208,10 +223,6 @@ export default {
             }
 
             this.infoData = data[0].infoData
-            this.userName = data[0].userName
-
-            console.log(this.infoData)
-            console.log(this.userName)
         })
     },
     methods:{
@@ -224,11 +235,16 @@ export default {
             console.log('触发')
         },
         toDetail(index){
-            // $router.replace('/c/detail')
+            
             const {infoData, $router, cheId} = this
 
-            $router.replace(`/c/detail/${cheId}/${infoData[index].objectId}`)
-        }
+            $router.push(`/c/detail/${cheId}/${infoData[index].objectId}`)
+        },
+        //处理关注
+        handleConcern(){
+            console.log('请求')
+            this.concernTag = true
+        },
     },
     filters:{
         showTime(time){
@@ -240,6 +256,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+
 #center{
     height: 100%;
     .t{
@@ -336,9 +353,9 @@ export default {
                     }
                 }
                 //评分
-                .info_rate{
+                .info_desc{
                     font-size: 12px;
-                    .rate_num{
+                    .desc-content{
                         span{
                             line-height: 18px;
                             color: #666;
@@ -348,9 +365,7 @@ export default {
                 // 配送
                 .info_tack{
                     font-size: 12px;
-                    display: block;  
                     .tack_heng{
-                        float: right;
                         padding-left: 10px;
                     }
                 }
@@ -358,4 +373,5 @@ export default {
         }
     }
 }
+
 </style>

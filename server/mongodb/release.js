@@ -49,6 +49,10 @@ const reSchema = new Schema({
         type: String,
         default: '0'// 0就是没有完成 1 完成了
     },
+    objectDelect: {//消息是否删除
+        type: String,
+        default: '0'// 0就是没有删除 1 删除了
+    },
 })
 
 module.exports = mongoose.model('release', reSchema)

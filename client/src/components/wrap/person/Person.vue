@@ -14,7 +14,7 @@
         <div class="p-wrap">
             <!-- 登陆注册头像 -->
             <div class="p-person">
-                <div @click="$router.replace(`/c/center/${userData.cheId}`)" class="p-person-opa">
+                <div @click="$router.push(`/c/center/${userData.cheId}`)" class="p-person-opa">
                     <van-row type="flex" justify="center">
                         <van-col span="8">
                             <!-- 头像 -->
@@ -32,28 +32,21 @@
                 </div>
             </div>
             <div class="cell-nav">
-                <div class="nav-wrap">
-                    <div class="nav-list">
-                        <div class="nav-item">
-                            <p>12</p>
-                            <span>失主发布</span>
-                        </div>
-                    
-                        <div class="nav-item">
-                            <p>0</p>
-                            <span>拾主发布</span>
-                        </div>
-                    
-                        <div class="nav-item">
-                            <p>56</p>
-                            <span>我的关注</span>
-                        </div>
-                    </div>
-                </div>
                 <div class="cell-wrap">
                     <div class="cell-list">
                         <div class="cell-item">
-                            <img src="../../../assets/person/collect.png" alt="">
+                            <img src="../../../assets/person/person_concern.png" alt="">
+                            <van-cell title-class="text" title="我的关注" is-link>
+                                <van-icon
+                                    slot="right-icon"
+                                    name="arrow"
+                                    color="#969799"
+                                    style="line-height: inherit;"
+                                />
+                            </van-cell>
+                        </div>
+                        <div class="cell-item">
+                            <img src="../../../assets/person/person_collect.png" alt="">
                             <van-cell title-class="text" title="我的收藏" is-link>
                                 <van-icon
                                     slot="right-icon"
@@ -64,7 +57,18 @@
                             </van-cell>
                         </div>
                         <div class="cell-item">
-                            <img src="../../../assets/person/complaint.png" alt="">
+                            <img src="../../../assets/person/person_word.png" alt="">
+                            <van-cell title-class="text" title="我的留言" is-link>
+                                <van-icon
+                                    slot="right-icon"
+                                    name="arrow"
+                                    color="#969799"
+                                    style="line-height: inherit;"
+                                />
+                            </van-cell>
+                        </div>
+                        <div class="cell-item">
+                            <img src="../../../assets/person/person_complaint.png" alt="">
                             <van-cell title-class="text" title="投诉建议" is-link>
                                 <van-icon
                                     slot="right-icon"
@@ -75,7 +79,7 @@
                             </van-cell>
                         </div>
                         <div class="cell-item">
-                            <img src="../../../assets/person/about.png" alt="">
+                            <img src="../../../assets/person/person_about.png" alt="">
                             <van-cell title-class="text" title="关于车神寻物" is-link>
                                 <van-icon
                                     slot="right-icon"
@@ -190,31 +194,6 @@ export default {
         .cell-nav{
             padding: 0 2%;
             margin-top: 10px;
-            // 列表导航栏
-            .nav-wrap{
-                text-align: center;
-                .nav-list{
-                    display: flex;
-                    background: #ffffff;
-                    border-radius: 10px;
-                    .nav-item{
-                        flex: 1;
-                        height: 100%;
-                        padding: 10px 0;
-                        span{
-                            color: #a5a5a6;
-                            font-size: 13px;
-                        }
-                        p{
-                            display: block;
-                            padding-bottom: 5px;
-                            font-weight: 700;
-                            font-size: 20px;
-                            color: #333333;
-                        }
-                    }
-                }
-            }
             // cell 列表
              .cell-wrap{
                 .cell-list{

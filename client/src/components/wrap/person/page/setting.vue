@@ -24,7 +24,7 @@
                     </van-cell>
                 </div>
                 <div class="cell-item">
-                    <img src="../../../../assets/person/collect.png" alt="">
+                    <img src="../../../../assets/set/c_password.png" alt="">
                     <van-cell to='/cp' title-class="text" title="修改密码" is-link>
                         <van-icon
                             slot="right-icon"
@@ -35,7 +35,7 @@
                     </van-cell>
                 </div>
                 <div class="cell-item">
-                    <img src="../../../../assets/person/about.png" alt="">
+                    <img src="../../../../assets/set/c_email.png" alt="">
                     <van-cell to="/ce" title-class="text" title="修改邮箱" is-link>
                         <van-icon
                             slot="right-icon"

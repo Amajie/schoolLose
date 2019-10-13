@@ -165,10 +165,9 @@ export default {
         ...mapState([
             'detailData',
             'userData'
-
         ])
     },
-    methods:{
+    methods:{                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
         ...mapMutations([
             'setState'
         ]),
@@ -181,7 +180,8 @@ export default {
             })
         },
         goCenter(){
-            this.$router.replace(`/c/center/${this.cheId}`)
+            // this.$router.replace(`/c/center/${this.cheId}`)
+            this.$router.go(-1)
         },
 
         //初始化一些数据
@@ -255,9 +255,9 @@ export default {
         handleReplayItem(index){
 
             this.targetData = this.commitData[index]
-            const {targetData, tText, $refs} = this
+            const {targetData, tText, $refs, userData} = this
 
-            if(targetData.fromId === this.cheId) return tText('只能回复别人哟')
+            if(targetData.fromId === userData.cheId) return tText('只能回复别人哟')
 
             //保持获取焦点
             $refs.commitNode.focus()
@@ -286,7 +286,7 @@ export default {
 
             this.rCommit({
                 infoId: objectId,
-                fromId: cheId,
+                fromId: userData.cheId,
                 toId,
                 commit,
                 commitTime
@@ -337,21 +337,37 @@ export default {
             // 清空目标人的信息
             this.targetData = null
         },
-
         // 更多操作
         onSelect(item, index){
+            const {deObject, cheId, objectId, 
+                    $router, dConfirm, dAlert} = this
             switch(index){
                 case 0://举报
                     break
                 case 1://转发
                     break
                 case 2://删除
+                    dConfirm('提示', '是否删除该寻物消息?')
+                    .then(res =>{
+                        deObject({objectId}).then(res =>{
+                           const {code} = res.data
+                           if(code === 0) return dAlert('删除失败')
+
+                           dAlert('删除成功').then(() =>{
+                              $router.replace(`/c/center/${cheId}`)
+                           })
+                        })
+                        
+                    }).catch(res =>{
+                        console.log('取消')
+                    })
+                    
                     break
                 case 3://编辑
-                    this.$router.push(`/c/updata/${this.cheId}/${this.objectId}`)
+                    $router.push(`/c/updata/${cheId}/${objectId}`)
                     break
                 case 4://添加
-                    this.$router.push(`/c/redata/${this.cheId}`)
+                    $router.push(`/c/redata/${cheId}`)
                     break
             }
         },
@@ -438,9 +454,9 @@ export default {
                             margin-left: 5px;
                         }
                         .name:active{
-                                color: #088fff;
-                                text-decoration: underline;
-                            }
+                            color: #088fff;
+                            text-decoration: underline;
+                        }
                     }
                     .item-commit{
                         padding: 0 7%;
