@@ -11,6 +11,7 @@
                             placeholder="请输入搜索关键词"
                             shape="round"
                             background="#ff0000"
+                            @click.native="$router.push(`/search/${cheId}`)"
                         />
                     </div>
                     <!-- 这个要根据是主人还是 访客显示不同的图标 -->
@@ -86,7 +87,7 @@
                             <!-- 标题 -->
                             <div class="info_title">
                                 <p>
-                                    <span class="title_p">{{item.objectType}}</span>
+                                    <span class="title_p">{{item.objectTypeId | filterTypeName}}</span>
                                     <span class="title_name">{{userName}}</span>
                                 </p>
                                 <p :class="{info_like: true, lose: item.objectWay === '0'}">{{item.objectWay === '0'? '丢': '拾'}}</p>
@@ -106,7 +107,7 @@
                                 </div>
                                 <div class="tack_heng">
                                     <icon name="center_time" :w="15" :h="15"></icon>
-                                <span>{{item.sendTime | showTime}}</span>
+                                <span>{{item.sendTime | filterTime}}</span>
                                 </div>
                             </div>
                         </div>
@@ -245,12 +246,6 @@ export default {
             console.log('请求')
             this.concernTag = true
         },
-    },
-    filters:{
-        showTime(time){
-            const data = new Date(Number(time))
-            return `${data.getFullYear()}-${('0'+data.getMonth()).slice(-2)}-${('0'+data.getDate()).slice(-2)}`
-        }
     }
 }
 </script>

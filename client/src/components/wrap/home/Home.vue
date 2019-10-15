@@ -2,7 +2,7 @@
     <div id="home">
         <div class="header">
             <van-sticky>
-                <div class="seach">
+                <div @click="$router.push('/search')" class="search">
                     <van-search
                         placeholder="请输入搜索关键词"
                         shape="round"
@@ -22,9 +22,9 @@
         <div class="nav-wrap">
             <div class="nav-list">
                 <van-grid clickable :column-num="4">
-                    <van-grid-item :to="item.url" v-for="(item, key, index) in type_nav" :key="index">
+                    <van-grid-item v-for="(item, key, index) in type_nav" :key="index">
                         <icon :name="item.name" :w="svg" :h="svg"></icon>
-                        <span>{{key}}</span>
+                        <span>{{item.type}}</span>
                     </van-grid-item>
                 </van-grid>
             </div>
@@ -52,7 +52,7 @@
                             <!-- 标题 -->
                             <div class="info_title">
                                 <p>
-                                    <span class="title_p">{{item.objectType}}</span>
+                                    <span class="title_p">{{item.objectTypeId | filterTypeName}}</span>
                                     <span @click.stop="toUserCenter(index)" class="title_name">{{item.userName}}</span>
                                 </p>
                                 <p :class="{info_like: true, lose: item.objectWay === '0'}">{{item.objectWay === '0'? '丢': '拾'}}</p>
@@ -72,7 +72,7 @@
                                 </div>
                                 <div class="tack_heng">
                                     <icon name="center_time" :w="15" :h="15"></icon>
-                                <span>{{item.sendTime | showTime}}</span>
+                                <span>{{item.sendTime | filterTime}}</span>
                                 </div>
                             </div>
                         </div>
@@ -134,12 +134,6 @@ export default {
         onLoad(){
             console.log('加载')
         }
-    },
-    filters:{
-        showTime(time){
-            const data = new Date(Number(time))
-            return `${data.getFullYear()}-${('0'+data.getMonth()).slice(-2)}-${('0'+data.getDate()).slice(-2)}`
-        }
     }
 }
 </script>
@@ -147,8 +141,7 @@ export default {
 <style lang="less" scoped>
 #home{
     .header{
-        
-        .seach{
+        .search{
             flex: 1;
         }
         .left{

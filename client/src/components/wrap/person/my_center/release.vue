@@ -58,7 +58,7 @@
                             label="时间"
                             required
                             size="large"
-                            v-model="objectTime"
+                            v-model="selectTime"
                             placeholder="丢失或者拾获时间点"
                             @click.native="showDate = !showDate"
                         />
@@ -103,12 +103,9 @@
                     <van-picker
                         show-toolbar
                         title="物品类型"
-                        :columns="type_list"
-                         @cancel="showType = !showType"
-                        @confirm="val => { 
-                            showType = !showType
-                            objectType = val
-                        }"
+                        :columns="type_nav | filterType"
+                        @cancel="showType = !showType"
+                        @confirm="selectType"
                     />
                 </van-popup>
             </div>
@@ -124,14 +121,17 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapState, mapMutations} from 'vuex'
 export default {
     data(){
         return {
+            gg: 0,
             headerTitle: '消息发布',
             objectName: '',
             objectAddress: '达南502袋子',
             objectTime: '',
+            selectTime: '',
+            objectTypeId: '',
             objectType: '',
             objectWay: '0',
             sendTime: '',
@@ -156,6 +156,7 @@ export default {
         ])
     },
     methods:{
+        ...mapMutations(['filterType']),
         //初始化一些数据
         handleCreated(){
             const {meta, params} = this.$route
@@ -185,7 +186,7 @@ export default {
                         return {url}
                     })
                 }else if(item === 'objectTime'){
-                    this.objectTime = this.showTime(detailData[item])
+                    this.selectTime = this.showTime(detailData[item])
                 }
             }
 
@@ -205,7 +206,18 @@ export default {
         //时间确认
         selectConfirm(val){
             this.showDate = !this.showDate
-            this.objectTime = `${val.getFullYear()}-${('0'+val.getMonth()).slice(-2)}-${('0'+val.getDate()).slice(-2)}`
+            // 此时都是默认时分默认 00:00
+            this.objectTime = val.getTime()
+            this.selectTime = `${val.getFullYear()}-${('0'+( 1+ val.getMonth())).slice(-2)}-${('0'+val.getDate()).slice(-2)}`
+        },
+        // 物品类型
+        selectType(val){
+
+            const {type_nav, showType, selectTypeId} = this
+            this.showType = !this.showType
+            this.objectType = val
+            this.objectTypeId = selectTypeId(type_nav, val)
+            
         },
         // 处理数据的提交
         handleSubmit(){
@@ -213,23 +225,31 @@ export default {
             let formData = new FormData()
 
             const {objectName, objectWay, objectAddress, objectTime, 
-            objectType, objectDesc, objectImg, tText} = this
+            objectTypeId, objectDesc, objectImg, tText} = this
 
-            // 以下是必须填写的
-            if(!objectAddress){
+            以下是必须填写的
+            if(!objectTypeId){
+                return tText('请选择物品的类型')
+            }else if(!objectName){
+                return tText('请输入物品的具体名称')
+            }else if(!objectAddress){
                 return tText('请输入地点')
             }else if(!objectTime){
                 return tText('请选择时间')
-            }else if(!objectType){
-                return tText('请选择物品的类型')
             }
 
+            // console.log(objectTime)
+            // console.log(new Date(this.selectTime).getTime())
+            // console.log(this.showTime(objectTime, true))
+            // console.log(this.showTime(new Date(this.selectTime).getTime(), true))
+
+            // return
 
             formData.append('objectName', objectName)
             formData.append('objectWay', objectWay)
             formData.append('objectAddress', objectAddress)
             formData.append('objectTime', new Date(objectTime).getTime())
-            formData.append('objectType', objectType)
+            formData.append('objectTypeId', objectTypeId)
             formData.append('objectDesc', objectDesc)
 
             if(this.reType) return this.addData(formData)
@@ -291,6 +311,7 @@ export default {
             })
 
         },
+
          /**
          * tag 为true 即为显示年月日 小时 分
          *      false 即为显示年月日
@@ -301,7 +322,7 @@ export default {
             return `${data.getFullYear()}-${('0'+data.getMonth()).slice(-2)}-${('0'+data.getDate()).slice(-2)} 
                             ${('0'+data.getHours()).slice(-2)}:
                             ${('0'+data.getMinutes()).slice(-2)}`
-        }
+        },
     }
 }
 </script>

@@ -194,9 +194,11 @@ router.get('/fInfo', (req, res) =>{
 
         if(cheId && data[0].infoData.length === 0) return res.json({"msg": "暂无数据", "code": 0, data})
 
+        // 这里 必须要的 因为 objectDelect是隐藏在
+        // infoData数组里面 因此这里需要过滤 一下
         data[0].infoData = data[0].infoData.filter(item => item.objectDelect === '0')
 
-        console.log(data)
+        // console.log( 1< data[0].infoData[0].sendTime)
 
         res.json({"msg": "查找成功", "code": 200, data})
     })
@@ -211,10 +213,10 @@ router.get('/home_f_info', (req, res) =>{
                 from: 'users',
                 localField: 'objectUserId',
                 foreignField: '_id',
-                as: 'infoData'
+                as: 'userData'
             }
         },
-        { $unwind: "$infoData"},
+        { $unwind: "$userData"},
         {$project:{
             objectId:"$objectId",
             objectDesc:"$objectDesc",
@@ -222,15 +224,70 @@ router.get('/home_f_info', (req, res) =>{
             objectAddress:"$objectAddress",
             sendTime:"$sendTime",
             objectId:"$objectId",
-            objectType:"$objectType",
+            objectTypeId:"$objectTypeId",
             objectWay:"$objectWay",
             objectImg:"$objectImg",
-            userName:"$infoData.userName",
-            cheId:"$infoData._id"
+            userName:"$userData.userName",
+            cheId:"$userData._id"
         }}
     ], (err, data) =>{
         console.log(data)
         res.json({"msg": "查找成功", "code": 200, homeData: data})
+    })
+})
+
+//搜素 消息的查找
+router.get('/search_f_info', (req, res) =>{
+    // target 用户搜索关键字
+    const {target} = req.query
+    // const ss = getMatch(req.query)
+
+    // console.log(ss)
+
+    // return res.json({"msg": "成功"})
+    reInfo.aggregate([
+        {
+            $lookup:{
+                from: 'users',
+                localField: 'objectUserId',
+                foreignField: '_id',
+                as: 'userData'
+            }
+        },
+        { $unwind: "$userData"},
+
+        // 可以根据该田间查询
+
+        {"$match": getMatch(req.query)},
+        {$project:{
+            objectId:"$objectId",
+            objectDesc:"$objectDesc",
+            objectName:"$objectName",
+            objectAddress:"$objectAddress",
+            sendTime:"$sendTime",
+            objectId:"$objectId",
+            objectTypeId:"$objectTypeId",
+            objectWay:"$objectWay",
+            objectImg:"$objectImg",
+            userName:"$userData.userName",
+            cheId:"$userData._id",
+            _id:"$__v"
+        }}
+    ], (err, data) =>{
+
+        let homeData = []
+        // 如果搜索文字存在 就过滤 不存在就搜索全部符合情况即可
+        if(target){
+            console.log(111111)
+            homeData = data.filter(item =>{
+                // 此时这里根据 想要的相似度 来返回相应的数据
+                if(similarStr(item.objectName, target) > 0.4) return item
+            })
+        }else{
+            homeData = data
+        }
+
+        res.json({"msg": "查找成功", "code": 200, homeData})
     })
 })
 
@@ -392,6 +449,73 @@ router.get('/f', (req, res) =>{
 function getId(){
     return (Math.random() + Date.now()).toString(36)
 }
+
+
+function getMatch({startTime, endTime, objectTypeId, objectWay, objectUserId}){
+    
+    const $match = {}
+
+    if(startTime || endTime) $match.sendTime = {$gte : parseInt(startTime), $lt: parseInt(endTime)}
+    if(objectTypeId) $match.objectTypeId = objectTypeId
+    if(objectWay) $match.objectWay = objectWay
+    // 因为 objectUserId比较特殊 如果不是 查找的时候需要转为 ObjectId
+    // 因此 需要判断是否符合 mongodb转为 该类型的参数
+    if(objectUserId && mongoose.Types.ObjectId.isValid(objectUserId)) {
+        $match.objectUserId = mongoose.Types.ObjectId(objectUserId)
+    }else if(objectUserId && !mongoose.Types.ObjectId.isValid(objectUserId)){
+        $match.objectUserId = ''
+    }
+
+
+    // return JSON.stringify($match) != '{}' ? $match : 
+    //     {$gte : new Date('1971-01-01 00: 00').getTime(), $lt: Date.now()}
+    console.log($match)
+    return $match
+}
+
+/**
+ * @function 比较两个字符串的相似度
+ * @param {*} source 源字符串
+ * @param {*} target 目标字符串
+ * 源字符串 与 目标字符串相同字符的个数 / 字符串最长的长度
+ */
+function similarStr(source, target){
+
+    //如果其中有一个为 空 相似度为 0
+    if(!source || !target) return
+    
+    //比较字符串长度 获取字符串最长的长度
+    // 这里不先去重 在获取了
+    let maxLen = source.length > target.length ? source.length : target.length
+    
+    source = DRemoval(source)
+    target = DRemoval(target)
+
+    let count = 0
+    
+
+    for(let i = 0; i< source.length; i++){
+        if(target.indexOf(source[i]) != -1) 
+            count++
+    }
+
+    return count/maxLen
+}
+
+/**
+ * @function 字符串去重
+ * @param {*} target 目标字符串
+ */
+function DRemoval(target){
+    let newStr = ''
+    for(let i=0; i< target.length; i++){
+        if(newStr.indexOf(target[i])=== -1){
+            newStr = newStr + target[i]
+        }
+    }
+    return newStr;
+}
+
 
 
 module.exports = router

@@ -210,6 +210,20 @@ export const gHomeInfo = params =>{
     })
 }
 
+
+/**
+ * @function 消息的搜索 此时应该只有 内容区显示加载 后面再改
+ * @param {*} params 搜索的限制条件
+ */
+export const gSearchInfo = params =>{
+    return sendService({
+        url: '/search_f_info',
+        method: 'get',
+        params
+    })
+}
+
+
 /**
  * @function 写留言
  * @param {*} data 发送的数据

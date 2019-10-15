@@ -34,10 +34,10 @@
                     --- 详情信息 ---
                 </div>
                 <div class="content">
-                    <van-cell title="分类" :value="detailData.objectType" size="large" />
+                    <van-cell title="分类" :value="detailData.objectTypeId | filterTypeName" size="large" />
                     <van-cell title="物品名称" :value="detailData.objectName" size="large" />
-                    <van-cell title="丢失时间" :value="detailData.objectTime | showTime" size="large" />
-                    <van-cell title="发布时间" :value="detailData.sendTime | showTime" size="large" />
+                    <van-cell title="丢失时间" :value="detailData.objectTime | filterTime" size="large" />
+                    <van-cell title="发布时间" :value="detailData.sendTime | filterTime" size="large" />
                     <van-cell title="丢失地点" :label="detailData.objectAddress" size="large" />
                     <van-cell title="楼主说明" :label="detailData.objectDesc" size="large" />
                 </div>
@@ -84,7 +84,7 @@
                             </div>
                             <div class="item-commit">
                                 <p class="text">{{item.commit}}</p>
-                                <p class="time-replay">{{item.commitTime | showTime(true)}}</p>
+                                <p class="time-replay">{{item.commitTime | filterTime(true)}}</p>
                             </div>
                     </div>
                     <div class="commit-end">
@@ -371,20 +371,6 @@ export default {
                     break
             }
         },
-
-    },
-    filters:{
-        /**
-         * tag 为true 即为显示年月日 小时 分
-         *      false 即为显示年月日
-         */
-        showTime(time, tag){
-            const data = new Date(Number(time))
-            if(!tag) return `${data.getFullYear()}-${('0'+data.getMonth()).slice(-2)}-${('0'+data.getDate()).slice(-2)}`
-            return `${data.getFullYear()}-${('0'+data.getMonth()).slice(-2)}-${('0'+data.getDate()).slice(-2)} 
-                            ${('0'+data.getHours()).slice(-2)}:
-                            ${('0'+data.getMinutes()).slice(-2)}`
-        }
     }
 }
 </script>

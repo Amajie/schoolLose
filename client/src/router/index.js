@@ -25,6 +25,9 @@ import Center from '../components/wrap/person/my_center/center.vue'
 import Releasedata from '../components/wrap/person/my_center/release.vue'
 import Deatil from '../components/wrap/person/my_center/detail.vue'
 
+//搜素
+import Search from '../components/seach/search.vue'
+
 import store from '../store.js'
 
 
@@ -170,6 +173,24 @@ const router =  new Router({
       path: '/cimg',
       name: 'Cimg',
       component: Cimg
+    },
+    // 首页的搜索
+    {
+      path: '/search',
+      name: 'Search',
+      meta: {
+        noRequireToken: true,
+      },
+      component: Search
+    },
+    // 用户的个人中心搜索
+    {
+      path: '/search/:cheId',
+      name: 'Search',
+      meta: {
+        noRequireToken: true,
+      },
+      component: Search
     },
     {
       path: '*',

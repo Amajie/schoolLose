@@ -18,7 +18,7 @@ const reSchema = new Schema({
         required: true
     },
     objectTime: {// 拾取 或者丢失 时间
-        type: String,
+        type: Number,
         required: true
     },
     objectAddress: {// 地址
@@ -29,12 +29,12 @@ const reSchema = new Schema({
         type: String,
         required: true
     },
-    objectType: {// 类型
+    objectTypeId: {// 类型
         type: String,
         required: true
     },
     sendTime: {// 发布时间
-        type: String,
+        type: Number,
         required: true
     },
     objectImg: {// 物品图片

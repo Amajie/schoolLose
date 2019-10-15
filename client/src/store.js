@@ -65,26 +65,15 @@ const store = new Vuex.Store({
             '马克思主义学院':['思想政治教育'],
         },
         type_nav: {
-            ['银行卡']:{name: 'home_school_car', url: '/', id: 43},
-            ['证件类']:{name: 'home_id_car', url: '/', id: 56},
-            ['电子产品']:{name: 'home_phone', url: '/', id: 12},
-            ['首饰']:{name: 'home_jewelry', url: '/', id: 84},
-            ['生活用品']:{name: 'home_life', url: '/', id: 71},
-            ['书籍']:{name: 'home_book', url: '/', id: 34},
-            ['宠物']:{name: 'home_pet', url: '/', id: 34},
-            ['其他']:{name: 'home_other', url: '/', id: 77}
-        },
-        type_list: [
-            '银行卡',
-            '证件类',
-            '电子产品',
-            '首饰',
-            '生活用品',
-            '书籍',
-            '宠物',
-            '其他'
-        ]
-
+            ['000']:{name: 'home_school_car', type: '银行卡'},
+            ['001']:{name: 'home_id_car',  type: '证件类'},
+            ['002']:{name: 'home_phone',  type: '电子产品'},
+            ['003']:{name: 'home_jewelry',  type: '首饰'},
+            ['004']:{name: 'home_life',  type: '生活用品'},
+            ['005']:{name: 'home_book',  type: '书籍'},
+            ['006']:{name: 'home_pet',  type: '宠物'},
+            ['007']:{name: 'home_other',  type: '其他'}
+        }
     },
     mutations: {
         //删除token
@@ -101,6 +90,13 @@ const store = new Vuex.Store({
         // 设置某个 用户的个人信息
         setUserData(state, userData){
             state.userData = userData
+        },
+        filterType(state){
+            const typeArr = []
+            for(let key in state.type_nav){
+                typeArr.push(state.type_nav[key].type)
+            }
+            return typeArr
         }
     },
     actions:{

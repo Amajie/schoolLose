@@ -22,7 +22,7 @@ Vue.prototype.tText = tText// 轻提示
 //请求函数的封装
 import {register, sendEmailCode, checkEmailCode, login,
   cName, cPaw, cEmail, cInfo, fInfo, upAvater, reObject,
-  upObject, deObject, gInfo, gHomeInfo, getDetail, rCommit, fCommit, text} from './axios/api.js'
+  upObject, deObject, gInfo, gHomeInfo, gSearchInfo, getDetail, rCommit, fCommit, text} from './axios/api.js'
 Vue.prototype.register = register//发送注册请求
 Vue.prototype.sendEmailCode = sendEmailCode//发送邮箱验证码
 Vue.prototype.checkEmailCode = checkEmailCode//发送 输入的 验证码
@@ -39,6 +39,7 @@ Vue.prototype.upObject = upObject//发送 寻物消息的更新
 Vue.prototype.deObject = deObject//发送 寻物消息的删除
 Vue.prototype.gInfo = gInfo//发送 寻物消息
 Vue.prototype.gHomeInfo = gHomeInfo//发送 首页寻物消息
+Vue.prototype.gSearchInfo = gSearchInfo//发送 搜索
 Vue.prototype.getDetail = getDetail//发送 详情页
 Vue.prototype.rCommit = rCommit//发送 写留言
 Vue.prototype.fCommit = fCommit//发送 查找留言
@@ -49,6 +50,10 @@ Vue.prototype.text = text//发送 密码修改请求
 import {decrypt, encrypt} from './assets/crypto/encrypt.js'
 Vue.prototype.decrypt = decrypt// 解密
 Vue.prototype.encrypt = encrypt// 加密
+
+//共同方法
+import {selectTypeId} from './commonF/commonF.js'
+Vue.prototype.selectTypeId = selectTypeId// 解密
 
 
 //svg 图片的使用
@@ -107,6 +112,13 @@ Vue.use(Button)
   .use(Swipe)
   .use(SwipeItem)
   .use(Lazyload)
+
+
+import * as filters from './filter/filter.js';
+
+Object.keys(filters).forEach(key => {
+  return  Vue.filter(key, filters[key])
+})
 
 Vue.config.productionTip = false
 new Vue({
