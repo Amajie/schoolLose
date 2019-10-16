@@ -3,7 +3,7 @@
         <div class="header b">
             <van-nav-bar
                 title="更换头像"
-                @click-left="() => $router.replace('/person')"
+                @click-left="handleRouter({url: '/person', tag: 'r'})"
                 :border="false"
             >
                 <van-icon name="arrow-left" slot="left" size="2em" color="#fff" />
@@ -41,7 +41,8 @@ export default {
     },
     methods:{
         ...mapMutations([
-            'setUserData'
+            'setUserData',
+            'handleRouter'
         ]),
         //图片读取前调用
         beforeRead(file){

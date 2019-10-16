@@ -278,7 +278,7 @@ router.get('/search_f_info', (req, res) =>{
         let homeData = []
         // 如果搜索文字存在 就过滤 不存在就搜索全部符合情况即可
         if(target){
-            console.log(111111)
+
             homeData = data.filter(item =>{
                 // 此时这里根据 想要的相似度 来返回相应的数据
                 if(similarStr(item.objectName, target) > 0.4) return item
@@ -296,7 +296,7 @@ router.get('/search_f_info', (req, res) =>{
 router.get('/fDetailInfo', (req, res) =>{
     // 此时需要判断以下 这个userId是否符合情况
     const {objectId, objectUserId} = req.query
-
+    // 此时要判断 用户的id是否正确
     reInfo.findOne({
         objectId, 
         objectDelect: '0',
@@ -351,11 +351,10 @@ router.get('/fCommit', (req, res) =>{
             }
         },
         {$match:{infoId}},
-        { $unwind: "$commitData" }
+        {$unwind: "$commitData" }
     ], function(err, data){
 
-        if(!data) return res.json({"msg": "获取评论失败", "code": -1})
-
+        //不会存在数组为空的情况
         if(data.length === 0) return res.json({"msg": "暂无评论", "code": 0})
 
         const commitData = data.map((item, index, array) =>{
@@ -369,10 +368,8 @@ router.get('/fCommit', (req, res) =>{
             arrData.commitTime = commitTime
 
             // 评论人的信息 评论人的信息 id不需要了 与上面的fromId 和 toId相同
-            // arrData.fromCheId = commitData._id
             arrData.fromUserName = commitData.userName
             arrData.fromAvater = commitData.avater
-            // arrData.toCheId = ''
             arrData.toUserName = ''
             arrData.toAvater = ''
             // 没值直接返回
@@ -381,7 +378,6 @@ router.get('/fCommit', (req, res) =>{
             //否则返回数据
             return {
                 ...arrData, 
-                // toCheId: replayUserInfo._id,
                 toUserName: replayUserInfo.userName,
                 toAvater: replayUserInfo.avater,
             }

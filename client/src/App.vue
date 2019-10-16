@@ -1,13 +1,13 @@
 <template>
   <div id="app">
-    <div class="loadingEntry p" v-show="showELoding">
-      <div class="loading-wrap p">
+    <div class="loadingEntry loadFixed" v-show="showELoding">
+      <div class="loading-wrap loadFixed">
         <van-loading :size="loadSize" text-size="15" color="#e80000">加载...</van-loading>
       </div>
     </div>
-    <div class="loadingSend p" v-show="showSLoding">
-      <div class="loading-wrap p">
-        <div class="p">
+    <div class="loadingSend loadFixed" v-show="showSLoding">
+      <div class="loading-wrap loadFixed">
+        <div class="loadFixed">
           <van-loading type="spinner" :size="loadSize" color="#e80000" />
         </div>
       </div>
@@ -38,15 +38,6 @@ export default {
 
 <style lang="less" scoped>
 #app {
-  .p{
-    position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    margin: auto;
-    z-index: 10000000000;
-  }
   .loadingEntry{
     background-color: #fff;
     .loading-wrap{
@@ -55,7 +46,6 @@ export default {
     }
   }
   .loadingSend{
-    z-index: 10000000000;
     .loading-wrap{
         width: 100px;
         height: 100px;

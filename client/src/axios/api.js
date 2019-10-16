@@ -190,7 +190,7 @@ export const gInfo = params =>{
  * @param {*} data 发送的数据
  */
 export const getDetail = params =>{
-    return entryService({
+    return notService({
         url: '/fDetailInfo',
         method: 'get',
         params
@@ -203,7 +203,7 @@ export const getDetail = params =>{
  * @param {*} params 发送的数据
  */
 export const gHomeInfo = params =>{
-    return entryService({
+    return notService({
         url: '/home_f_info',
         method: 'get',
         params
@@ -216,7 +216,7 @@ export const gHomeInfo = params =>{
  * @param {*} params 搜索的限制条件
  */
 export const gSearchInfo = params =>{
-    return sendService({
+    return notService({
         url: '/search_f_info',
         method: 'get',
         params

@@ -2,7 +2,7 @@
     <div id="home">
         <div class="header">
             <van-sticky>
-                <div @click="$router.push('/search')" class="search">
+                <div @click="handleRouter({url: '/search/all', tag: 'p'})" class="search">
                     <van-search
                         placeholder="请输入搜索关键词"
                         shape="round"
@@ -22,14 +22,14 @@
         <div class="nav-wrap">
             <div class="nav-list">
                 <van-grid clickable :column-num="4">
-                    <van-grid-item v-for="(item, key, index) in type_nav" :key="index">
+                    <van-grid-item @click.native="handleSelectNav(key)" v-for="(item, key, index) in type_nav" :key="index">
                         <icon :name="item.name" :w="svg" :h="svg"></icon>
                         <span>{{item.type}}</span>
                     </van-grid-item>
                 </van-grid>
             </div>
         </div>
-        <div class="info-list">
+        <div class="info-list cell">
             <van-list
                 v-model="loading"
                 :finished="finished"
@@ -37,7 +37,7 @@
                 @load="onLoad"
                 :immediate-check="false"
                 >
-                <van-cell @click.native="toDetail(index)" clickable v-for="(item, index) in homeData" :key="index">
+                <van-cell @click.native="toDetail(item)" clickable v-for="(item, index) in homeData" :key="index">
                     <div class="shop_data_item">
                         <div class="item_img">
                             <van-image
@@ -52,8 +52,8 @@
                             <!-- 标题 -->
                             <div class="info_title">
                                 <p>
-                                    <span class="title_p">{{item.objectTypeId | filterTypeName}}</span>
-                                    <span @click.stop="toUserCenter(index)" class="title_name">{{item.userName}}</span>
+                                    <span class="title_p">{{item.objectTypeId | filterTypeName(type_nav)}}</span>
+                                    <span @click.stop="toUserCenter(item)" class="title_name">{{item.userName}}</span>
                                 </p>
                                 <p :class="{info_like: true, lose: item.objectWay === '0'}">{{item.objectWay === '0'? '丢': '拾'}}</p>
                             </div>
@@ -79,12 +79,14 @@
                     </div>
                 </van-cell>
             </van-list>
+            <Loading @fresh="getHomeData" v-bind="loadObj" />
         </div>  
     </div>
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapMutations} from 'vuex'
+import Loading from '../../loading/loading.vue'
 export default {
     data(){
         return{
@@ -93,6 +95,7 @@ export default {
             homeData: [],
             loading: false,
             finished: false,
+            loadObj: {}
         }
     },
     created(){
@@ -104,36 +107,40 @@ export default {
         ])
     },
     methods:{
+        ...mapMutations([
+            'toDetail',
+            'toUserCenter',
+            'handleRouter'
+        ]),
         getHomeData(){
+            this.loadObj = {
+                loadTag: true,
+                freshTag: false
+            }
             this.gHomeInfo().then(res =>{
+
+                // 关闭加载
+                this.loadObj = {
+                    loadTag: false,
+                    freshTag: false
+                }
                 const {code, homeData} = res.data
+                console.log(res.data)
                 this.homeData = homeData
                 console.log(homeData)
             })
         },
-        // 前往详细信息页面
-        toDetail(index){
-            /**
-             * 跳转到详情页 以下数据可通过 homeData获取
-             *  1 用户的 cheId id
-             *  2 信息的 objectId id
-             */
-            const {cheId, objectId} = this.homeData[index]
-            this.$router.push(`/c/detail/${cheId}/${objectId}`)
-        },
-        // 前往详细信息页面
-        toUserCenter(index){
-            /**
-             * 跳转到详情页 以下数据可通过 homeData获取
-             *  1 用户的 cheId id
-             *  2 信息的 objectId id
-             */
-            const {cheId, objectId} = this.homeData[index]
-            this.$router.push(`/c/center/${cheId}`)
+        // 处理点击便捷导航
+        handleSelectNav(objectTypeId){
+            console.log(objectTypeId)
+            this.handleRouter({url: `/search/${objectTypeId}`, tag: 'p'})
         },
         onLoad(){
             console.log('加载')
         }
+    },
+    components:{
+        Loading
     }
 }
 </script>
@@ -163,6 +170,7 @@ export default {
         }
     }
     .info-list{
+        padding-bottom: 50px;
         .info-wrap{
           padding: 0 1%;
           padding-bottom: 10px;

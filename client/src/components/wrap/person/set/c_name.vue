@@ -3,7 +3,7 @@
         <div class="header g">
             <van-nav-bar
                 title="修改用户名"
-                @click-left="() => $router.replace('/set')"
+                @click-left="handleRouter({ url: '/set', tag: 'r'})"
                 left-arrow
             >
                 <van-icon name="arrow-left" slot="left" size="1.5em" color="#fff"/>
@@ -38,10 +38,11 @@ export default {
     methods:{
         
         ...mapMutations([
-            'setUserData'
+            'setUserData',
+            'handleRouter'
         ]),
         changeName(){
-            const {userName, cName, tText, setUserData} = this
+            const {userName, cName, tText, setUserData, handleRouter} = this
 
             //验证 用户名是否输入正确
             if(!userName){
@@ -62,6 +63,7 @@ export default {
                 
                 tText('修改用户名成功')
                 setUserData({...this.$store.state.userData, userName})
+                handleRouter({})
             })
         }
     }

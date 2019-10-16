@@ -18,7 +18,13 @@ export const  filterType = (type_nav) =>{
  * @function 根据分类id拿取相应的分类
  * @param {*} key 这是 物品类型分类 key值
  */
-export const  filterTypeName = key => store.state.type_nav[key].type
+export const  filterTypeName = (key) => {
+
+    // 这个过滤器 在组件初始化的时候会调用一次 因此 值可能为undefined的
+    if(!key) return 
+
+    return store.state.type_nav[key].type
+}
 
  /**
  * tag 为true 即为显示年月日 小时 分

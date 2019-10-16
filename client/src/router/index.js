@@ -25,6 +25,9 @@ import Center from '../components/wrap/person/my_center/center.vue'
 import Releasedata from '../components/wrap/person/my_center/release.vue'
 import Deatil from '../components/wrap/person/my_center/detail.vue'
 
+//测试loading
+import Load from '../components/loading/loading.vue'
+
 //搜素
 import Search from '../components/seach/search.vue'
 
@@ -176,7 +179,7 @@ const router =  new Router({
     },
     // 首页的搜索
     {
-      path: '/search',
+      path: '/search/:objectTypeId',
       name: 'Search',
       meta: {
         noRequireToken: true,
@@ -185,12 +188,21 @@ const router =  new Router({
     },
     // 用户的个人中心搜索
     {
-      path: '/search/:cheId',
+      path: '/pSearch/:cheId',
       name: 'Search',
       meta: {
         noRequireToken: true,
       },
       component: Search
+    },
+    // 测试loading
+    {
+      path: '/load',
+      name: 'Load',
+      meta: {
+        noRequireToken: true,
+      },
+      component: Load
     },
     {
       path: '*',

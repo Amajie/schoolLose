@@ -3,7 +3,7 @@
         <div class="header g">
             <van-nav-bar
                 title="修改邮箱"
-                @click-left="() => $router.replace('/set')"
+                @click-left="$router.replace('/set')"
                 left-arrow
             >
                 <van-icon name="arrow-left" slot="left" size="1.5em" color="#fff"/>

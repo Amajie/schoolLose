@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import $router from './router/index.js'
 
 Vue.use(Vuex)
 
@@ -91,12 +92,44 @@ const store = new Vuex.Store({
         setUserData(state, userData){
             state.userData = userData
         },
-        filterType(state){
-            const typeArr = []
-            for(let key in state.type_nav){
-                typeArr.push(state.type_nav[key].type)
+
+        // 前往详细信息页面
+        toDetail(state, data){
+            /**
+             * 跳转到详情页 以下数据可通过 homeData获取
+             *  1 用户的 cheId id
+             *  2 信息的 objectId id
+             */
+            const {cheId, objectId} = data
+            $router.push(`/c/detail/${cheId}/${objectId}`)
+        },
+        // 前往用户的个人中心
+        toUserCenter(state, data){
+            /**
+             * 跳转到详情页 以下数据可通过 homeData获取
+             *  用户的 cheId id
+             */
+            const {cheId, objectId} = data
+            $router.push(`/c/center/${cheId}`)
+        },
+        /**
+         * 
+         * @param {*} state 
+         * @param {*} urlData 跳转的数据 tag 方式 url 路径
+         */
+        handleRouter(state, {tag, url}){
+            
+            switch(tag){
+                case 'r':
+                    $router.replace(url)
+                    break
+                case 'p':
+                    $router.push(url)
+                    break
+                default:
+                    return $router.go(-1)
+                    
             }
-            return typeArr
         }
     },
     actions:{

@@ -3,7 +3,7 @@
         <van-sticky>
             <div class="t">
                 <div class="header">
-                    <div @click="$router.go(-1)" class="right">
+                    <div @click="handleRouter({})" class="right">
                         <icon name="left_arrow" :w="svg" :h="svg"></icon>
                     </div>
                     <div class="seach">
@@ -11,14 +11,14 @@
                             placeholder="请输入搜索关键词"
                             shape="round"
                             background="#ff0000"
-                            @click.native="$router.push(`/search/${cheId}`)"
+                            @click.native="handleRouter({url: `/pSearch/${cheId}`, tag: 'p'})"
                         />
                     </div>
                     <!-- 这个要根据是主人还是 访客显示不同的图标 -->
-                    <!-- <div @click="$router.replace('/person')" class="left">
+                    <!-- <div @click="handleRouter({url: `/person`, tag: 'p'})" class="left">
                         <icon name="tip" :w="svg" :h="svg"></icon>
                     </div> -->
-                    <div @click="$router.push(`/c/redata/${cheId}`)" class="left">
+                    <div @click="handleRouter({url: `/c/redata/${cheId}`, tag: 'p'})" class="left">
                         <icon name="add_info" :w="svg" :h="svg"></icon>
                     </div>
                 </div>
@@ -63,7 +63,7 @@
                 </div>
             </div>
         </van-sticky>
-        <div class="b">
+        <div class="b cell">
             <van-list
                 v-model="loading"
                 :finished="finished"
@@ -173,7 +173,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex'
+import {mapState, mapMutations} from 'vuex'
 export default {
     data(){
         return{
@@ -227,6 +227,9 @@ export default {
         })
     },
     methods:{
+        ...mapMutations([
+            'handleRouter'
+        ]),
         onLoad() {
             /**
              * 注意 
@@ -237,9 +240,12 @@ export default {
         },
         toDetail(index){
             
-            const {infoData, $router, cheId} = this
+            const {infoData, handleRouter, cheId} = this
 
-            $router.push(`/c/detail/${cheId}/${infoData[index].objectId}`)
+            handleRouter({
+                url: `/c/detail/${cheId}/${infoData[index].objectId}`,
+                tag:'p'
+            })
         },
         //处理关注
         handleConcern(){

@@ -3,7 +3,7 @@
         <div class="header g">
             <van-nav-bar
                 title="个人信息"
-                @click-left="() => $router.replace('/set')"
+                @click-left="handleRouter({url: '/set', tag: 'r'})"
                 left-arrow
             >
                 <van-icon name="arrow-left" slot="left" size="1.5em" color="#fff"/>
@@ -126,7 +126,8 @@ export default {
     },
     methods:{
         ...mapMutations([
-            'setUserData'
+            'setUserData',
+            'handleRouter'
         ]),
         /**
          * @function 处理专业选项
@@ -165,7 +166,7 @@ export default {
          */
         handleInfo(){
             //获取相应的数据
-            const {name, stId, gender, courtyard, $router, setUserData,
+            const {name, stId, gender, courtyard, handleRouter, setUserData,
                 major, classes, address, cInfo, tText, dAlert} = this
 
             //发送请求
@@ -181,6 +182,7 @@ export default {
                         name, stId, gender, courtyard,
                         major, classes, address
                     })
+                    handleRouter({})
                 })
             })
             

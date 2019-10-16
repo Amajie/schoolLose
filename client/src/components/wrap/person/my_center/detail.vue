@@ -1,7 +1,7 @@
 <template>
     <div @click="handleBlur" id="detail">
          <div class="header">
-            <div @click.stop="goCenter" class="left">
+            <div @click.stop="handleRouter({})" class="left">
                 <icon name="detail_arrow" :w="svg" :h="svg"></icon>
             </div>
             <div @click.stop="showOption = true" class="right">
@@ -44,9 +44,9 @@
             </div>
             <div class="commit-wrap">
                 <van-sticky @scroll="handleScroll" :offset-top="0">
-                <div class="title">
-                    --- 相关留言 ---
-                </div>
+                    <div class="title">
+                        --- 相关留言 ---
+                    </div>
                 </van-sticky>
                 <div class="content">
                     <div class="item" 
@@ -87,14 +87,15 @@
                                 <p class="time-replay">{{item.commitTime | filterTime(true)}}</p>
                             </div>
                     </div>
-                    <div class="commit-end">
-                        没有更多了
+                     <div class="commit-loading">
+                        <Loading @fresh="handleGetCommit" v-bind="loadObj"/>
                     </div>
+                    <div class="commit-end">{{noCommitText}}</div>
                 </div>
             </div>
         </div>
         <div @click.stop class="commit-replay">
-            <div class="commit-wrap">
+            <div class="replay-wrap">
                 <div class="c-in">
                     <van-field ref="commitNode" v-model="commit" :placeholder="commitHolder"
                         type="textarea"
@@ -132,6 +133,7 @@
 <script>
 import {ImagePreview} from 'vant'
 import {mapState, mapMutations} from 'vuex'
+import Loading from '../../../loading/loading.vue'
 export default {
     data(){
         return {
@@ -148,7 +150,10 @@ export default {
                 {name: '举报', id: 1},
                 {name: '转发', id: 2}
             ],
-            showOption: false
+            showOption: false,
+            showLoad: false,
+            noCommitText: '',
+            loadObj: {}
         }
     },
     created(){
@@ -164,12 +169,13 @@ export default {
     computed:{
         ...mapState([
             'detailData',
-            'userData'
+            'userData',
         ])
     },
     methods:{                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
         ...mapMutations([
-            'setState'
+            'setState',
+            'handleRouter'
         ]),
         showBigImg(startPosition){
 
@@ -178,10 +184,6 @@ export default {
                 images,
                 startPosition
             })
-        },
-        goCenter(){
-            // this.$router.replace(`/c/center/${this.cheId}`)
-            this.$router.go(-1)
         },
 
         //初始化一些数据
@@ -194,33 +196,55 @@ export default {
         },
         //获取详细信息
         handleGetDetail(){
+
+            //显示loading
+            this.showLoad = true
+
             this.getDetail({
                 objectId: this.objectId,
                 objectUserId: this.cheId
             }).then(res =>{
+
                 console.log(res.data.detailData)
                 const {code, detailData} = res.data
                 if(code === 0) return console.log('查找失败')
                 if(code === 200){
                     this.images = detailData.objectImg
                     this.setState({detailData})
-                 }
+                }
             })
         },
         //获取评论数据
         handleGetCommit(){
+            
+            // 获取数据 关闭加载
+            this.loadObj = {
+                loadTag: true,
+                freshTag: false
+            }
+
             this.fCommit({
                 infoId: this.$route.params.objectId
             }).then(res =>{
                 const {code, commitData} = res.data
+               
+                // 获取数据 关闭加载
+                this.loadObj = {
+                    loadTag: false,
+                    freshTag: false
+                }
 
-                if(code === 0) return this.tText('暂无评论')
-                if(code === -1) return this.tText('获取失败')
-
+                if(code === 0) return this.noCommitText = '暂无用户评论'
+                
+                this.noCommitText = '没有更多了'
                 this.commitData = commitData
 
-                console.log(commitData)
-
+            }, () =>{
+                //获取数据失败 出现按钮重新加载
+                this.loadObj = {
+                    loadTag: false,
+                    freshTag: true
+                }
             })
         },
         // 统一处理点击输入框的时候 失去焦点
@@ -340,7 +364,7 @@ export default {
         // 更多操作
         onSelect(item, index){
             const {deObject, cheId, objectId, 
-                    $router, dConfirm, dAlert} = this
+                    handleRouter, dConfirm, dAlert} = this
             switch(index){
                 case 0://举报
                     break
@@ -354,7 +378,7 @@ export default {
                            if(code === 0) return dAlert('删除失败')
 
                            dAlert('删除成功').then(() =>{
-                              $router.replace(`/c/center/${cheId}`)
+                              handleRouter({url: `/c/center/${cheId}`, tag: 'r'})
                            })
                         })
                         
@@ -364,13 +388,16 @@ export default {
                     
                     break
                 case 3://编辑
-                    $router.push(`/c/updata/${cheId}/${objectId}`)
+                    handleRouter({url: `/c/updata/${cheId}/${objectId}`, tag: 'p'})
                     break
                 case 4://添加
-                    $router.push(`/c/redata/${cheId}`)
+                    handleRouter({url: `/c/redata/${cheId}`, tag: 'p'})
                     break
             }
-        },
+        }
+    },
+    components:{
+        Loading
     }
 }
 </script>
@@ -397,7 +424,7 @@ export default {
         overflow: hidden;
     }
     .detail-info{
-        padding-bottom: 80px;
+        padding-bottom: 200px;
         .title{
             text-align: center;
             padding: 10px 0;
@@ -409,10 +436,12 @@ export default {
             }
         }
         .commit-wrap{
+            
             .title{
                 background-color: red;
             }
             .content{
+                position: relative;
                 .item{
                     padding: 10px 0;
                     border: 1px solid #fafafa;
@@ -465,7 +494,7 @@ export default {
                 }
                 .commit-end{
                     text-align: center;
-                    padding: 5px 0;
+                    padding: 15px 0;
                     color: #ccc;
                 }
             }
@@ -482,7 +511,7 @@ export default {
         // 图片预览为2002
         z-index: 110;
         background-color: #1e323f;
-        .commit-wrap{
+        .replay-wrap{
             .c-in{
                 border-radius: 10px;
                 overflow: hidden;

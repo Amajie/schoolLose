@@ -3,7 +3,7 @@
         <div class="header r">
             <van-nav-bar
                 title="设置"
-                @click-left="() => $router.replace('/person')"
+                @click-left="$router.replace('/person')"
                 left-arrow
                 :border="false"
             >

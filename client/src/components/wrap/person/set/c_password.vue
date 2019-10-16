@@ -3,7 +3,7 @@
         <div class="header g">
             <van-nav-bar
                 title="修改密码"
-                @click-left="() => $router.replace('/set')"
+                @click-left="$router.replace('/set')"
                 left-arrow
             >
                 <van-icon name="arrow-left" slot="left" size="1.5em" color="#fff"/>
@@ -50,7 +50,7 @@ export default {
     },
     methods:{
         changePaw(){
-            const {password, oldPassword, cPaw, tText, encrypt} = this
+            const {password, oldPassword, cPaw, tText, encrypt, $router} = this
 
             if(!password){
                 return tText('密码不能为空')

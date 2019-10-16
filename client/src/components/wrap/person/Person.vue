@@ -2,8 +2,8 @@
     <div id="person">
         <div class="header b">
             <van-nav-bar
-                @click-left="$router.replace('/set')"
-                @click-right="$router.push(`/c/redata/${userData.cheId}`)"
+                @click-left="handleRouter({url: '/set', tag: 'p'})"
+                @click-right="handleRouter({url: `/c/redata/${userData.cheId}`, tag: 'p'})"
                 :border="false"
             >
                 <van-icon name="add-o" slot="right" size="2em" color="#fff" />
@@ -14,7 +14,7 @@
         <div class="p-wrap">
             <!-- 登陆注册头像 -->
             <div class="p-person">
-                <div @click="$router.push(`/c/center/${userData.cheId}`)" class="p-person-opa">
+                <div @click="handleRouter({url:`/c/center/${userData.cheId}`, tag: 'p'})" class="p-person-opa">
                     <van-row type="flex" justify="center">
                         <van-col span="8">
                             <!-- 头像 -->
@@ -141,7 +141,8 @@ export default {
     },
     methods:{
         ...mapMutations([
-            'setUserData'
+            'setUserData',
+            'handleRouter'
         ]),
         /**
          * @function 退出当前登陆
@@ -150,13 +151,13 @@ export default {
          * 
          */
         logoutCount(){
-            this.$router.replace('/login')
+            this.handleRouter({url:`/login`, tag: 'r'})
         },
                 //这个是 上拉菜单选项框
         onSelect(item){
             const {id, show_img} = item
             if(id === 1) return this.show_img = !show_img
-            if(id === 2) return this.$router.replace('/cimg')
+            if(id === 2) return this.handleRouter({url: '/cimg', tag: 'p'})
         },
     }
 }

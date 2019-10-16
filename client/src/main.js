@@ -52,8 +52,9 @@ Vue.prototype.decrypt = decrypt// 解密
 Vue.prototype.encrypt = encrypt// 加密
 
 //共同方法
-import {selectTypeId} from './commonF/commonF.js'
-Vue.prototype.selectTypeId = selectTypeId// 解密
+import {selectTypeId, findTypeId} from './commonF/commonF.js'
+Vue.prototype.selectTypeId = selectTypeId// 根据用户选择的物品 得到相应的key
+Vue.prototype.findTypeId = findTypeId// 根据传来的key 查看分类表是否存在该key
 
 
 //svg 图片的使用
