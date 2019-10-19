@@ -48,49 +48,59 @@
                         --- 相关留言 ---
                     </div>
                 </van-sticky>
-                <div class="content">
-                    <div class="item" 
-                        @click.stop="handleReplayItem(index)"
-                        v-for="(item, index) in commitData"
-                        :key="index"
-                        >
-                            <div class="item-info">
-                            <div class="from">
-                                <van-image
-                                        :width="h_img_size"
-                                        :height="h_img_size"
-                                        round
-                                        fit="cover"
-                                        :src="item.fromAvater"
-                                    />
-                            </div>
+                <div class="content cell">
+                    <van-list
+                        v-model="loading"
+                        :finished="finished"
+                        :finished-text="noCommitText"
+                        @load="loadData"
+                        :immediate-check="false"
+                    >
+                        <van-cell clickable 
+                            v-for="(item, index) in commitData"
+                            @click.native="handleReplayItem(index)"
+                            :key="index">
+                                <div class="item" 
+                                    @click.stop="handleReplayItem(index)"
+                                    >
+                                        <div class="item-info">
+                                        <div class="from">
+                                            <van-image
+                                                    :width="h_img_size"
+                                                    :height="h_img_size"
+                                                    round
+                                                    fit="cover"
+                                                    :src="item.fromAvater"
+                                                />
+                                        </div>
 
-                            <div class="from-name name">{{item.fromUserName}}</div>
-                            
-                            <div v-if="item.toId" class="replay-text">
-                                回复
-                            </div>
-                            <div class="to">
-                                <van-image
-                                    v-if="item.toId"
-                                    :width="h_img_size"
-                                    :height="h_img_size"
-                                    round
-                                    fit="cover"
-                                    :src="item.toAvater"
-                                />
-                            </div>
-                            <div v-if="item.toId" class="to-name name">{{item.toUserName}}</div>
-                            </div>
-                            <div class="item-commit">
-                                <p class="text">{{item.commit}}</p>
-                                <p class="time-replay">{{item.commitTime | filterTime(true)}}</p>
-                            </div>
-                    </div>
+                                        <div class="from-name name">{{item.fromUserName}}</div>
+                                        
+                                        <div v-if="item.toId" class="replay-text">
+                                            回复
+                                        </div>
+                                        <div class="to">
+                                            <van-image
+                                                v-if="item.toId"
+                                                :width="h_img_size"
+                                                :height="h_img_size"
+                                                round
+                                                fit="cover"
+                                                :src="item.toAvater"
+                                            />
+                                        </div>
+                                        <div v-if="item.toId" class="to-name name">{{item.toUserName}}</div>
+                                        </div>
+                                        <div class="item-commit">
+                                            <p class="text">{{item.commit}}</p>
+                                            <p class="time-replay">{{item.commitTime | filterTime(true)}}</p>
+                                        </div>
+                                </div>
+                        </van-cell>
+                    </van-list>
                      <div class="commit-loading">
                         <Loading @fresh="handleGetCommit" v-bind="loadObj"/>
                     </div>
-                    <div class="commit-end">{{noCommitText}}</div>
                 </div>
             </div>
         </div>
@@ -133,7 +143,7 @@
 <script>
 import {ImagePreview} from 'vant'
 import {mapState, mapMutations} from 'vuex'
-import Loading from '../../../loading/loading.vue'
+import Loading from '../../../loading/Load.vue'
 export default {
     data(){
         return {
@@ -152,8 +162,12 @@ export default {
             ],
             showOption: false,
             showLoad: false,
-            noCommitText: '',
-            loadObj: {}
+            noCommitText: '没有更多了',
+            loadObj: {},
+            loading: false,
+            finished: false,
+            page: 0,
+            pageNum: 1
         }
     },
     created(){
@@ -223,8 +237,13 @@ export default {
                 freshTag: false
             }
 
+            // 暂时不触发 loadData函数
+            this.loading = true
+
             this.fCommit({
-                infoId: this.$route.params.objectId
+                infoId: this.$route.params.objectId,
+                page: this.page++,
+                pageNum: this.pageNum
             }).then(res =>{
                 const {code, commitData} = res.data
                
@@ -234,10 +253,18 @@ export default {
                     freshTag: false
                 }
 
-                if(code === 0) return this.noCommitText = '暂无用户评论'
+                this.loading = false
+
+                console.log(commitData)
+
+                this.commitData = this.commitData.concat(commitData)
                 
-                this.noCommitText = '没有更多了'
-                this.commitData = commitData
+                if(code === 0 && this.commitData.length === 0) return this.noCommitText = '暂无用户评论'
+                
+                if(commitData.length === 0){
+                    this.finished = true
+                    console.log(1111111)
+                }
 
             }, () =>{
                 //获取数据失败 出现按钮重新加载
@@ -394,6 +421,10 @@ export default {
                     handleRouter({url: `/c/redata/${cheId}`, tag: 'p'})
                     break
             }
+        },
+        loadData(){
+            this.handleGetCommit()
+            console.log('加载')
         }
     },
     components:{
@@ -424,7 +455,7 @@ export default {
         overflow: hidden;
     }
     .detail-info{
-        padding-bottom: 200px;
+        padding-bottom: 60px;
         .title{
             text-align: center;
             padding: 10px 0;
@@ -436,14 +467,12 @@ export default {
             }
         }
         .commit-wrap{
-            
             .title{
                 background-color: red;
             }
             .content{
                 position: relative;
                 .item{
-                    padding: 10px 0;
                     border: 1px solid #fafafa;
                     .item-info{
                         font-size: 15px;
@@ -491,11 +520,6 @@ export default {
                 }
                 .item:last-child{
                     border: 0;
-                }
-                .commit-end{
-                    text-align: center;
-                    padding: 15px 0;
-                    color: #ccc;
                 }
             }
             

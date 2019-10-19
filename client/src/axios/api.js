@@ -190,7 +190,7 @@ export const gInfo = params =>{
  * @param {*} data 发送的数据
  */
 export const getDetail = params =>{
-    return notService({
+    return entryService({
         url: '/fDetailInfo',
         method: 'get',
         params

@@ -227,7 +227,7 @@ export default {
             const {objectName, objectWay, objectAddress, objectTime, 
             objectTypeId, objectDesc, objectImg, tText} = this
 
-            以下是必须填写的
+            //以下是必须填写的
             if(!objectTypeId){
                 return tText('请选择物品的类型')
             }else if(!objectName){

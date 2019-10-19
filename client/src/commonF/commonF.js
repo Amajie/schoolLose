@@ -21,9 +21,9 @@ export const findTypeId = (type_nav, targetKey) =>{
 export const selectTypeId = (type_nav, val) =>{
     let objectTypeId = ''
     for(var key in type_nav){
-        if(type_nav[key].type != val) return
-        objectTypeId = key
+        if(type_nav[key].type === val)
+            objectTypeId = key
     }
-
+    
     return objectTypeId
 }

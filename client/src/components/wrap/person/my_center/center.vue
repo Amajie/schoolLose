@@ -31,7 +31,6 @@
                                 <van-col span="6">
                                     <!-- 头像 -->
                                     <div class="item">
-                                        <!-- <img class="hi" :src="userData.avater" /> -->
                                         <van-image
                                             round
                                             width="60"
@@ -63,140 +62,83 @@
                 </div>
             </div>
         </van-sticky>
-        <div class="b cell">
-            <van-list
-                v-model="loading"
-                :finished="finished"
-                finished-text="没有更多了"
-                @load="onLoad"
-                :immediate-check="false"
-                >
-                <van-cell @click.native="toDetail(index)" clickable v-for="(item, index) in infoData" :key="index">
-                    <div class="shop_data_item">
-                        <div class="item_img">
-                            <!-- <img :src="item.objectImg[0]?item.objectImg[0]: 'http://192.168.43.124:7070/av/init.png'"> -->
-                            <van-image
-                                width="100"
-                                height="100"
-                                fit="cover"
-                                radius="5"
-                                :src="item.objectImg[0]"
-                            />
+        <div class="b">
+            <div 
+                class="b-item"
+                @click="toDetail(index)" clickable v-for="(item, index) in centerData" 
+                :key="index" >
+                <div class="item_img">
+                    <van-image
+                        width="100"
+                        height="100"
+                        fit="cover"
+                        radius="5"
+                        :src="item.objectImg[0]"
+                    />
+                </div>
+                <div class="item_info">
+                    <!-- 标题 -->
+                    <div class="info_title">
+                        <p>
+                            <span class="title_p">{{item.objectTypeId | filterTypeName}}</span>
+                            <span class="title_name">{{userName}}</span>
+                        </p>
+                        <p :class="{info_like: true, lose: item.objectWay === '0'}">{{item.objectWay === '0'? '丢': '拾'}}</p>
+                    </div>
+                    <!-- 评分 -->
+                    <div class="info_desc">
+                        <p class="desc-content">
+                            <icon name="desc" :w="15" :h="15"></icon>
+                            <span>{{item.objectDesc}}</span>
+                        </p>
+                    </div>
+                    <!-- 配送 -->
+                    <div class="info_tack">
+                        <div class="user">
+                            <icon name="center_object" :w="12" :h="12"></icon>
+                            <span>{{item.objectName}}</span>
                         </div>
-                        <div class="item_info">
-                            <!-- 标题 -->
-                            <div class="info_title">
-                                <p>
-                                    <span class="title_p">{{item.objectTypeId | filterTypeName}}</span>
-                                    <span class="title_name">{{userName}}</span>
-                                </p>
-                                <p :class="{info_like: true, lose: item.objectWay === '0'}">{{item.objectWay === '0'? '丢': '拾'}}</p>
-                            </div>
-                            <!-- 评分 -->
-                            <div class="info_desc">
-                                <p class="desc-content">
-                                    <icon name="desc" :w="15" :h="15"></icon>
-                                    <span>{{item.objectDesc}}</span>
-                                </p>
-                            </div>
-                            <!-- 配送 -->
-                            <div class="info_tack">
-                                <div class="user">
-                                    <icon name="center_object" :w="12" :h="12"></icon>
-                                    <span>{{item.objectName}}</span>
-                                </div>
-                                <div class="tack_heng">
-                                    <icon name="center_time" :w="15" :h="15"></icon>
-                                <span>{{item.sendTime | filterTime}}</span>
-                                </div>
-                            </div>
+                        <div class="tack_heng">
+                            <icon name="center_time" :w="15" :h="15"></icon>
+                        <span>{{item.sendTime | filterTime}}</span>
                         </div>
                     </div>
-                </van-cell>
-            </van-list>
-            <!-- <div class="info-wrap">
-                <div class="info-list"> -->
-                    <!-- 信息填写 -->
-                    <!-- <van-cell-group>
-                        <van-field
-                            readonly
-                            label="姓名"
-                            v-model="userData.name"
-                        />
-                        <van-field
-                            readonly
-                            label="学号"
-                            v-model="userData.stId"
-                        />
-                        <van-field
-                            readonly
-                            label="性别"
-                            v-model="userData.gender"
-                        />
-                        <van-field
-                            readonly
-                            label="身份"
-                            v-model="userData.userType"
-                        />
-                        <van-field
-                            readonly
-                            label="学院"
-                            v-model="userData.courtyard"
-                        />
-                        <van-field
-                            readonly
-                            label="专业"
-                            v-model="userData.major"
-                        />
-                        <van-field
-                            readonly
-                            label="班级"
-                            v-model="userData.classes"
-                        />
-
-                        <van-field
-                            readonly
-                            label="宿舍地址"
-                            v-model="userData.address"
-                        />
-                        <van-field
-                            readonly
-                            label="邮箱"
-                            v-model="userData.email"
-                        />
-                    </van-cell-group>
                 </div>
-            </div> -->
+            </div>
+            <Empty v-if="noData" />
+            <div v-else class="data-end">
+                到底啦，不能再往下啦~~~
+            </div>
         </div>
-      
+        <FreshTop @fresh="fresh" :freshTag="true" />  
     </div>
 </template>
 
 <script>
+
 import {mapState, mapMutations} from 'vuex'
+
+import Empty from '../../../loading/Empty.vue'
+import FreshTop from '../../../loading/Fresh_top.vue'
+
+
 export default {
     data(){
         return{
             svg: 30,
-            list: [],
-            loading: false,
-            finished: false,
-            infoData: [],
             cheId: '',
             userName: '',
             avater: '',
-            otherConcern: [],
-            /**
-             * 是否已经关注他标志位 此时应该是遍历它的关注列表来决定 我这里先写死
-             */
+            loadObj: {},
+            noData: true,
             concernTag: false
-
-
         }
     },
     computed:{
         ...mapState([
-            'userData'
+            'centerData',
+            'centerPage',
+            'centerPageNum',
         ])
     },
     created(){
@@ -204,32 +146,59 @@ export default {
         /**
          *  此时这里 需要判断一下如果路由传递过来的 id
          */
-        this.cheId = this.$route.params.cheId
-
-        // 此时应该定义在函数上 当拉到底端的时候再次调用
-        this.gInfo({cheId: this.cheId}).then(res =>{
-            const {code, data} = res.data
-
-
-            console.log(data[0])
-            // 个人信息要获取
-            this.userName = data[0].userName
-            this.avater = data[0].avater
-            this.otherConcern = data[0].otherConcern
-            if(code === 0){
-                
-                //此时这里没有数据 应该友好显示
-                console.log('没有数据，应该友好显示')
-                return
-            }
-
-            this.infoData = data[0].infoData
-        })
+        const {$route, centerData, getCenterData} = this
+        this.cheId = $route.params.cheId
+        // 当没有数据 或者当前访问目标用户不是之前的目标用户 就发送请求获取新的数据
+        if(centerData.length === 0 || centerData[0].cheId != this.cheId){
+            this.fresh()
+        }else{
+            this.userName = centerData[0].userName
+            this.avater = centerData[0].avater
+            this.noData = false
+        }
     },
     methods:{
         ...mapMutations([
-            'handleRouter'
+            'handleRouter',
+            'setState'
         ]),
+        // 获取数据
+        getCenterData(){
+            const {cheId} = this
+
+            // 此时应该定义在函数上 当拉到底端的时候再次调用
+            this.gInfo({
+                cheId: cheId
+            }).then(res =>{
+                const {code, data, userData} = res.data
+
+                // 如果存在 说明不存在数据
+                if(userData){
+                    this.userName = userData.userName
+                    this.avater = userData.avater
+                    return
+                }
+
+                // 个人信息要获取
+                this.setState({centerData: data})
+                // 没有值再获取
+                if(!this.userName){
+                    this.userName = data[0].userName
+                    this.avater = data[0].avater
+                }
+
+                if(this.centerData.length === 0) return this.noData = true
+
+                this.noData = false
+
+            }, () =>{
+                // 关闭加载
+                this.loadObj = {
+                    loadTag: false,
+                    freshTag: true
+                }
+            })
+        },
         onLoad() {
             /**
              * 注意 
@@ -237,13 +206,14 @@ export default {
              *      此时要想显示 要想不再触发 onLoad事件 设置 this.finished = true
              */
             console.log('触发')
+            this.getCenterData()
         },
         toDetail(index){
             
-            const {infoData, handleRouter, cheId} = this
+            const {centerData, handleRouter, cheId} = this
 
             handleRouter({
-                url: `/c/detail/${cheId}/${infoData[index].objectId}`,
+                url: `/c/detail/${cheId}/${centerData[index].objectId}`,
                 tag:'p'
             })
         },
@@ -252,12 +222,19 @@ export default {
             console.log('请求')
             this.concernTag = true
         },
+        fresh(){
+            this.setState({centerData: []})
+            this.getCenterData()
+        }
+    },
+    components:{
+        Empty,
+        FreshTop
     }
 }
 </script>
 
 <style lang="less" scoped>
-
 #center{
     height: 100%;
     .t{
@@ -308,13 +285,11 @@ export default {
         }
     }
     .b{
-      .info-wrap{
-          padding: 0 1%;
-          padding-bottom: 10px;
-      }
-      .shop_data_item{
+        padding-bottom: 20px;
+        .b-item{
             display: flex;
             padding-left: 10px;
+            margin: 10px 0;
             .item_img{
                 height: 100px;
                 width: 100px;
@@ -353,7 +328,6 @@ export default {
                         background-color: red;
                     }
                 }
-                //评分
                 .info_desc{
                     font-size: 12px;
                     .desc-content{
@@ -363,7 +337,6 @@ export default {
                         }
                     }
                 }
-                // 配送
                 .info_tack{
                     font-size: 12px;
                     .tack_heng{
@@ -372,7 +345,11 @@ export default {
                 }
             }
         }
+        .data-end{
+            color: #666;
+            text-align: center;
+            padding: 5px 0;
+        }
     }
 }
-
 </style>

@@ -75,7 +75,7 @@ Sticky, ImagePreview, ActionSheet,
 Uploader, Loading, Notify, Switch,
 DatetimePicker, List, PullRefresh,
 DropdownMenu, DropdownItem, Image,
-Swipe, SwipeItem, Lazyload} from 'vant'
+Swipe, SwipeItem, Lazyload, Tag} from 'vant'
 Vue.use(Button)
   .use(Icon)
   .use(NavBar)
@@ -113,6 +113,7 @@ Vue.use(Button)
   .use(Swipe)
   .use(SwipeItem)
   .use(Lazyload)
+  .use(Tag)
 
 
 import * as filters from './filter/filter.js';

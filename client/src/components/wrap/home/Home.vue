@@ -31,14 +31,14 @@
         </div>
         <div class="info-list cell">
             <van-list
-                v-model="loading"
-                :finished="finished"
-                finished-text="没有更多了"
-                @load="onLoad"
+                v-model="homeLoad"
+                :finished="homeFinished"
+                :finished-text="noData && homeFinished? '': '没有更多了'"
+                @load="loadData"
                 :immediate-check="false"
                 >
                 <van-cell @click.native="toDetail(item)" clickable v-for="(item, index) in homeData" :key="index">
-                    <div class="shop_data_item">
+                    <div class="data_item">
                         <div class="item_img">
                             <van-image
                                 width="100"
@@ -79,55 +79,97 @@
                     </div>
                 </van-cell>
             </van-list>
-            <Loading @fresh="getHomeData" v-bind="loadObj" />
-        </div>  
+            <Empty v-show="noData" />
+            <Load @fresh="getHomeData" v-bind="loadObj" />
+        </div>
+        <FreshTop @fresh="fresh" :freshTag="true" />  
     </div>
 </template>
 
 <script>
 import { mapState, mapMutations} from 'vuex'
-import Loading from '../../loading/loading.vue'
+
+import Load from '../../loading/Load.vue'
+import Empty from '../../loading/Empty.vue'
+import FreshTop from '../../loading/Fresh_top.vue'
+
 export default {
     data(){
         return{
             svg: 35,
             isLogin: false,
-            homeData: [],
-            loading: false,
-            finished: false,
-            loadObj: {}
+            homeLoad: false,
+            loadObj: {},
+            noData: true
         }
     },
     created(){
-        this.getHomeData()
+       this.handleCreated()
     },
+    inject:['reload'],
     computed:{
         ...mapState([
-            'type_nav'
+            'type_nav',
+            'homeData',
+            'homePage',
+            'homePageNum',
+            'homeFinished',
         ])
     },
     methods:{
         ...mapMutations([
+            'setState',
+            'concatArr',
             'toDetail',
             'toUserCenter',
             'handleRouter'
         ]),
+        handleCreated(){
+            // 如果有数据不必在获取 此时要看上拉之后是否要继续加载
+            if(this.homeData.length) return this.noData = false
+            this.getHomeData()
+        },
         getHomeData(){
+            console.log('请求')
+            let {homeData,homePage, homePageNum} = this
+            // 显示加载
             this.loadObj = {
                 loadTag: true,
                 freshTag: false
             }
-            this.gHomeInfo().then(res =>{
+
+            this.noData = false
+            this.homeLoad = true
+            //发送请求
+            this.gHomeInfo({
+                page: homePage,
+                pageNum: homePageNum
+            }).then(res =>{
 
                 // 关闭加载
                 this.loadObj = {
                     loadTag: false,
                     freshTag: false
                 }
+
                 const {code, homeData} = res.data
-                console.log(res.data)
-                this.homeData = homeData
-                console.log(homeData)
+
+
+                // 此时说明数据没有了 因此不比在触发加载事件
+                if(!code) return this.setState({homeFinished: true})     
+
+                this.concatArr({key: 'homeData', data: homeData})
+
+                if(this.homeData.length === 0) this.noData = true
+                this.setState({homePage: ++homePage})
+                // 表示 当上拉到底的时候 需要需要在继续触发 loadData函数    
+                this.homeLoad = false
+            }, () =>{
+                // 关闭加载
+                this.loadObj = {
+                    loadTag: false,
+                    freshTag: true
+                }
             })
         },
         // 处理点击便捷导航
@@ -135,12 +177,23 @@ export default {
             console.log(objectTypeId)
             this.handleRouter({url: `/search/${objectTypeId}`, tag: 'p'})
         },
-        onLoad(){
+        loadData(){
+            this.getHomeData()
             console.log('加载')
+        },
+        fresh(){
+            this.setState({
+                'homeData': [],
+                'homePage': 0,
+                'homeFinished': false
+            })
+            this.reload()
         }
     },
     components:{
-        Loading
+        Load,
+        Empty,
+        FreshTop
     }
 }
 </script>
@@ -170,12 +223,12 @@ export default {
         }
     }
     .info-list{
-        padding-bottom: 50px;
+        padding-bottom: 60px;
         .info-wrap{
           padding: 0 1%;
           padding-bottom: 10px;
         }
-       .shop_data_item{
+       .data_item{
             display: flex;
             padding-left: 10px;
             .item_img{

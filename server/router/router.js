@@ -154,6 +154,70 @@ router.get('/deObject', checkToken, (req, res) =>{
 
 //个人中心 消息的查找
 router.get('/fInfo', (req, res) =>{
+
+    const {cheId} = req.query
+
+    if(!cheId || (cheId && !mongoose.Types.ObjectId.isValid(cheId)))
+        return res.status(404).json({success: false, msg: '访问的页面不存在'})
+        
+
+    reInfo.aggregate([
+        {
+            $lookup:{
+                from: 'users',
+                localField: 'objectUserId',
+                foreignField: '_id',
+                as: 'userData'
+            }
+        },
+        // 此时要根据 这个来排序
+        {$sort:{sendTime: -1}},
+        {
+            $match:{
+                "objectUserId": mongoose.Types.ObjectId(cheId),
+                "objectDelect": "0"
+            }
+        },
+        { $unwind: "$userData"},
+        {$project:{
+            objectId:"$objectId",
+            objectDesc:"$objectDesc",
+            objectName:"$objectName",
+            objectAddress:"$objectAddress",
+            sendTime:"$sendTime",
+            objectId:"$objectId",
+            objectTypeId:"$objectTypeId",
+            objectWay:"$objectWay",
+            objectImg:"$objectImg",
+            userName:"$userData.userName",
+            avater:"$userData.avater",
+            cheId:"$userData._id"
+        }}
+    ], (err, data) =>{
+        console.log(data)
+
+        // 存在数据
+        if(data.length != 0) return res.json({"msg": "查找成功", "code": 200, data})     
+        
+        //不存在数据
+        userInfo.findOne({_id: cheId}, (err, fData) =>{
+            
+            // 用户名 或者 电子邮箱错误错误
+            if(!fData) return res.status(404).json({"msg": "404页面", "code": -1})
+
+
+            res.json({
+                "msg": "没有数据", "code": 1, 
+                userData: {
+                    userName: fData.userName,
+                    avater: fData.avater
+                }
+            })
+        })
+    })
+})
+
+router.get('/fInddfo', (req, res) =>{
     const {cheId} = req.query
 
     if(!cheId || (cheId && !mongoose.Types.ObjectId.isValid(cheId)))
@@ -207,6 +271,11 @@ router.get('/fInfo', (req, res) =>{
 
 //首页 消息的查找
 router.get('/home_f_info', (req, res) =>{
+    let {pageNum, page} = req.query
+
+    // 因为是字符串
+    pageNum = parseInt(pageNum)
+    page = parseInt(page)
     reInfo.aggregate([
         {
             $lookup:{
@@ -216,6 +285,10 @@ router.get('/home_f_info', (req, res) =>{
                 as: 'userData'
             }
         },
+        // 此时要根据 这个来排序
+        {$sort:{sendTime: -1}},
+        {$skip : pageNum*page},
+        {$limit: pageNum},
         { $unwind: "$userData"},
         {$project:{
             objectId:"$objectId",
@@ -231,7 +304,7 @@ router.get('/home_f_info', (req, res) =>{
             cheId:"$userData._id"
         }}
     ], (err, data) =>{
-        console.log(data)
+        if(!data.length) return res.json({"msg": "查找成功", "code": 0, homeData: data})
         res.json({"msg": "查找成功", "code": 200, homeData: data})
     })
 })
@@ -239,12 +312,10 @@ router.get('/home_f_info', (req, res) =>{
 //搜素 消息的查找
 router.get('/search_f_info', (req, res) =>{
     // target 用户搜索关键字
-    const {target} = req.query
-    // const ss = getMatch(req.query)
+    let {target, page, pageNum, upDownTag} = req.query
+    page = parseInt(page)
+    pageNum = parseInt(pageNum)
 
-    // console.log(ss)
-
-    // return res.json({"msg": "成功"})
     reInfo.aggregate([
         {
             $lookup:{
@@ -254,11 +325,13 @@ router.get('/search_f_info', (req, res) =>{
                 as: 'userData'
             }
         },
-        { $unwind: "$userData"},
-
+        // 此时要根据 这个来排序
+        {$sort:{sendTime: parseInt(upDownTag)}},
         // 可以根据该田间查询
-
         {"$match": getMatch(req.query)},
+        { $unwind: "$userData"},
+        // {$skip : pageNum*page},
+        // {$limit: pageNum},
         {$project:{
             objectId:"$objectId",
             objectDesc:"$objectDesc",
@@ -273,21 +346,26 @@ router.get('/search_f_info', (req, res) =>{
             cheId:"$userData._id",
             _id:"$__v"
         }}
-    ], (err, data) =>{
-
-        let homeData = []
+    ], (err, searchData) =>{
+        
+        let data = []
         // 如果搜索文字存在 就过滤 不存在就搜索全部符合情况即可
         if(target){
-
-            homeData = data.filter(item =>{
+            data = searchData.filter(item =>{
                 // 此时这里根据 想要的相似度 来返回相应的数据
+                console.log(similarStr(item.objectName, target))
+                console.log(item.objectName, target)
                 if(similarStr(item.objectName, target) > 0.4) return item
             })
         }else{
-            homeData = data
+            data = searchData
         }
 
-        res.json({"msg": "查找成功", "code": 200, homeData})
+        const newData = data.slice(pageNum*page, pageNum*(page+1))
+        //此时可 返回数据 结束加载
+        console.log("长度："+ newData.length)
+        if(!newData.length) return res.json({"msg": "查找成功", "code": 0, data: []})
+        res.json({"msg": "查找成功", "code": 200, data: newData})
     })
 })
 
@@ -331,8 +409,11 @@ router.post('/rCommit', (req, res) =>{
 // 留言的查询
 router.get('/fCommit', (req, res) =>{
     //这里 要根据这个 数据
-    const {infoId} = req.query
-    console.log(infoId)
+    let {infoId, page, pageNum} = req.query
+    page = parseInt(page)
+    pageNum = parseInt(pageNum)
+    console.log(page)
+    console.log(pageNum)
     commitInfo.aggregate([
         {
             $lookup:{
@@ -351,12 +432,11 @@ router.get('/fCommit', (req, res) =>{
             }
         },
         {$match:{infoId}},
+        {$skip : pageNum*page},
+        {$limit: pageNum},
         {$unwind: "$commitData" }
     ], function(err, data){
-
-        //不会存在数组为空的情况
-        if(data.length === 0) return res.json({"msg": "暂无评论", "code": 0})
-
+        console.log(data)
         const commitData = data.map((item, index, array) =>{
             const {fromId, toId, commit, commitTime, commitData, replayData} = item
 
@@ -451,7 +531,15 @@ function getMatch({startTime, endTime, objectTypeId, objectWay, objectUserId}){
     
     const $match = {}
 
-    if(startTime || endTime) $match.sendTime = {$gte : parseInt(startTime), $lt: parseInt(endTime)}
+    // 要判断 时间段是否存在
+    if(startTime && endTime){
+        $match.sendTime = {$gte : parseInt(startTime), $lt: parseInt(endTime)}
+    }else if(startTime){
+        $match.sendTime = {$gte : parseInt(startTime), $lt: Date.now()}
+    }else if(endTime){
+        $match.sendTime = {$gte : new Date('2008-01-01 00:00:00').getTime(), $lt: parseInt(endTime)}
+    }
+
     if(objectTypeId) $match.objectTypeId = objectTypeId
     if(objectWay) $match.objectWay = objectWay
     // 因为 objectUserId比较特殊 如果不是 查找的时候需要转为 ObjectId

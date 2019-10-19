@@ -12,7 +12,7 @@
         </div>
       </div>
     </div>
-    <router-view/>
+    <router-view v-if="isFreshTag" />
   </div>
 </template>
 
@@ -22,7 +22,13 @@ export default {
   name: 'App',
   data(){
     return{
-      loadSize: 50
+      loadSize: 50,
+      isFreshTag: true
+    }
+  },
+  provide(){
+    return {
+      reload: this.reload
     }
   },
   computed: {
@@ -31,6 +37,14 @@ export default {
     },
     showSLoding () {
       return this.$store.state.lodingSTag
+    }
+  },
+  methods:{
+    reload(){
+      this.isFreshTag = false
+      this.$nextTick(() =>{
+        this.isFreshTag = true
+      })
     }
   }
 }

@@ -12,6 +12,21 @@ const store = new Vuex.Store({
         regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"),
         userData: {},
         detailData:{},
+
+        homeData: [],
+        homePage: 0,
+        homePageNum: 4,
+        homeFinished: false,
+
+        centerData: [],
+        centerPage: 0,
+        centerPageNum: 1,
+
+        searchData: [],
+        searchPage: 0,
+        searchPageNum: 6,
+        searchFinished: false,
+        searchParams: {},
         //学院
         courtyardData: [
             '物理与信息工程学院',
@@ -130,6 +145,17 @@ const store = new Vuex.Store({
                     return $router.go(-1)
                     
             }
+        },
+
+        /**
+         * 
+         * @param {*} state 
+         * @param {*} param1 key 合并的数据(必须是数组) data合并的内容
+         */
+        concatArr(state, {key, data}){
+            state[key] = state[key].concat(data)
+            console.log(data)
+            
         }
     },
     actions:{

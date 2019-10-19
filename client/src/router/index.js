@@ -25,9 +25,6 @@ import Center from '../components/wrap/person/my_center/center.vue'
 import Releasedata from '../components/wrap/person/my_center/release.vue'
 import Deatil from '../components/wrap/person/my_center/detail.vue'
 
-//测试loading
-import Load from '../components/loading/loading.vue'
-
 //搜素
 import Search from '../components/seach/search.vue'
 
@@ -194,15 +191,6 @@ const router =  new Router({
         noRequireToken: true,
       },
       component: Search
-    },
-    // 测试loading
-    {
-      path: '/load',
-      name: 'Load',
-      meta: {
-        noRequireToken: true,
-      },
-      component: Load
     },
     {
       path: '*',
