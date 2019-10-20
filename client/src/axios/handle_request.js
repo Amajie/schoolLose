@@ -12,7 +12,6 @@ export const request = ({config, tag, notLoad}) =>{
     //     config.data = qs.stringify({...config.data}): config.params = {...config.params}
 
     // tag --> true 全白  false   透明
-
     !notLoad && store.commit('setState', {
         lodingETag: tag,
         lodingSTag: !tag

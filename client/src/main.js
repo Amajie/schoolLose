@@ -22,7 +22,9 @@ Vue.prototype.tText = tText// 轻提示
 //请求函数的封装
 import {register, sendEmailCode, checkEmailCode, login,
   cName, cPaw, cEmail, cInfo, fInfo, upAvater, reObject,
-  upObject, deObject, gInfo, gHomeInfo, gSearchInfo, getDetail, rCommit, fCommit, text} from './axios/api.js'
+  upObject, deObject, gInfo, gHomeInfo, gSearchInfo, getDetail, 
+  rCommit, fCommit, concren, getConcren, collection, mCollection,
+  getCollection, text} from './axios/api.js'
 Vue.prototype.register = register//发送注册请求
 Vue.prototype.sendEmailCode = sendEmailCode//发送邮箱验证码
 Vue.prototype.checkEmailCode = checkEmailCode//发送 输入的 验证码
@@ -43,6 +45,11 @@ Vue.prototype.gSearchInfo = gSearchInfo//发送 搜索
 Vue.prototype.getDetail = getDetail//发送 详情页
 Vue.prototype.rCommit = rCommit//发送 写留言
 Vue.prototype.fCommit = fCommit//发送 查找留言
+Vue.prototype.concren = concren//发送 关注请求
+Vue.prototype.getConcren = getConcren//发送 获取关注用户信息
+Vue.prototype.collection = collection//发送 收藏请求
+Vue.prototype.getCollection = getCollection//发送 获取收藏信息
+Vue.prototype.mCollection = mCollection//发送 获取收藏信息
 
 Vue.prototype.text = text//发送 密码修改请求
 
@@ -75,7 +82,7 @@ Sticky, ImagePreview, ActionSheet,
 Uploader, Loading, Notify, Switch,
 DatetimePicker, List, PullRefresh,
 DropdownMenu, DropdownItem, Image,
-Swipe, SwipeItem, Lazyload, Tag} from 'vant'
+Swipe, SwipeItem, Lazyload, SwipeCell} from 'vant'
 Vue.use(Button)
   .use(Icon)
   .use(NavBar)
@@ -113,7 +120,7 @@ Vue.use(Button)
   .use(Swipe)
   .use(SwipeItem)
   .use(Lazyload)
-  .use(Tag)
+  .use(SwipeCell )
 
 
 import * as filters from './filter/filter.js';

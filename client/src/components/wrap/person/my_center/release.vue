@@ -180,13 +180,17 @@ export default {
             this.objectId = params.objectId
 
             for(let item in detailData){
-                this[item] = detailData[item]
+                const val = detailData[item]
                 if(item === 'objectImg'){
-                    this.objectImg = detailData[item].map(url =>{
+                    this.objectImg = val.map(url =>{
                         return {url}
                     })
                 }else if(item === 'objectTime'){
-                    this.selectTime = this.showTime(detailData[item])
+                    this.selectTime = this.showTime(val)
+                }else if(item === 'objectTypeId'){
+                    this.objectType = this.type_nav[val].type
+                }else{
+                    this[item] = val
                 }
             }
 

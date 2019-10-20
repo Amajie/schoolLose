@@ -98,8 +98,8 @@ const store = new Vuex.Store({
         },
         //设置 state属性
         setState(state, setState){
-            for(let item in setState){
-                state[item] = setState[item]
+            for(let key in setState){
+                state[key] = setState[key]
             }
         },
 
@@ -109,22 +109,16 @@ const store = new Vuex.Store({
         },
 
         // 前往详细信息页面
-        toDetail(state, data){
+        toDetail(state, {cheId, objectId}){
             /**
              * 跳转到详情页 以下数据可通过 homeData获取
              *  1 用户的 cheId id
              *  2 信息的 objectId id
              */
-            const {cheId, objectId} = data
             $router.push(`/c/detail/${cheId}/${objectId}`)
         },
         // 前往用户的个人中心
-        toUserCenter(state, data){
-            /**
-             * 跳转到详情页 以下数据可通过 homeData获取
-             *  用户的 cheId id
-             */
-            const {cheId, objectId} = data
+        toUserCenter(state, cheId){
             $router.push(`/c/center/${cheId}`)
         },
         /**

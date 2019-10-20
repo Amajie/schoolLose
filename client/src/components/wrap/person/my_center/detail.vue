@@ -167,12 +167,16 @@ export default {
             loading: false,
             finished: false,
             page: 0,
-            pageNum: 1
+            pageNum: 1,
+            collectionTag: false
+
         }
     },
+    inject:['reload'],
     created(){
         this.cheId = this.$route.params.cheId
         this.objectId = this.$route.params.objectId
+        
         // 获取详细信息
         this.handleGetDetail()
         // 获取评论
@@ -202,7 +206,16 @@ export default {
 
         //初始化一些数据
         handleCreated(){
-            if(this.cheId != this.userData.cheId) return
+            const {cheId, userData, objectId, collectionTag} = this
+            const i = userData.otherConcern.findIndex(item => item === objectId)
+            // 有搜藏
+            if(i != -1) this.collectionTag = true
+
+            if(cheId != userData.cheId) {
+                const obj = this.collectionTag ? {name: '取消收藏', id: 7} : {name: '收藏', id: 6}
+                this.options.push(obj)
+                return
+            }
 
             this.options.push({name: '删除', id: 3})
             this.options.push({name: '编辑', id: 4})
@@ -380,7 +393,7 @@ export default {
                 this.commitData = [arrData, ...commitData]
             })
         },
-        //取消 回复
+        // 取消 回复
         rejectReplay(){
             //此时把toId 清空
             this.toId = ''
@@ -390,14 +403,14 @@ export default {
         },
         // 更多操作
         onSelect(item, index){
-            const {deObject, cheId, objectId, 
-                    handleRouter, dConfirm, dAlert} = this
-            switch(index){
-                case 0://举报
+            const {deObject, cheId, objectId, sendCollection,  
+                    handleRouter, dConfirm, tText, dAlert} = this
+            switch(item.id){
+                case 1://举报
                     break
-                case 1://转发
+                case 2://转发
                     break
-                case 2://删除
+                case 3://删除
                     dConfirm('提示', '是否删除该寻物消息?')
                     .then(res =>{
                         deObject({objectId}).then(res =>{
@@ -414,13 +427,56 @@ export default {
                     })
                     
                     break
-                case 3://编辑
+                case 4://编辑
                     handleRouter({url: `/c/updata/${cheId}/${objectId}`, tag: 'p'})
                     break
-                case 4://添加
+                case 5://添加
                     handleRouter({url: `/c/redata/${cheId}`, tag: 'p'})
                     break
+                case 6://收藏
+                    const addList = [objectId, ...this.userData.otherConcern]
+                    sendCollection(addList, res =>{
+                        const {code} = res.data
+                        if(code === 0) return tText('收藏失败, 请稍后再试')
+                        tText(`已收藏`)
+
+                        // 把搜藏的物品 id保存
+                        this.userData.otherConcern = addList
+                        this.handleCollection(true)
+                    })
+                    break
+                case 7://取消收藏
+                    
+                    const i = this.userData.otherConcern.findIndex(item => item === objectId)
+                    const reList = this.userData.otherConcern.slice()
+                    reList.splice(i, 1)
+
+                    sendCollection(reList, res =>{
+                        const {code} = res.data
+                        if(code === 0) return tText('取消失败, 请稍后再试')
+                        tText(`已取消收藏`)
+
+                        // 把当前的 收藏id移除
+                        
+                        this.userData.otherConcern = reList
+                        this.handleCollection(false)
+                    })
+                    break
             }
+        },
+        // 发送 搜藏请求
+        sendCollection(otherConcern, callback){
+            //发送关注请求
+            this.mCollection({
+                otherConcern
+            }).then(callback)
+        },
+        // 收藏和取消收藏
+        handleCollection(tag){
+            this.collectionTag = tag
+
+            if(tag) return this.options[2] = {name: '取消收藏', id: 7}
+            this.options[2] = {name: '收藏', id: 6}
         },
         loadData(){
             this.handleGetCommit()

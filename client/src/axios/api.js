@@ -187,11 +187,70 @@ export const gInfo = params =>{
 
 /**
  * @function 消息详情页
- * @param {*} data 发送的数据
+ * @param {*} params 发送的数据
  */
 export const getDetail = params =>{
     return entryService({
         url: '/fDetailInfo',
+        method: 'get',
+        params
+    })
+}
+
+/**
+ * @function 关注
+ * @param {*} data 发送的数据
+ */
+export const concren = data =>{
+    return sendService({
+        url: '/concren',
+        method: 'post',
+        data
+    })
+}
+/**
+ * @function 关注列表查找
+ * @param {*} params 发送的数据
+ */
+export const getConcren = params =>{
+    return entryService({
+        url: '/get_concren',
+        method: 'get',
+        params
+    })
+}
+
+
+/**
+ * @function 搜藏
+ * @param {*} data 发送的数据
+ */
+export const collection = data =>{
+    return sendService({
+        url: '/collection',
+        method: 'post',
+        data
+    })
+}
+
+/**
+ * @function 批量取消搜藏
+ * @param {*} data 发送的数据
+ */
+export const mCollection = data =>{
+    return sendService({
+        url: '/mCollection',
+        method: 'post',
+        data
+    })
+}
+/**
+ * @function 搜藏列表查找
+ * @param {*} params 发送的数据
+ */
+export const getCollection = params =>{
+    return entryService({
+        url: '/get_collection',
         method: 'get',
         params
     })

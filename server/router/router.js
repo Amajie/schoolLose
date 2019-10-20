@@ -52,6 +52,145 @@ router.post('/ce', checkToken, cUserInfo.cUserEmail)
 router.post('/ci', checkToken, cUserInfo.cUserInfo)
 router.post('/fi', checkToken, cUserInfo.fUserInfo)
 
+// 关注用户
+router.post('/concren', checkToken, (req, res) =>{
+    const {concrenId, concrenTag} = req.body
+    
+    // true 关注 false 取消关注
+    let op = JSON.parse(concrenTag) ?{$push:{'myConcern': concrenId}} : {$pull:{'myConcern': concrenId}}
+
+    userInfo.updateOne({_id: req.userId}, op, (err, data) =>{
+        if(!data.n) return res.json({"msg": "关注失败", "code": 0})
+        res.json({"msg": "关注成功", "code": 200})
+    })
+})
+
+// 关注人信息的查找
+router.get('/get_concren', (req, res) =>{
+    const {concrenList} = req.query
+    /**
+     * 循环遍历 关注列表 数组包裹，每一条数据即为{_d: 5da3075072a90339f44cdf1a}
+     */
+
+     const orArr = JSON.parse(concrenList).map(item => {
+         return {_id: item}
+     })
+
+    userInfo.find({$or: orArr},{
+
+    }, (err, data) =>{
+        console.log(data)
+        const concrenData = data.map(item =>{
+            return {
+                userName: item.userName,
+                avater: item.avater,
+                cheId: item._id,
+            }
+        })
+
+        res.json({"msg": "获取成功", "code": 200, concrenData})
+    })
+})
+
+
+router.post('/collection', checkToken, (req, res) =>{
+    const {collectionId, collectionTag} = req.body
+    
+    // true 关注 false 取消关注
+    let op = JSON.parse(collectionTag) ?{$push:{'otherConcern': collectionId}} : {$pull:{'otherConcern': collectionId}}
+
+    userInfo.updateOne({_id: req.userId}, {otherConcern}, (err, data) =>{
+        if(!data.n) return res.json({"msg": "关注失败", "code": 0})
+        res.json({"msg": "关注成功", "code": 200})
+    })
+})
+
+router.post('/mCollection', checkToken, (req, res) =>{
+
+    const {otherConcern} = req.body
+
+    userInfo.update({_id: '5da68019edd6263de477e2e4'}, {otherConcern}, (err, data) =>{
+        if(!data.n) return res.json({"msg": "取消失败", "code": 0})
+        res.json({"msg": "取消成功", "code": 200})
+    })
+})
+
+// 收藏信息的查找
+router.get('/get_collection', (req, res) =>{
+    const collectionList = JSON.parse(req.query.collectionList)
+    const orArr = collectionList.map(item => {
+        return {objectId: item}
+    })
+
+    reInfo.find({$or: orArr}, (err, reData) =>{
+        console.log(reData)
+        let arr = []
+        let userArr = []
+        let reArr = []
+
+        // 先排序
+        const newReData = collectionList.map((key, index) =>{
+
+            const i = reData.findIndex(item =>{
+
+                return key === item.objectId.toString()
+            })
+            return reData[i]
+
+        })
+      
+        newReData.filter(item => {
+            let id = item.objectUserId.toString()
+            const i = arr.indexOf(id)
+            if(i === -1){
+                arr.push(id)
+                userArr.push({_id: item.objectUserId})
+                reArr[reArr.length] = [item]
+            }else{
+                reArr[i].push(item)
+            }
+        })
+
+        userInfo.find({$or: userArr}, (err, userData) =>{
+
+            // 此时这里先要排序
+            const newUserData = userArr.map((key, index) =>{
+
+                const i = userData.findIndex(item =>{
+                    return key._id.toString() === item._id.toString()
+                })
+                return userData[i]
+    
+            })
+
+            const collectionData = newUserData.map((item, index) => {
+                const obj = {}
+                obj.userName = item.userName
+                obj.avater = item.avater
+                obj.cheId = item.avater
+                obj.objectData = reArr[index]
+                return obj
+            })
+
+            res.json({"msg": "获取成功", "code": 200, collectionData})
+        })
+
+    })
+
+})
+
+
+router.get('/c', checkToken, (req, res) =>{
+    
+    // true 关注 false 取消关注
+
+    userInfo.updateOne({_id: '5da3075072a90339f44cdf1a'}, {$push:{'otherConcern': ''}}, (err, data) =>{
+        if(!data.n) return res.json({"msg": "关注失败", "code": 0})
+        res.json({"msg": "关注成功", "code": 200})
+    })
+})
+
+
 //头像的上传
 router.post('/upAvatar', checkToken, upload.single("avater"), (req, res) =>{
 
@@ -208,7 +347,7 @@ router.get('/fInfo', (req, res) =>{
 
             res.json({
                 "msg": "没有数据", "code": 1, 
-                userData: {
+                userInfo: {
                     userName: fData.userName,
                     avater: fData.avater
                 }
@@ -327,11 +466,9 @@ router.get('/search_f_info', (req, res) =>{
         },
         // 此时要根据 这个来排序
         {$sort:{sendTime: parseInt(upDownTag)}},
-        // 可以根据该田间查询
+        // 可以根据查询
         {"$match": getMatch(req.query)},
         { $unwind: "$userData"},
-        // {$skip : pageNum*page},
-        // {$limit: pageNum},
         {$project:{
             objectId:"$objectId",
             objectDesc:"$objectDesc",
@@ -368,7 +505,6 @@ router.get('/search_f_info', (req, res) =>{
         res.json({"msg": "查找成功", "code": 200, data: newData})
     })
 })
-
 
 // 详情页的查找
 router.get('/fDetailInfo', (req, res) =>{

@@ -52,8 +52,8 @@
                             <!-- 标题 -->
                             <div class="info_title">
                                 <p>
-                                    <span class="title_p">{{item.objectTypeId | filterTypeName(type_nav)}}</span>
-                                    <span @click.stop="toUserCenter(item)" class="title_name">{{item.userName}}</span>
+                                    <span class="title_p">{{item.objectTypeId | filterTypeName}}</span>
+                                    <span @click.stop="toUserCenter(item.cheId)" class="title_name">{{item.userName}}</span>
                                 </p>
                                 <p :class="{info_like: true, lose: item.objectWay === '0'}">{{item.objectWay === '0'? '丢': '拾'}}</p>
                             </div>
@@ -64,7 +64,7 @@
                                     <span>{{item.objectDesc}}</span>
                                 </p>
                             </div>
-                            <!-- 配送 -->
+                            <!-- 时间 名称 -->
                             <div class="info_tack">
                                 <div class="user">
                                     <icon name="center_object" :w="12" :h="12"></icon>
@@ -105,6 +105,7 @@ export default {
     },
     created(){
        this.handleCreated()
+       console.log(this.homeData)
     },
     inject:['reload'],
     computed:{
@@ -228,7 +229,7 @@ export default {
           padding: 0 1%;
           padding-bottom: 10px;
         }
-       .data_item{
+        .data_item{
             display: flex;
             padding-left: 10px;
             .item_img{
@@ -244,7 +245,6 @@ export default {
                     padding: 1px 10px;
                     justify-content: space-between;
                 }
-                //标题
                 .info_title{
                     font-size: 18px;
                     .title_p{
@@ -273,7 +273,6 @@ export default {
                         background-color: red;
                     }
                 }
-                //评分
                 .info_desc{
                     font-size: 12px;
                     .desc-content{
@@ -283,7 +282,6 @@ export default {
                         }
                     }
                 }
-                // 配送
                 .info_tack{
                     font-size: 12px;
                     .tack_heng{

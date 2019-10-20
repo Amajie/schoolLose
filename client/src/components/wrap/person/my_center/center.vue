@@ -51,7 +51,7 @@
                                 </van-col>
                                 <van-col span="3">
                                     <!--关注 -->
-                                    <div class="item" @click.stop="handleConcern" @click="loading=false">
+                                    <div class="item" v-if="!isMyCenter" @click.stop="handleConcren">
                                         <icon v-if="!concernTag" name="concern" :w="svg" :h="svg"></icon>
                                         <icon v-else name="concern_active" :w="svg" :h="svg"></icon>
                                     </div>
@@ -131,18 +131,20 @@ export default {
             avater: '',
             loadObj: {},
             noData: true,
-            concernTag: false
+            concernTag: false,
+            isMyCenter: false
         }
     },
     computed:{
         ...mapState([
+            'userData',
             'centerData',
             'centerPage',
             'centerPageNum',
         ])
     },
     created(){
-        
+        console.log(this.userData)
         /**
          *  此时这里 需要判断一下如果路由传递过来的 id
          */
@@ -156,6 +158,9 @@ export default {
             this.avater = centerData[0].avater
             this.noData = false
         }
+
+        //因为这里需要获取 
+        this.handleConcrenTag()
     },
     methods:{
         ...mapMutations([
@@ -170,12 +175,12 @@ export default {
             this.gInfo({
                 cheId: cheId
             }).then(res =>{
-                const {code, data, userData} = res.data
+                const {code, data, userInfo} = res.data
 
                 // 如果存在 说明不存在数据
-                if(userData){
-                    this.userName = userData.userName
-                    this.avater = userData.avater
+                if(userInfo){
+                    this.userName = userInfo.userName
+                    this.avater = userInfo.avater
                     return
                 }
 
@@ -199,14 +204,43 @@ export default {
                 }
             })
         },
-        onLoad() {
-            /**
-             * 注意 
-             *      此时要想显示 加载loading 设置this.loading = true
-             *      此时要想显示 要想不再触发 onLoad事件 设置 this.finished = true
-             */
-            console.log('触发')
-            this.getCenterData()
+        // 查看是否关注
+        handleConcrenTag(){
+
+            const {userData, cheId} = this
+
+            this.concrenList = userData.myConcern
+
+            // 自己的中心 不必现实关注按钮
+            if(this.cheId === userData.cheId) this.isMyCenter = true
+            if(!this.concrenList.length) return console.log('关注列表没有数据')
+            const i = this.concrenList.findIndex(item => item === cheId)
+
+            // 没有关注
+            if(i === -1) return
+            // 已经关注
+            this.concernTag = true
+        },
+        // 发送 关注请求
+        handleConcren(){
+            const {concernTag, centerData, cheId, concren, tText, userName} = this
+            
+            //已经关注
+            if(concernTag) return tText('已经关注他咯，快去看他的动态吧')
+            
+            //发送关注请求
+            concren({
+                concrenId: cheId,
+                concrenTag: JSON.stringify(true)
+            }).then(res =>{
+                const {code} = res.data
+                if(code === 0) return tText('关注失败, 请稍后再试')
+                tText(`已关注 ${userName}`)
+                // 显示 关注图标
+                this.concernTag = true
+                // 关注对象 添加到关注列表
+                this.userData.myConcern.push(cheId)
+            })
         },
         toDetail(index){
             

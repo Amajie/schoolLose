@@ -81,8 +81,8 @@ exports.enter = {
             if(!data) return res.json({"msg": "该用户不存在", "code": -1})
 
             const {
-                userName, email, _id, userType, 
-                avater, name, stId, gender, userActive, 
+                userName, email, _id, userType, myConcern,
+                avater, name, stId, gender, userActive, otherConcern,
                 courtyard, major, classes, address   
             } = data
     
@@ -100,7 +100,7 @@ exports.enter = {
                 token, 
                 userData: {
                     userName, email, userType, cheId: _id,
-                    avater, name, stId, gender, 
+                    avater, name, stId, gender, myConcern, otherConcern,
                     courtyard, major, classes, address   
                 }
             })

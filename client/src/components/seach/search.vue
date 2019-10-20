@@ -96,7 +96,7 @@
                             <div class="info_title">
                                 <p>
                                     <span class="title_p">{{item.objectTypeId | filterTypeName}}</span>
-                                    <span @click.stop="toUserCenter(item)" class="title_name">{{item.userName}}</span>
+                                    <span @click.stop="toUserCenter(item.cheId)" class="title_name">{{item.userName}}</span>
                                 </p>
                                 <p :class="{info_like: true, lose: item.objectWay === '0'}">{{item.objectWay === '0'? '丢': '拾'}}</p>
                             </div>

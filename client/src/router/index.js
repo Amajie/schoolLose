@@ -25,6 +25,10 @@ import Center from '../components/wrap/person/my_center/center.vue'
 import Releasedata from '../components/wrap/person/my_center/release.vue'
 import Deatil from '../components/wrap/person/my_center/detail.vue'
 
+// 个人执行的cell点击列表
+import Concren from '../components/wrap/person/page/concren.vue'
+import Collection from '../components/wrap/person/page/collection.vue'
+
 //搜素
 import Search from '../components/seach/search.vue'
 
@@ -173,6 +177,24 @@ const router =  new Router({
       path: '/cimg',
       name: 'Cimg',
       component: Cimg
+    },
+    //关注列表
+    {
+      path: '/concren',
+      name: 'Concren',
+      meta: {
+        noRequireToken: true,
+      },
+      component: Concren
+    },
+    //收藏列表
+    {
+      path: '/collection',
+      name: 'Collection',
+      meta: {
+        noRequireToken: true,
+      },
+      component: Collection
     },
     // 首页的搜索
     {

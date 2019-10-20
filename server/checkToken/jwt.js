@@ -6,7 +6,7 @@
 const jwt = require('jsonwebtoken')
 
 const secretKey = 'che-hj-www://jie412.com'//加密参数 解密也需要它
-const expiresIn = 60//设置token过期时间
+const expiresIn = 150000 // 设置token过期时间
 
 
 /**

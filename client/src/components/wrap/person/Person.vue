@@ -36,7 +36,7 @@
                     <div class="cell-list">
                         <div class="cell-item">
                             <img src="../../../assets/person/person_concern.png" alt="">
-                            <van-cell title-class="text" title="我的关注" is-link>
+                            <van-cell to="/concren" title-class="text" title="我的关注" is-link>
                                 <van-icon
                                     slot="right-icon"
                                     name="arrow"
@@ -47,7 +47,7 @@
                         </div>
                         <div class="cell-item">
                             <img src="../../../assets/person/person_collect.png" alt="">
-                            <van-cell title-class="text" title="我的收藏" is-link>
+                            <van-cell to="/collection" title-class="text" title="我的收藏" is-link>
                                 <van-icon
                                     slot="right-icon"
                                     name="arrow"
