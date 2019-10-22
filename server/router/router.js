@@ -54,12 +54,11 @@ router.post('/fi', checkToken, cUserInfo.fUserInfo)
 
 // 关注用户
 router.post('/concren', checkToken, (req, res) =>{
-    const {concrenId, concrenTag} = req.body
+    const {myConcern} = req.body
     
     // true 关注 false 取消关注
-    let op = JSON.parse(concrenTag) ?{$push:{'myConcern': concrenId}} : {$pull:{'myConcern': concrenId}}
 
-    userInfo.updateOne({_id: req.userId}, op, (err, data) =>{
+    userInfo.updateOne({_id: req.userId}, {myConcern}, (err, data) =>{
         if(!data.n) return res.json({"msg": "关注失败", "code": 0})
         res.json({"msg": "关注成功", "code": 200})
     })
@@ -67,20 +66,29 @@ router.post('/concren', checkToken, (req, res) =>{
 
 // 关注人信息的查找
 router.get('/get_concren', (req, res) =>{
-    const {concrenList} = req.query
+    const concrenList = JSON.parse(req.query.concrenList)
     /**
      * 循环遍历 关注列表 数组包裹，每一条数据即为{_d: 5da3075072a90339f44cdf1a}
      */
 
-     const orArr = JSON.parse(concrenList).map(item => {
+     const orArr = concrenList.map(item => {
          return {_id: item}
      })
 
     userInfo.find({$or: orArr},{
 
     }, (err, data) =>{
-        console.log(data)
-        const concrenData = data.map(item =>{
+        const newData = concrenList.map((key, index) =>{
+
+            const i = data.findIndex(item =>{
+
+                return key === item._id.toString()
+            })
+            return data[i]
+
+        })
+
+        const concrenData = newData.map(item =>{
             return {
                 userName: item.userName,
                 avater: item.avater,
@@ -92,31 +100,18 @@ router.get('/get_concren', (req, res) =>{
     })
 })
 
-
 router.post('/collection', checkToken, (req, res) =>{
-    const {collectionId, collectionTag} = req.body
-    
-    // true 关注 false 取消关注
-    let op = JSON.parse(collectionTag) ?{$push:{'otherConcern': collectionId}} : {$pull:{'otherConcern': collectionId}}
-
-    userInfo.updateOne({_id: req.userId}, {otherConcern}, (err, data) =>{
-        if(!data.n) return res.json({"msg": "关注失败", "code": 0})
-        res.json({"msg": "关注成功", "code": 200})
-    })
-})
-
-router.post('/mCollection', checkToken, (req, res) =>{
 
     const {otherConcern} = req.body
 
-    userInfo.update({_id: '5da68019edd6263de477e2e4'}, {otherConcern}, (err, data) =>{
+    userInfo.update({_id: req.userId}, {otherConcern}, (err, data) =>{
         if(!data.n) return res.json({"msg": "取消失败", "code": 0})
         res.json({"msg": "取消成功", "code": 200})
     })
 })
 
 // 收藏信息的查找
-router.get('/get_collection', (req, res) =>{
+router.get('/get_collection', checkToken, (req, res) =>{
     const collectionList = JSON.parse(req.query.collectionList)
     const orArr = collectionList.map(item => {
         return {objectId: item}
@@ -136,9 +131,9 @@ router.get('/get_collection', (req, res) =>{
                 return key === item.objectId.toString()
             })
             return reData[i]
-
         })
       
+        // 这里先排序 帖子顺序
         newReData.filter(item => {
             let id = item.objectUserId.toString()
             const i = arr.indexOf(id)
@@ -153,7 +148,7 @@ router.get('/get_collection', (req, res) =>{
 
         userInfo.find({$or: userArr}, (err, userData) =>{
 
-            // 此时这里先要排序
+            // 再排个人信息的顺序
             const newUserData = userArr.map((key, index) =>{
 
                 const i = userData.findIndex(item =>{
@@ -167,7 +162,7 @@ router.get('/get_collection', (req, res) =>{
                 const obj = {}
                 obj.userName = item.userName
                 obj.avater = item.avater
-                obj.cheId = item.avater
+                obj.cheId = item._id
                 obj.objectData = reArr[index]
                 return obj
             })
@@ -175,6 +170,101 @@ router.get('/get_collection', (req, res) =>{
             res.json({"msg": "获取成功", "code": 200, collectionData})
         })
 
+    })
+
+})
+
+
+
+// 留言管理查询 
+router.get('/f_my_commit', (req, res) =>{
+    //这里 要根据这个 数据
+    let {cheId, page, pageNum} = req.query
+
+    page = parseInt(page)
+    pageNum = parseInt(pageNum)  
+
+    commitInfo.aggregate([
+        {
+            $lookup:{
+                from: 'users',
+                localField: 'fromId',
+                foreignField: '_id',
+                as: 'commitData'
+            }
+        },
+        {
+            $lookup:{
+                from: 'users',
+                localField: 'toId',
+                foreignField: '_id',
+                as: 'replyData'
+            }
+        },
+        {
+            $lookup:{
+                from: 'users',
+                localField: 'toId',
+                foreignField: '_id',
+                as: 'replyData'
+            }
+        },
+        {$sort: {commitTime: -1}},
+        {$match:{
+            // 此时可以正则表达式
+            commitTag: {$regex: cheId}
+        }},
+        {$skip : pageNum*page},
+        {$limit: pageNum},
+        {$unwind: "$commitData" }
+    ], function(err, data){
+        console.log(data)
+        const commitData = data.map((item, index, array) =>{
+            const {fromId, toId, infoId, infoUserId, commit, commitId, commitTag,
+                 replyCommit, commitTime, commitData, replyData} = item
+
+            const replyUserInfo = replyData[0]
+            let arrData = {}
+            arrData.fromId = fromId
+            arrData.toId = toId
+            arrData.infoUserId = infoUserId
+            arrData.infoId = infoId
+            arrData.commit = commit
+            arrData.commitId = commitId
+            arrData.commitTag = commitTag
+            arrData.replyCommit = replyCommit
+            arrData.commitTime = commitTime
+
+            // 评论人的信息 评论人的信息 id不需要了 与上面的fromId 和 toId相同
+            arrData.fromUserName = commitData.userName
+            arrData.fromAvater = commitData.avater
+            arrData.toUserName = ''
+            arrData.toAvater = ''
+            // 没值直接返回
+            if(!replyUserInfo) return arrData
+
+            //否则返回数据
+            return {
+                ...arrData, 
+                toUserName: replyUserInfo.userName,
+                toAvater: replyUserInfo.avater,
+            }
+        })
+
+        res.json({"msg": "获取评论成功", "code": 200, commitData})
+    })
+
+})
+
+
+// 留言删除 
+router.get('/d_my_commit', (req, res) =>{
+
+    const {commitId, commitTag} = req.query
+    commitInfo.updateOne({commitId}, {commitTag}, (err, data) =>{
+        if(!data.n) return res.json({"msg": "删除失败，请稍后再试"})
+
+        res.json({"msg": "修改成功", "code": 200})
     })
 
 })
@@ -528,18 +618,23 @@ router.get('/fDetailInfo', (req, res) =>{
 router.post('/rCommit', (req, res) =>{
     console.log(req.body)
     let {toId, fromId} = req.body
+    // 是回复 不需要生成唯一id
     if(toId){
         toId = mongoose.Types.ObjectId(toId)
+    // 不是回复 需要生成唯一id
     }
+
+    const commitId = getId()
 
     commitInfo.create({
         ...req.body,
+        commitId,
         toId,
         fromId: mongoose.Types.ObjectId(fromId)
     }, (err, data) =>{
         if(!data) return res.json({"msg": "留言失败", "code": 0})
         
-        res.json({"msg":"留言成功", "code": 200, "commitData": data})
+        res.json({"msg":"留言成功", "code": 200, "commitData": data, commitId})
     })
 })
 // 留言的查询
@@ -548,8 +643,7 @@ router.get('/fCommit', (req, res) =>{
     let {infoId, page, pageNum} = req.query
     page = parseInt(page)
     pageNum = parseInt(pageNum)
-    console.log(page)
-    console.log(pageNum)
+
     commitInfo.aggregate([
         {
             $lookup:{
@@ -564,7 +658,7 @@ router.get('/fCommit', (req, res) =>{
                 from: 'users',
                 localField: 'toId',
                 foreignField: '_id',
-                as: 'replayData'
+                as: 'replyData'
             }
         },
         {$match:{infoId}},
@@ -574,13 +668,18 @@ router.get('/fCommit', (req, res) =>{
     ], function(err, data){
         console.log(data)
         const commitData = data.map((item, index, array) =>{
-            const {fromId, toId, commit, commitTime, commitData, replayData} = item
+            const {fromId, toId, infoId, infoUserId, commit, commitId, replyCommit, commitTime, commitData, replyData} = item
 
-            const replayUserInfo = replayData[0]
+            const replyUserInfo = replyData[0]
             let arrData = {}
             arrData.fromId = fromId
             arrData.toId = toId
+            arrData.infoUserId = infoUserId
+            arrData.infoId = infoId
+            arrData.toId = toId
             arrData.commit = commit
+            arrData.commitId = commitId
+            arrData.replyCommit = replyCommit
             arrData.commitTime = commitTime
 
             // 评论人的信息 评论人的信息 id不需要了 与上面的fromId 和 toId相同
@@ -589,13 +688,13 @@ router.get('/fCommit', (req, res) =>{
             arrData.toUserName = ''
             arrData.toAvater = ''
             // 没值直接返回
-            if(!replayUserInfo) return arrData
+            if(!replyUserInfo) return arrData
 
             //否则返回数据
             return {
                 ...arrData, 
-                toUserName: replayUserInfo.userName,
-                toAvater: replayUserInfo.avater,
+                toUserName: replyUserInfo.userName,
+                toAvater: replyUserInfo.avater,
             }
         })
 

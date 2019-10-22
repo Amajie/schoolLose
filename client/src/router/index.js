@@ -28,6 +28,7 @@ import Deatil from '../components/wrap/person/my_center/detail.vue'
 // 个人执行的cell点击列表
 import Concren from '../components/wrap/person/page/concren.vue'
 import Collection from '../components/wrap/person/page/collection.vue'
+import Commit from '../components/wrap/person/page/commit.vue'
 
 //搜素
 import Search from '../components/seach/search.vue'
@@ -195,6 +196,15 @@ const router =  new Router({
         noRequireToken: true,
       },
       component: Collection
+    },
+    //留言列表
+    {
+      path: '/commit/:cheId',
+      name: 'Commit',
+      meta: {
+        noRequireToken: true,
+      },
+      component: Commit
     },
     // 首页的搜索
     {

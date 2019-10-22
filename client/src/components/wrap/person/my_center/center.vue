@@ -223,23 +223,20 @@ export default {
         },
         // 发送 关注请求
         handleConcren(){
-            const {concernTag, centerData, cheId, concren, tText, userName} = this
+            const {concernTag, centerData, userData, cheId, concren, tText, userName} = this
             
             //已经关注
             if(concernTag) return tText('已经关注他咯，快去看他的动态吧')
-            
+            const myC = [cheId, ...userData.myConcern]
             //发送关注请求
-            concren({
-                concrenId: cheId,
-                concrenTag: JSON.stringify(true)
-            }).then(res =>{
+            concren({myConcern: myC}).then(res =>{
                 const {code} = res.data
                 if(code === 0) return tText('关注失败, 请稍后再试')
                 tText(`已关注 ${userName}`)
                 // 显示 关注图标
                 this.concernTag = true
                 // 关注对象 添加到关注列表
-                this.userData.myConcern.push(cheId)
+                userData.myConcern = myC
             })
         },
         toDetail(index){

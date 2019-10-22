@@ -7,11 +7,8 @@
                 title="我的收藏"
             >
                 <van-icon name="arrow-left" slot="left" size="1.5em" color="#fff" />
-                <p @click="delectTag = !delectTag" slot="right" class="t">管理</p>
+                <p v-show="delectTag" @click="handleCollection" slot="right" class="t">取消收藏</p>
             </van-nav-bar>
-        </div>
-        <div v-show="delectTag" class="delect-btn">
-            <van-button :disabled="optionList.length? false: true" @click.native="handleCollection" type="primary" block>取消收藏</van-button>
         </div>
         <div class="collection-wrap">
             <div class="collection-list">
@@ -19,7 +16,7 @@
                     v-for="(item, index) in collectionData"
                     :key="index"
                 >
-                    <div class="user-info">
+                    <div @click.stop="toUserCenter(item.cheId)" class="user-info">
                         <div class="l">
                             <van-image
                                 width="20"
@@ -62,7 +59,7 @@
                                         <div class="info_title">
                                             <p>
                                                 <span class="title_p">{{val.objectTypeId | filterTypeName}}</span>
-                                                <span @click.stop="toUserCenter(val.objectUserId)" class="title_name">{{item.userName}}</span>
+                                                <span class="title_name">{{item.userName}}</span>
                                             </p>
                                             <p :class="{info_like: true, lose: val.objectWay === '0'}">
                                                 {{val.objectWay === '0'? '丢': '拾'}}
@@ -79,7 +76,7 @@
                                         <div class="info_tack">
                                             <div class="user">
                                                 <icon name="center_object" :w="12" :h="12"></icon>
-                                                <span>{{val.objectId}}</span>
+                                                <span>{{val.objectName}}</span>
                                             </div>
                                             <div class="tack_heng">
                                                 <icon name="center_time" :w="15" :h="15"></icon>
@@ -125,6 +122,12 @@ export default {
        // 获取数据
        this.getInfo()
     },
+    watch:{
+        optionList(newData, oldData){
+            if(newData.length > 0) return this.delectTag = true
+            this.delectTag = false
+        }
+    },
     methods:{
         ...mapMutations([
             'setState',
@@ -140,7 +143,6 @@ export default {
             }).then(res =>{
                 const {collectionData} = res.data
                 this.collectionData = collectionData
-                console.log(collectionData)
             })
         },
         handleBox(){
@@ -148,16 +150,16 @@ export default {
         },
         handleCollection(){
             const {optionList, collectionList, 
-            mCollection, getInfo, dConfirm, tText} = this
-
+            sendCollection, getInfo, dConfirm, tText} = this
+            
+            // 选择 不同的数组元素
             const otherConcern = optionList.concat(collectionList).filter(function(v, i, arr) {
-               return arr.indexOf(v) === arr.lastIndexOf(v)
-  
+               return arr.indexOf(v) === arr.lastIndexOf(v)  
             })
             
-            dConfirm('提示', '是否要取消关注?').then(() =>{
+            dConfirm('提示', '是否要取消收藏?').then(() =>{
                 // 发送数据
-                mCollection({
+                sendCollection({
                     otherConcern
                 }).then(res =>{
                     const {code} = res.data
@@ -168,7 +170,7 @@ export default {
                     // 操作成功 获取数据
                     this.reload()
                 })
-            })
+            }).catch(() =>{})
         },
         back(){
            this.$router.go(-1)

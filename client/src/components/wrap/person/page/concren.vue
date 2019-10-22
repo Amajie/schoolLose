@@ -57,10 +57,12 @@ export default {
     },
     inject: ['reload'],
     created(){
-        const concrenList = this.userData.myConcern
-        if(concrenList.length === 0) return this.isEmpty = true
+
+        // 判断是否有关注列表
+        if(this.userData.myConcern.length === 0) return this.isEmpty = true
+        // 有则发送请求拿取
         this.getConcren({
-            concrenList: JSON.stringify(concrenList)
+            concrenList: JSON.stringify(this.userData.myConcern)
         }).then(res =>{
             this.concrenData = res.data.concrenData
         })
@@ -72,18 +74,21 @@ export default {
         ]),
         //取消关注
         rejectConcren(index, concrenId, userName){
-            const {tText, dConfirm} = this
+            const {tText, userData, dConfirm, concren} = this
             dConfirm('提示', `是否取消关注${userName}?`).then(() =>{
-                this.concren({
-                    concrenId,
-                    concrenTag: JSON.stringify(false)
-                }).then(res =>{
+
+                // 查询克隆
+                const i = userData.myConcern.indexOf(concrenId)
+                const myC = userData.myConcern.slice()
+                myC.splice(i, 1)
+                
+                concren({myConcern: myC}).then(res =>{
                     const {code} = res.data
                     if(code === 0) return tText('取消关注失败, 请稍后再试')
                     tText(`已取消关注 ${userName}`)
 
                     // 关注对象 添加到关注列表
-                    this.userData.myConcern.splice(index, 1)
+                    this.userData.myConcern = myC
                     this.reload()
                 })
             })

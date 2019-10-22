@@ -58,7 +58,7 @@
                         </div>
                         <div class="cell-item">
                             <img src="../../../assets/person/person_word.png" alt="">
-                            <van-cell title-class="text" title="我的留言" is-link>
+                            <van-cell :to="`/commit/${userData.cheId}`" title-class="text" title="留言管理" is-link>
                                 <van-icon
                                     slot="right-icon"
                                     name="arrow"

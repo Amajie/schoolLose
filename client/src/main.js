@@ -23,8 +23,8 @@ Vue.prototype.tText = tText// 轻提示
 import {register, sendEmailCode, checkEmailCode, login,
   cName, cPaw, cEmail, cInfo, fInfo, upAvater, reObject,
   upObject, deObject, gInfo, gHomeInfo, gSearchInfo, getDetail, 
-  rCommit, fCommit, concren, getConcren, collection, mCollection,
-  getCollection, text} from './axios/api.js'
+  rCommit, fCommit, concren, getConcren, sendCollection,
+  getCollection, getMyCommit, delectMyCommit, text} from './axios/api.js'
 Vue.prototype.register = register//发送注册请求
 Vue.prototype.sendEmailCode = sendEmailCode//发送邮箱验证码
 Vue.prototype.checkEmailCode = checkEmailCode//发送 输入的 验证码
@@ -47,9 +47,10 @@ Vue.prototype.rCommit = rCommit//发送 写留言
 Vue.prototype.fCommit = fCommit//发送 查找留言
 Vue.prototype.concren = concren//发送 关注请求
 Vue.prototype.getConcren = getConcren//发送 获取关注用户信息
-Vue.prototype.collection = collection//发送 收藏请求
+Vue.prototype.sendCollection = sendCollection//发送 收藏请求
 Vue.prototype.getCollection = getCollection//发送 获取收藏信息
-Vue.prototype.mCollection = mCollection//发送 获取收藏信息
+Vue.prototype.getMyCommit = getMyCommit//发送 获取我的留言信息
+Vue.prototype.delectMyCommit = delectMyCommit//发送 留言删除
 
 Vue.prototype.text = text//发送 密码修改请求
 

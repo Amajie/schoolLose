@@ -222,10 +222,10 @@ export const getConcren = params =>{
 
 
 /**
- * @function 搜藏
+ * @function 搜藏 取消搜藏
  * @param {*} data 发送的数据
  */
-export const collection = data =>{
+export const sendCollection = data =>{
     return sendService({
         url: '/collection',
         method: 'post',
@@ -234,23 +234,35 @@ export const collection = data =>{
 }
 
 /**
- * @function 批量取消搜藏
- * @param {*} data 发送的数据
- */
-export const mCollection = data =>{
-    return sendService({
-        url: '/mCollection',
-        method: 'post',
-        data
-    })
-}
-/**
  * @function 搜藏列表查找
  * @param {*} params 发送的数据
  */
 export const getCollection = params =>{
     return entryService({
         url: '/get_collection',
+        method: 'get',
+        params
+    })
+}
+
+/**
+ * @function 我的留言列表查找
+ * @param {*} params 发送的数据
+ */
+export const getMyCommit = params =>{
+    return notService({
+        url: '/f_my_commit',
+        method: 'get',
+        params
+    })
+}
+/**
+ * @function 留言删除
+ * @param {*} params 发送的数据
+ */
+export const delectMyCommit = params =>{
+    return notService({
+        url: '/d_my_commit',
         method: 'get',
         params
     })
