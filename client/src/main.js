@@ -24,7 +24,7 @@ import {register, sendEmailCode, checkEmailCode, login,
   cName, cPaw, cEmail, cInfo, fInfo, upAvater, reObject,
   upObject, deObject, gInfo, gHomeInfo, gSearchInfo, getDetail, 
   rCommit, fCommit, concren, getConcren, sendCollection,
-  getCollection, getMyCommit, delectMyCommit, text} from './axios/api.js'
+  getCollection, getMyCommit, delectMyCommit, getUInfo, text} from './axios/api.js'
 Vue.prototype.register = register//发送注册请求
 Vue.prototype.sendEmailCode = sendEmailCode//发送邮箱验证码
 Vue.prototype.checkEmailCode = checkEmailCode//发送 输入的 验证码
@@ -51,6 +51,7 @@ Vue.prototype.sendCollection = sendCollection//发送 收藏请求
 Vue.prototype.getCollection = getCollection//发送 获取收藏信息
 Vue.prototype.getMyCommit = getMyCommit//发送 获取我的留言信息
 Vue.prototype.delectMyCommit = delectMyCommit//发送 留言删除
+Vue.prototype.getUInfo = getUInfo//发送 个人权限是否通过
 
 Vue.prototype.text = text//发送 密码修改请求
 
@@ -60,9 +61,10 @@ Vue.prototype.decrypt = decrypt// 解密
 Vue.prototype.encrypt = encrypt// 加密
 
 //共同方法
-import {selectTypeId, findTypeId} from './commonF/commonF.js'
+import {selectTypeId, findTypeId, getAuthory} from './commonF/commonF.js'
 Vue.prototype.selectTypeId = selectTypeId// 根据用户选择的物品 得到相应的key
 Vue.prototype.findTypeId = findTypeId// 根据传来的key 查看分类表是否存在该key
+Vue.prototype.getAuthory = getAuthory// 根据传来的key 查看分类表是否存在该key
 
 
 //svg 图片的使用
@@ -83,7 +85,8 @@ Sticky, ImagePreview, ActionSheet,
 Uploader, Loading, Notify, Switch,
 DatetimePicker, List, PullRefresh,
 DropdownMenu, DropdownItem, Image,
-Swipe, SwipeItem, Lazyload, SwipeCell} from 'vant'
+Swipe, SwipeItem, Lazyload, SwipeCell,
+Step, Steps} from 'vant'
 Vue.use(Button)
   .use(Icon)
   .use(NavBar)
@@ -121,7 +124,9 @@ Vue.use(Button)
   .use(Swipe)
   .use(SwipeItem)
   .use(Lazyload)
-  .use(SwipeCell )
+  .use(SwipeCell)
+  .use(Step)
+  .use(Steps)
 
 
 import * as filters from './filter/filter.js';

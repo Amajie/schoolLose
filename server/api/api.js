@@ -82,10 +82,10 @@ exports.enter = {
 
             const {
                 userName, email, _id, userType, myConcern,
-                avater, name, stId, gender, userActive, otherConcern,
-                courtyard, major, classes, address   
+                avater, name, stId, gender, userActive, myCollection,
+                courtyard, major, classes, address, credePic, passTag,
+                authory    
             } = data
-    
             if(!userActive) return res.json({"msg": "该用户还没有激活", "code": 1})
     
     
@@ -100,8 +100,9 @@ exports.enter = {
                 token, 
                 userData: {
                     userName, email, userType, cheId: _id,
-                    avater, name, stId, gender, myConcern, otherConcern,
-                    courtyard, major, classes, address   
+                    avater, name, stId, gender, myConcern, myCollection, 
+                    courtyard, major, classes, address, credePic, passTag,
+                    authory     
                 }
             })
         })
@@ -327,13 +328,27 @@ exports.cUserInfo = {
     * 
     */
     cUserInfo: (req, res) =>{
+        // 因为是数组 因此也不需要在重新设置
+        let credePic = JSON.parse(req.body.credePic)
     
-        userInfo.updateOne({_id: req.userId}, req.body, (err, data) =>{
-            if(data.n <= 0) return res.json({"msg": "修改失败", "code": 0})
-    
-            res.json({"msg": "修改成功", "code": 200})
+        // 如果有值 上传图片则
+        if(req.files.length){
+            req.files.map(item =>{
+                credePic.push(`http://192.168.43.124:7070/av/${item.filename}`)
+            })
+        // 如果上传图片失败 或者说 证件照长度为 0 即为没有图片
+        // 直接返回
+        }else if(!req.files.length && !credePic.length){
+            return res.json({"msg": "修改失败", "code": 0})
+        }
+
+        userInfo.updateOne({_id: req.userId}, {...req.body, credePic}, (err, data) =>{
+            console.log(data)
+            if(!data.n) return res.json({"msg": "修改失败", "code": 0})
+
+            res.json({"msg": "修改成功", "code": 200, credePic})
         })
-    
+
     },
 
     /**

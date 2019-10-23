@@ -3,7 +3,7 @@
         <div class="header b">
             <van-nav-bar
                 @click-left="handleRouter({url: '/set', tag: 'p'})"
-                @click-right="handleRouter({url: `/c/redata/${userData.cheId}`, tag: 'p'})"
+                @click-right="handleReData"
                 :border="false"
             >
                 <van-icon name="add-o" slot="right" size="2em" color="#fff" />
@@ -138,12 +138,29 @@ export default {
     },
     created(){
         this.bigAvater[0] = this.userData.avater
+        this.handleCreated()
     },
     methods:{
         ...mapMutations([
             'setUserData',
             'handleRouter'
         ]),
+        handleCreated(){
+            const {getUInfo, userData} = this
+            this.bigAvater[0] = userData.avater
+            if(userData.authory) return
+            
+            getUInfo({_id: userData.cheId}).then(res =>{
+                const {authory} = res.data
+                userData.authory = authory
+            })
+        },
+        handleReData(){
+            const {userData, handleRouter, getAuthory} = this
+
+            if(!getAuthory()) return
+            handleRouter({url: `/c/redata/${userData.cheId}`, tag: 'p'})
+        },
         /**
          * @function 退出当前登陆
          *  1 退出当前账号 不只是路由的跳转

@@ -23,6 +23,7 @@ const app = express()
 // })
 
 const router = require('./router/router.js')
+const adminRouter = require('./router/adminRouter.js')
 const re_lo = require('./router/login_register.js')
 
 app.use(bodyParser.urlencoded({ extended: false, limit: '20000kb'}))
@@ -51,6 +52,7 @@ app.use(function(req, res, next){
 })
 
 app.use(router)
+app.use(adminRouter)
 app.use(re_lo)
 
 

@@ -96,6 +96,18 @@ export const cEmail = data =>{
 }
 
 /**
+ * @function 获取个人信息是否被激活
+ * @param {*} params 发送的数据
+ */
+export const getUInfo = params =>{
+    return notService({
+        url: '/gi',
+        method: 'get',
+        params
+    })
+}
+
+/**
  * @function 个人信息的修改
  * @param {*} data 发送的数据
  */
@@ -106,6 +118,8 @@ export const cInfo = data =>{
         data
     })
 }
+
+
 /**
  * @function 个人信息的获取
  * @param {*} params 发送的数据

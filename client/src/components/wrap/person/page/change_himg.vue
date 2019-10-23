@@ -34,7 +34,6 @@ import {mapMutations} from 'vuex'
 export default {
     data(){
         return{
-            select_img_action: false,
             show_loading: false,
             fileList: [],
         }

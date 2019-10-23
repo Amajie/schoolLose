@@ -52,11 +52,14 @@
                 <!-- 默认选择学生 即radio为 0 -->
                 <van-radio-group v-model="userType">
                     <van-cell-group>
-                        <van-cell title="学生" clickable @click="userType = student">
-                            <van-radio slot="right-icon" :name="student" />
+                        <van-cell :title="student" clickable @click="userType = 1">
+                            <van-radio slot="right-icon" :name="1" />
                         </van-cell>
-                        <van-cell title="老师" clickable @click="userType = teacher">
-                            <van-radio slot="right-icon" :name="teacher" />
+                        <van-cell :title="teacher" clickable @click="userType = 2">
+                            <van-radio slot="right-icon" :name="2" />
+                        </van-cell>
+                        <van-cell :title="friend" clickable @click="userType = 3">
+                            <van-radio slot="right-icon" :name="3" />
                         </van-cell>
                     </van-cell-group>
                 </van-radio-group>
@@ -76,9 +79,10 @@ export default {
             userName: '车神-黄杰',
             password: 'huang661775',
             email: '2291945117@qq.com',
-            userType: '学生',
+            userType: 1,
             student: '学生',           
             teacher: '老师',           
+            friend: '访客'           
         }
     },
     computed:{

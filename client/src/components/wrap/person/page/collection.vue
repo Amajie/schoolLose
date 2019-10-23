@@ -136,7 +136,7 @@ export default {
         ]),
         getInfo(){
 
-            this.collectionList = this.userData.otherConcern
+            this.collectionList = this.userData.myCollection
             if(this.collectionList.length === 0) return this.isEmpty = true
             this.getCollection({
                 collectionList: JSON.stringify(this.collectionList)
@@ -153,20 +153,20 @@ export default {
             sendCollection, getInfo, dConfirm, tText} = this
             
             // 选择 不同的数组元素
-            const otherConcern = optionList.concat(collectionList).filter(function(v, i, arr) {
+            const myCollection = optionList.concat(collectionList).filter(function(v, i, arr) {
                return arr.indexOf(v) === arr.lastIndexOf(v)  
             })
             
             dConfirm('提示', '是否要取消收藏?').then(() =>{
                 // 发送数据
                 sendCollection({
-                    otherConcern
+                    myCollection
                 }).then(res =>{
                     const {code} = res.data
                     if(code === 0) return tText('操作失败，请稍后再试')
 
                     tText('操作成功')
-                    this.userData.otherConcern = otherConcern
+                    this.userData.myCollection = myCollection
                     // 操作成功 获取数据
                     this.reload()
                 })

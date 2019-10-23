@@ -9,6 +9,13 @@
                 <van-icon name="arrow-left" slot="left" size="1.5em" color="#fff"/>
             </van-nav-bar>
         </div>
+        <div class="step">
+            <van-steps :active="stepActive">
+                <van-step>信息完善</van-step>
+                <van-step>审核中</van-step>
+                <van-step>审核通过</van-step>
+            </van-steps>
+        </div>
         <div class="info-wrap">
             <div class="info-list">
                 <!-- 信息填写 -->
@@ -21,10 +28,10 @@
                     />
                     <van-field
                         clearable
-                        label="学号"
+                        :label="labelStId"
                         type="number"
                         v-model="stId"
-                        placeholder="真实学号"
+                        placeholder="请如实填写"
                     />
                     <van-field
                         readonly
@@ -35,6 +42,7 @@
                         @click="handleClick(genderData, 'gender')"
                     />
                     <van-field
+                        v-if="userType != 3"
                         readonly
                         clickable
                         label="学院"
@@ -42,7 +50,10 @@
                         placeholder="选择学院"
                         @click="handleClick(courtyardData, 'courtyard')"
                     />
+
+                    <!-- 专业和职业不同 -->
                     <van-field
+                        v-if="userType === 1"
                         readonly
                         clickable
                         label="专业"
@@ -51,6 +62,14 @@
                         @click="handleMajor"
                     />
                     <van-field
+                        v-else-if="userType === 3"
+                        clearable
+                        label="职业"
+                         v-model="major"
+                        placeholder="填写您的职业"
+                    />
+                    <van-field
+                        v-if="userType === 1"
                         clearable
                         label="班级"
                         v-model="classes"
@@ -59,9 +78,9 @@
 
                     <van-field
                         clearable
-                        label="宿舍地址"
+                        label="现居地址"
                         v-model="address"
-                        placeholder="例: 达理公寓1A614"
+                        placeholder="填写目前居住的地址"
                     />
                 </van-cell-group>
                 <!-- picker 选项 -->
@@ -75,12 +94,23 @@
                     />
                 </van-popup>
             </div>
+            <div class="c_i">
+                <div class="uploader">
+                    <van-uploader
+                        v-model="credePic"
+                        upload-text="上传证件照"
+                        :preview-full-image="false"
+                        :after-read="afterRead"
+                        :before-read="beforeRead"
+                    />
+                </div>
+            </div>
             <div class="info-btn" @click="handleInfo">
-                <van-button type="danger" block>保存</van-button>
+                <van-button type="danger" block>提交信息</van-button>
             </div>
             <div class="chang_explain">
                 <span class="chang_explain_title">注意：</span>
-                <span class="chang_explain_text">以上信息必须填写才能发布相关信息，走读学生，宿舍地址请填写: 校外居住</span>
+                <span class="chang_explain_text">以上信息比须如实填写，工作人员将在1-2工作日审核信息，审核结果将发送邮箱告知</span>
             </div>
         </div>
     </div>
@@ -108,13 +138,38 @@ export default {
             dataKey: '',
             showPicker: false,
             genderData: ['男', '女'],
+            credePic: [],
+            userType: '',
+
+            //label 文字
+            labelStId: '学号',
+            stepActive: 0
         }
     },
     created(){
         //设置个人信息 在表中
         const {userData} = this
+
         for(let key in userData){
             this[key] = userData[key]
+            if(key === 'credePic'){
+                this.credePic = userData[key].map(url =>{
+                    return {url}
+                })
+            }
+        }
+
+        // 这里 显示审核结果
+        if(userData.name && !userData.authory){
+            this.stepActive = 1
+        }else if(userData.authory){
+            this.stepActive = 2
+        }
+
+        if(this.userType === 2){
+            this.labelStId = '教工号'
+        }else if(this.userType === 3){
+            this.labelStId = '身份证号'
         }
     },
     computed:{
@@ -152,12 +207,13 @@ export default {
         },
 
         selectPicker(val, index){
-            const {dataKey, majorData} = this
+            const {dataKey, majorData, userData} = this
 
             this[dataKey] = val
             this.showPicker = false
 
-            if(dataKey === 'courtyard') this.major = majorData[this[dataKey]][0]
+            // 此时教师是不需要设置的
+            if(dataKey === 'courtyard' && userData.userType != 2) this.major = majorData[this[dataKey]][0]
 
         },
         /**
@@ -165,34 +221,73 @@ export default {
          * 
          */
         handleInfo(){
+
+            let formData = new FormData()
             //获取相应的数据
-            const {name, stId, gender, courtyard, handleRouter, setUserData,
+            const {name, stId, gender, courtyard, userData, userType, credePic, handleRouter, setUserData,
                 major, classes, address, cInfo, tText, dAlert} = this
+            
+            if(!name || !stId || !gender || !address ||
+                (userType === 1 && !classes) ||
+                ((userType === 1 || userType === 3) && !major) ||
+                ((userType === 1 || userType === 2) && !courtyard)
+            ){
+                return tText('内容不能为空')
+            }else if(!credePic.length){
+                return tText('请上传证件照')
+            }
+
+            formData.append('name', name)
+            formData.append('stId', stId)
+            formData.append('gender', gender)
+            formData.append('courtyard', courtyard)
+            formData.append('major', major)
+            formData.append('classes', classes)
+            formData.append('address', address)
+            formData.append('passTag', true)
+
+            let arrImg = []
+            credePic.forEach(item => {
+                if(item.file) return formData.append('uCredePic', item.file)
+                arrImg.push(item.url)
+            })
+
+            formData.append('credePic', JSON.stringify(arrImg))
 
             //发送请求
-            cInfo({
-                name, stId, gender, courtyard,
-                major, classes, address
-            }).then(res =>{
-                const {code} = res.data
+            cInfo(formData).then(res =>{
+                const {code, credePic} = res.data
+                console.log(res)
                 if(code === 0) return tText('修改失败，请稍后再试')
                 if(code === 200) return dAlert('操作成功').then(() =>{
                     
-                    setUserData({...this.$store.state.userData,
-                        name, stId, gender, courtyard,
-                        major, classes, address
+                    setUserData({...userData,
+                        name, stId, gender, courtyard, passTag: true,
+                        major, classes, address, credePic,
                     })
                     handleRouter({})
                 })
             })
-            
-        }
+        },
+
+        //图片读取前调用
+        beforeRead(file){
+            return true
+        },
+        //图片读取完毕 限制图片个数为 1
+        afterRead(){
+            // this.credePic = this.credePic.slice(-1)
+            console.log(this.credePic)
+        },
     }
 }
 </script>
 <style lang="less" scoped>
 #change-info{
     .info-wrap{
+        .c_i{
+            padding: 10px;
+        }
         .info-btn{
             padding: 0 1%;
         }

@@ -18,7 +18,7 @@
                     <!-- <div @click="handleRouter({url: `/person`, tag: 'p'})" class="left">
                         <icon name="tip" :w="svg" :h="svg"></icon>
                     </div> -->
-                    <div @click="handleRouter({url: `/c/redata/${cheId}`, tag: 'p'})" class="left">
+                    <div @click="handleReData" class="left">
                         <icon name="add_info" :w="svg" :h="svg"></icon>
                     </div>
                 </div>
@@ -220,6 +220,12 @@ export default {
             if(i === -1) return
             // 已经关注
             this.concernTag = true
+        },
+        handleReData(){
+            const {cheId, handleRouter, getAuthory} = this
+
+            if(!getAuthory()) return
+            handleRouter({url: `/c/redata/${cheId}`, tag: 'p'})
         },
         // 发送 关注请求
         handleConcren(){

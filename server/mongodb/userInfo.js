@@ -18,8 +18,21 @@ var userSchema = new Schema({
         type: String,
         required: true
     },
+    authory: {
+        type: Boolean,
+        default: false
+    },// 是否具有权限 只有管理员才能修改
+    passTag: {
+        type: Boolean,
+        default: false
+    },// 默认为false 即用户没有完善信息 当完善信息后 修改为true
+        // 管理员 不通过 修改false 因此管理员只能看到为true的信息
+    credePic: {
+        type: Array,
+        default: []
+    },// 证件照
     userType: {
-        type: String,
+        type: Number,
         required: true// 学生 老师
     },
     avater:{
@@ -30,7 +43,7 @@ var userSchema = new Schema({
         type: Array,
         default: []
     }, //我的关注列表
-    otherConcern:{
+    myCollection:{
         type: Array,
         default: []
     }, //他人关注列表

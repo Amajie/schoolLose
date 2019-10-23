@@ -210,7 +210,7 @@ export default {
         //初始化一些数据
         handleCreated(){
             const {cheId, userData, objectId, collectionTag} = this
-            const i = userData.otherConcern.findIndex(item => item === objectId)
+            const i = userData.myCollection.findIndex(item => item === objectId)
             // 有搜藏
             if(i != -1) this.collectionTag = true
 
@@ -309,11 +309,14 @@ export default {
         //获取焦点
         replyFocus(){
 
+            // 没有获取权限 无法评论
+            const {getAuthory, $refs, saveCommit} = this
+            if(!getAuthory()) return $refs.commitNode.blur()
             //显示发表字样
             this.replyTag = true
             //如果存在备份 就显示
             if(this.saveCommit){
-                this.commit = this.saveCommit
+                this.commit = saveCommit
                 this.saveCommit = ''
             }
         },
@@ -446,30 +449,30 @@ export default {
                     break
                 case 6://收藏
 
-                    if(userData.otherConcern.length > maxCLen) 
+                    if(userData.myCollection.length > maxCLen) 
                         return dConfirm('提示', '您的收藏夹满啦，需要清理一下').then(() =>{
                             handleRouter({url: `/collection`, tag: 'p'})
                         }).catch(() =>{})
-                    const addList = [objectId, ...userData.otherConcern]
+                    const addList = [objectId, ...userData.myCollection]
                     sendCollection({
-                        otherConcern: addList
+                        myCollection: addList
                     }).then(res =>{
                         const {code} = res.data
                         if(code === 0) return tText('收藏失败, 请稍后再试')
                         tText(`已收藏`)
 
                         // 把搜藏的物品 id保存
-                        userData.otherConcern = addList
+                        userData.myCollection = addList
                         this.handleCollection(true)
                     })
                     break
                 case 7://取消收藏
-                    const i = this.userData.otherConcern.findIndex(item => item === objectId)
-                    const reList = this.userData.otherConcern.slice()
+                    const i = this.userData.myCollection.findIndex(item => item === objectId)
+                    const reList = this.userData.myCollection.slice()
                     reList.splice(i, 1)
 
                     sendCollection({
-                        otherConcern
+                        myCollection
                     }).then(res =>{
                         const {code} = res.data
                         if(code === 0) return tText('取消失败, 请稍后再试')
@@ -477,7 +480,7 @@ export default {
 
                         // 把当前的 收藏id移除
                         
-                        this.userData.otherConcern = reList
+                        this.userData.myCollection = reList
                         this.handleCollection(false)
                     })
                     break

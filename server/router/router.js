@@ -49,8 +49,19 @@ router.get('/checkE', enter.checkE)
 router.post('/cn', checkToken, cUserInfo.cUserName)
 router.post('/cp', checkToken, cUserInfo.cUserPassword)
 router.post('/ce', checkToken, cUserInfo.cUserEmail)
-router.post('/ci', checkToken, cUserInfo.cUserInfo)
+router.post('/ci', checkToken, upload.array('uCredePic', 2), cUserInfo.cUserInfo)
+
 router.post('/fi', checkToken, cUserInfo.fUserInfo)
+
+router.get('/gi', checkToken, (req, res) =>{
+    const {_id} = req.query
+    userInfo.findOne({_id: req.userId}, (err, data) =>{
+        if(!data) return res.json({"msg": "查询失败", "code": 0, authory: false})
+
+        res.json({"msg": "查询成功", "code": 200, data, authory: data.authory})
+    })
+})
+
 
 // 关注用户
 router.post('/concren', checkToken, (req, res) =>{
@@ -102,9 +113,9 @@ router.get('/get_concren', (req, res) =>{
 
 router.post('/collection', checkToken, (req, res) =>{
 
-    const {otherConcern} = req.body
+    const {myCollection} = req.body
 
-    userInfo.update({_id: req.userId}, {otherConcern}, (err, data) =>{
+    userInfo.update({_id: req.userId}, {myCollection}, (err, data) =>{
         if(!data.n) return res.json({"msg": "取消失败", "code": 0})
         res.json({"msg": "取消成功", "code": 200})
     })
@@ -274,7 +285,7 @@ router.get('/c', checkToken, (req, res) =>{
     
     // true 关注 false 取消关注
 
-    userInfo.updateOne({_id: '5da3075072a90339f44cdf1a'}, {$push:{'otherConcern': ''}}, (err, data) =>{
+    userInfo.updateOne({_id: '5da3075072a90339f44cdf1a'}, {$push:{'myCollection': ''}}, (err, data) =>{
         if(!data.n) return res.json({"msg": "关注失败", "code": 0})
         res.json({"msg": "关注成功", "code": 200})
     })
@@ -472,7 +483,7 @@ router.get('/fInddfo', (req, res) =>{
             userType: "$userType",
             avater: "$avater",
             userActive: "$userActive",
-            otherConcern: "$otherConcern",
+            myCollection: "$myCollection",
             name: "$name",
             stId: "$stId",
             gender: "$gender",
