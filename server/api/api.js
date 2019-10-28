@@ -83,11 +83,13 @@ exports.enter = {
             const {
                 userName, email, _id, userType, myConcern,
                 avater, name, stId, gender, userActive, myCollection,
-                courtyard, major, classes, address, credePic, passTag,
-                authory    
+                courtyard, major, classes, address, credePic, passStep,
+                authory, freezeTag    
             } = data
             if(!userActive) return res.json({"msg": "该用户还没有激活", "code": 1})
-    
+            // 已被冻结
+            if(!freezeTag) return res.json({"msg": "该账户已被冻结", "code": -2})
+
     
             //验证密码是否正确
             if(data.password != md5(password)) return res.json({"msg": "密码错误", "code": 0})
@@ -101,7 +103,7 @@ exports.enter = {
                 userData: {
                     userName, email, userType, cheId: _id,
                     avater, name, stId, gender, myConcern, myCollection, 
-                    courtyard, major, classes, address, credePic, passTag,
+                    courtyard, major, classes, address, credePic, passStep,
                     authory     
                 }
             })
@@ -341,8 +343,10 @@ exports.cUserInfo = {
         }else if(!req.files.length && !credePic.length){
             return res.json({"msg": "修改失败", "code": 0})
         }
-
-        userInfo.updateOne({_id: req.userId}, {...req.body, credePic}, (err, data) =>{
+        
+        // 此时更新 数据都设置为 passStep: 1
+        // userInfo.updateOne({_id: req.userId}, {...req.body, credePic, passStep: 1}, (err, data) =>{
+        userInfo.updateOne({_id: req.userId}, {...req.body, credePic, authory: false, passStep: 1}, (err, data) =>{
             console.log(data)
             if(!data.n) return res.json({"msg": "修改失败", "code": 0})
 

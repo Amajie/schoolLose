@@ -1,7 +1,8 @@
 import axios from 'axios'
 
-import {request, requestError, response, responseError} from './handle_request.js'
-// axios.defaults.withCredentials = true
+import cookie from 'vue-cookies'
+import store from '../store.js'
+import router from '../router/index.js'
 
 const createObj = {
     //baseURL: 'http://192.168.43.124:7070',  // 这里即为 url 加上 这里baseURL  即指定了域名和端口 
@@ -11,25 +12,39 @@ const createObj = {
     withCredentials: true
 }
 
-const eService = axios.create(createObj)
-const sService = axios.create(createObj)
-const nService = axios.create(createObj)
+const service = axios.create(createObj)
 
-eService.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-sService.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
-nService.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+service.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
 
 
 //请求处理  此时可以把token 保存在session中 并设置过期时间
-eService.interceptors.request.use(config => request({config, tag: true}), error => {requestError(error)})
-sService.interceptors.request.use(config => request({config, tag: false}), error => {requestError(error)})
-nService.interceptors.request.use(config => request({config, notLoad: true}), error => {requestError(error)})
+service.interceptors.request.use(config =>{
+
+    console.log(config)
+
+    store.commit('setState', {fullsLoad: true})
+
+    //此时需要token 后台判断是否需要 token 
+    config.headers['jie412.com-token'] = cookie.get('che_token')
+
+    return config
+
+}, error =>{
+    console.log('超时')
+})
 
 //响应处理
-eService.interceptors.response.use(res => response(res), error => {responseError(error)})
-sService.interceptors.response.use(res => response(res), error => {responseError(error)})
-nService.interceptors.response.use(res => response(res), error => {responseError(error)})
+service.interceptors.response.use(response => {
 
-export const entryService = eService
-export const sendService = sService
-export const notService = nService
+    store.commit('setState', {fullsLoad: false})
+
+    return response
+}, error => {
+
+    store.commit('setState', {fullsLoad: false})
+
+    //这里只是打印 并不需要 还需要处理500错误
+    return Promise.reject(error.response.data)
+})
+
+export default service

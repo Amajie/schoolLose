@@ -114,6 +114,12 @@ export default {
                 console.log(userData)
                 
                 if(code === -1) return dAlert('该用户不存在')
+                if(code === -2) return dAlert('该账户已被冻结，请联系管理员解冻').then(() =>{
+                    //清空输入内容
+                    this.userName = ''
+                    this.password = ''
+                    this.remember = false
+                })
                 if(code === 1) return dConfirm('提示', '该用户还没有激活').then(() =>{
                     $router.replace({name: 'CheckEmail'})
                 }).catch(() =>{
@@ -121,6 +127,7 @@ export default {
                     //清空输入内容
                     this.userName = ''
                     this.password = ''
+                    this.remember = false
                 })
 
                 if(code === 0) return dAlert('密码错误')

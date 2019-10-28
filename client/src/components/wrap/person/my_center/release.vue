@@ -178,7 +178,7 @@ export default {
              */
             this.headerTitle = '消息编辑'
             this.objectId = params.objectId
-
+            console.log(detailData)
             for(let item in detailData){
                 const val = detailData[item]
                 if(item === 'objectImg'){
@@ -187,8 +187,10 @@ export default {
                     })
                 }else if(item === 'objectTime'){
                     this.selectTime = this.showTime(val)
+                    this[item] = val
                 }else if(item === 'objectTypeId'){
                     this.objectType = this.type_nav[val].type
+                    this[item] = val
                 }else{
                     this[item] = val
                 }
@@ -260,7 +262,6 @@ export default {
 
             this.upData(formData)
         },
-
         //添加数据
         addData(formData){
             /**
@@ -276,7 +277,9 @@ export default {
             const {objectImg, reObject, dAlert} = this
 
             // 发布的时间不能更新
-            formData.append('sendTime', new Date().getTime())
+            const currentTime = new Date().getTime()
+            formData.append('sendTime', currentTime)
+            formData.append('finishTime', currentTime)
 
             this.objectImg.forEach(item => {
                 formData.append('objectPic', item.file)

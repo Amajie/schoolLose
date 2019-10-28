@@ -13,10 +13,13 @@
             <van-steps :active="stepActive">
                 <van-step>信息完善</van-step>
                 <van-step>审核中</van-step>
-                <van-step>审核通过</van-step>
+                <van-step v-if="currenStep === 2">审核通过</van-step>
+                <van-step v-else-if="currenStep === 1">等待审核结果</van-step>
+                <van-step v-else>审核未通过</van-step>
             </van-steps>
         </div>
-        <div class="info-wrap">
+        <!-- 未通过 -->
+        <div v-if="!authory" class="info-wrap">
             <div class="info-list">
                 <!-- 信息填写 -->
                 <van-cell-group>
@@ -99,18 +102,91 @@
                     <van-uploader
                         v-model="credePic"
                         upload-text="上传证件照"
+                        :max-count="2"
                         :preview-full-image="false"
                         :after-read="afterRead"
                         :before-read="beforeRead"
                     />
                 </div>
             </div>
-            <div class="info-btn" @click="handleInfo">
-                <van-button type="danger" block>提交信息</van-button>
+            <div class="info-btn">
+                <!-- <van-button type="danger" @click.native="handleInfo" :disabled="userData.authory" block>提交信息</van-button> -->
+                <van-button type="danger" @click.native="handleInfo" block>提交信息</van-button>
             </div>
             <div class="chang_explain">
                 <span class="chang_explain_title">注意：</span>
                 <span class="chang_explain_text">以上信息比须如实填写，工作人员将在1-2工作日审核信息，审核结果将发送邮箱告知</span>
+            </div>
+        </div>
+        <!-- 通过-->
+        <div v-else class="info-wrap">
+            <div class="info-list">
+                <!-- 信息填写 -->
+                <van-cell-group>
+                    <van-field
+                        readonly
+                        label="姓名"
+                        v-model="name"
+                    />
+                    <van-field
+                        readonly
+                        :label="labelStId"
+                        type="number"
+                        v-model="stId"
+                    />
+                    <van-field
+                        readonly
+                        label="性别"
+                        v-model="gender"
+                    />
+                    <van-field
+                        v-if="userType != 3"
+                        readonly
+                        label="学院"
+                        v-model="courtyard"
+                    />
+
+                    <!-- 专业和职业不同 -->
+                    <van-field
+                        v-if="userType === 1"
+                        readonly
+                        label="专业"
+                        v-model="major"
+                    />
+                    <van-field
+                        v-else-if="userType === 3"
+                        readonly
+                        label="职业"
+                        v-model="major"
+                    />
+                    <van-field
+                        v-if="userType === 1"
+                        readonly
+                        label="班级"
+                        v-model="classes"
+                    />
+
+                    <van-field
+                        readonly
+                        label="现居地址"
+                        v-model="address"
+                    />
+                    <van-field
+                        readonly
+                        :border="false"
+                        label="证件照"
+                    />
+                </van-cell-group>
+                <div class="car-pic">
+                    <van-image
+                        width="100"
+                        height="100"
+                        lazy-load
+                        v-for="(item, index) in credePic"
+                        :key="index"
+                        :src="item.url"
+                    />
+                </div>
             </div>
         </div>
     </div>
@@ -120,14 +196,7 @@ import {mapState, mapMutations} from 'vuex'
 export default {
     data(){
         return{
-            // name: '黄杰',
-            // stId: '1605120155',
-            // gender: '男',
-            // courtyard: '物理与信息工程学院',
-            // major: '电子信息科学与技术',
-            // classes: '16电子1',
-            // address: '达理公寓',
-            name: '',
+            name: 'sad',
             stId: '',
             gender: '',
             courtyard: '',
@@ -143,7 +212,9 @@ export default {
 
             //label 文字
             labelStId: '学号',
-            stepActive: 0
+            stepActive: 0,
+            currenStep: 0,
+            authory: false,
         }
     },
     created(){
@@ -159,10 +230,10 @@ export default {
             }
         }
 
+        this.stepActive = userData.passStep
+        this.currenStep = userData.passStep
         // 这里 显示审核结果
-        if(userData.name && !userData.authory){
-            this.stepActive = 1
-        }else if(userData.authory){
+        if(userData.passStep === 3){
             this.stepActive = 2
         }
 
@@ -244,7 +315,6 @@ export default {
             formData.append('major', major)
             formData.append('classes', classes)
             formData.append('address', address)
-            formData.append('passTag', true)
 
             let arrImg = []
             credePic.forEach(item => {
@@ -257,12 +327,11 @@ export default {
             //发送请求
             cInfo(formData).then(res =>{
                 const {code, credePic} = res.data
-                console.log(res)
                 if(code === 0) return tText('修改失败，请稍后再试')
                 if(code === 200) return dAlert('操作成功').then(() =>{
                     
                     setUserData({...userData,
-                        name, stId, gender, courtyard, passTag: true,
+                        name, stId, gender, courtyard, passStep: 1,
                         major, classes, address, credePic,
                     })
                     handleRouter({})
@@ -302,6 +371,9 @@ export default {
                 line-height: 25px;
             }
         }
+    }
+    .car-pic{
+        padding: 3%;
     }
 }
 </style>

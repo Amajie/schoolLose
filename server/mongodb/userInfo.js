@@ -22,11 +22,10 @@ var userSchema = new Schema({
         type: Boolean,
         default: false
     },// 是否具有权限 只有管理员才能修改
-    passTag: {
-        type: Boolean,
-        default: false
-    },// 默认为false 即用户没有完善信息 当完善信息后 修改为true
-        // 管理员 不通过 修改false 因此管理员只能看到为true的信息
+    passStep: {
+        type: Number,
+        default: 0
+    }, //默认 为 0 一旦信息完善 就设置为 1 通过验证设置为 2 未通过验证 设置为3
     credePic: {
         type: Array,
         default: []
@@ -80,6 +79,10 @@ var userSchema = new Schema({
     address:{ //宿舍地址 类型为老师 直接设置 闽师大 即可
         type: String,
         default: ''
+    },
+    freezeTag:{ //账号的冻结与否
+        type: Boolean,
+        default: true
     }
 })
 

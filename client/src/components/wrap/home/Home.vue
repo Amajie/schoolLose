@@ -33,7 +33,6 @@
             <van-list
                 v-model="homeLoad"
                 :finished="homeFinished"
-                :finished-text="noData && homeFinished? '': '没有更多了'"
                 @load="loadData"
                 :immediate-check="false"
                 >
@@ -79,7 +78,10 @@
                     </div>
                 </van-cell>
             </van-list>
-            <Empty v-show="noData" />
+            <Empty v-if="noData" />
+            <div v-else-if="!homeLoad" class="data-end">
+                到底啦，不能再往下啦~~~
+            </div>
             <Load @fresh="getHomeData" v-bind="loadObj" />
         </div>
         <FreshTop @fresh="fresh" :freshTag="true" />  
@@ -105,7 +107,6 @@ export default {
     },
     created(){
        this.handleCreated()
-       console.log(this.homeData)
     },
     inject:['reload'],
     computed:{
@@ -127,6 +128,7 @@ export default {
         ]),
         handleCreated(){
             // 如果有数据不必在获取 此时要看上拉之后是否要继续加载
+            console.log()
             if(this.homeData.length) return this.noData = false
             this.getHomeData()
         },
@@ -155,9 +157,12 @@ export default {
 
                 const {code, homeData} = res.data
 
-
+                console.log(this.noData, this.homeFinished)
                 // 此时说明数据没有了 因此不比在触发加载事件
-                if(!code) return this.setState({homeFinished: true})     
+                if(!code){
+                    if(this.homeData.length === 0) this.noData = true
+                    return this.setState({homeFinished: true})
+                }     
 
                 this.concatArr({key: 'homeData', data: homeData})
 

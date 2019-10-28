@@ -68,17 +68,6 @@
                             </van-cell>
                         </div>
                         <div class="cell-item">
-                            <img src="../../../assets/person/person_complaint.png" alt="">
-                            <van-cell title-class="text" title="投诉建议" is-link>
-                                <van-icon
-                                    slot="right-icon"
-                                    name="arrow"
-                                    color="#969799"
-                                    style="line-height: inherit;"
-                                />
-                            </van-cell>
-                        </div>
-                        <div class="cell-item">
                             <img src="../../../assets/person/person_about.png" alt="">
                             <van-cell title-class="text" title="关于车神寻物" is-link>
                                 <van-icon

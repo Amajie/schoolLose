@@ -329,7 +329,8 @@ router.post('/reObject', checkToken, upload.array('objectPic', 3), (req, res) =>
         ...req.body, 
         objectId: getId(), //可以直接获取 不需要定义一个函数
         objectUserId: mongoose.Types.ObjectId(req.userId), //与用户信息表的userId相同
-        objectImg
+        objectImg,
+        objectStepTag: 1
     },(err, upData) =>{
         if(!upData) return res.json({"msg": "发布失败", "code": 0})
         
@@ -346,7 +347,6 @@ router.post('/upObject', checkToken, upload.array('objectPic', 3), (req, res) =>
     // 因为是数组 因此也不需要在重新设置
     let objectImg = JSON.parse(req.body.objectImg)
     let objectId = req.body.objectId
-
     // 此时删除这个消息 也可以不用删除 数据一样其他也会更新
     // delete req.body.objectId
 
@@ -364,9 +364,9 @@ router.post('/upObject', checkToken, upload.array('objectPic', 3), (req, res) =>
     reInfo.updateOne({
         objectUserId: mongoose.Types.ObjectId(req.userId),
         objectId
-    },{...req.body, objectImg}, (err, upData) =>{
+    },{...req.body, objectImg, objectStepTag: 1}, (err, upData) =>{
         console.log(upData)
-        
+        // 更新失败 也要的
         //此时返回数据
         res.json({"msg": "发布成功", "code": 200})
     })
@@ -395,11 +395,23 @@ router.get('/deObject', checkToken, (req, res) =>{
 //个人中心 消息的查找
 router.get('/fInfo', (req, res) =>{
 
-    const {cheId} = req.query
+    const {cheId, objectPassTag, objectStepTag} = req.query
 
     if(!cheId || (cheId && !mongoose.Types.ObjectId.isValid(cheId)))
         return res.status(404).json({success: false, msg: '访问的页面不存在'})
         
+
+    const $match = {
+        "objectUserId": mongoose.Types.ObjectId(cheId),
+        "objectDelect": "0",
+    }
+    if(objectPassTag){
+        $match.objectPassTag = JSON.parse(objectPassTag)
+    }
+
+    if(objectStepTag){
+        $match.objectStepTag = parseInt(objectStepTag)
+    }
 
     reInfo.aggregate([
         {
@@ -412,12 +424,7 @@ router.get('/fInfo', (req, res) =>{
         },
         // 此时要根据 这个来排序
         {$sort:{sendTime: -1}},
-        {
-            $match:{
-                "objectUserId": mongoose.Types.ObjectId(cheId),
-                "objectDelect": "0"
-            }
-        },
+        {$match},
         { $unwind: "$userData"},
         {$project:{
             objectId:"$objectId",
@@ -425,10 +432,14 @@ router.get('/fInfo', (req, res) =>{
             objectName:"$objectName",
             objectAddress:"$objectAddress",
             sendTime:"$sendTime",
+            objectTime:"$objectTime",
+            objectPassTag:"$objectPassTag",
+            objectStepTag:"$objectStepTag",
             objectId:"$objectId",
             objectTypeId:"$objectTypeId",
             objectWay:"$objectWay",
             objectImg:"$objectImg",
+            objectReason:"$objectReason",
             userName:"$userData.userName",
             avater:"$userData.avater",
             cheId:"$userData._id"
@@ -448,66 +459,15 @@ router.get('/fInfo', (req, res) =>{
 
             res.json({
                 "msg": "没有数据", "code": 1, 
-                userInfo: {
+                "userInfo": {
                     userName: fData.userName,
                     avater: fData.avater
-                }
+                },
+                "code": 200
             })
         })
     })
 })
-
-router.get('/fInddfo', (req, res) =>{
-    const {cheId} = req.query
-
-    if(!cheId || (cheId && !mongoose.Types.ObjectId.isValid(cheId)))
-        return res.status(404).json({success: false, msg: '访问的页面不存在'})
-        
-
-    userInfo.aggregate([
-        {
-            $lookup:{
-                from: 'releases',
-                localField: '_id',
-                foreignField: 'objectUserId',
-                as: 'infoData'
-            }
-        },
-        {
-            $match:{"_id": mongoose.Types.ObjectId(cheId)}
-        },
-        {$project:{
-            cheId:"$_id",
-            userName: "$userName",
-            email: "$email",
-            userType: "$userType",
-            avater: "$avater",
-            userActive: "$userActive",
-            myCollection: "$myCollection",
-            name: "$name",
-            stId: "$stId",
-            gender: "$gender",
-            courtyard: "$courtyard",
-            major: "$major",
-            classes: "$classes",
-            address: "$address",
-            infoData: "$infoData",
-            _id: "$__v"
-        }}
-    ], (err, data) =>{
-
-        if(cheId && data[0].infoData.length === 0) return res.json({"msg": "暂无数据", "code": 0, data})
-
-        // 这里 必须要的 因为 objectDelect是隐藏在
-        // infoData数组里面 因此这里需要过滤 一下
-        data[0].infoData = data[0].infoData.filter(item => item.objectDelect === '0')
-
-        // console.log( 1< data[0].infoData[0].sendTime)
-
-        res.json({"msg": "查找成功", "code": 200, data})
-    })
-})
-
 
 //首页 消息的查找
 router.get('/home_f_info', (req, res) =>{
@@ -527,6 +487,10 @@ router.get('/home_f_info', (req, res) =>{
         },
         // 此时要根据 这个来排序
         {$sort:{sendTime: -1}},
+        {"$match": {
+            objectPassTag: true,
+            objectAuthory: true
+        }},
         {$skip : pageNum*page},
         {$limit: pageNum},
         { $unwind: "$userData"},
@@ -541,8 +505,13 @@ router.get('/home_f_info', (req, res) =>{
             objectWay:"$objectWay",
             objectImg:"$objectImg",
             userName:"$userData.userName",
+            freezeTag:"$userData.freezeTag",
             cheId:"$userData._id"
-        }}
+        }},
+        // 只能搜素 没有冻结的账号
+        {"$match": {
+            freezeTag: true
+        }},
     ], (err, data) =>{
         if(!data.length) return res.json({"msg": "查找成功", "code": 0, homeData: data})
         res.json({"msg": "查找成功", "code": 200, homeData: data})
@@ -555,6 +524,25 @@ router.get('/search_f_info', (req, res) =>{
     let {target, page, pageNum, upDownTag} = req.query
     page = parseInt(page)
     pageNum = parseInt(pageNum)
+    let regText = ''
+    let $regex = new RegExp(``)
+
+    let freezeMatch = {
+        freezeTag: false
+    }
+    if(req.adminGrade){ 
+        freezeMatch = {}
+    }
+
+    // 如果有关键字 则使用正则
+    if(target){
+        regText = target[0]
+        for(let i = 1; i< target.length; i++){
+            regText += `|${target[i]}`
+        }
+
+        $regex = new RegExp(`${regText}`, "i")
+    }
 
     reInfo.aggregate([
         {
@@ -566,7 +554,11 @@ router.get('/search_f_info', (req, res) =>{
             }
         },
         // 此时要根据 这个来排序
-        {$sort:{sendTime: parseInt(upDownTag)}},
+        {$sort:{sendTime: parseInt(upDownTag? upDownTag : -1)}},
+        {$match:{
+            // 此时可以正则表达式
+            objectName: {$regex}
+        }},
         // 可以根据查询
         {"$match": getMatch(req.query)},
         { $unwind: "$userData"},
@@ -576,34 +568,35 @@ router.get('/search_f_info', (req, res) =>{
             objectName:"$objectName",
             objectAddress:"$objectAddress",
             sendTime:"$sendTime",
+            objectTime:"$objectTime",
             objectId:"$objectId",
             objectTypeId:"$objectTypeId",
             objectWay:"$objectWay",
             objectImg:"$objectImg",
+            objectStepTag:"$objectStepTag",
+            objectPassTag:"$objectPassTag",
+            objectAuthory:"$objectAuthory",
             userName:"$userData.userName",
+            avater:"$userData.avater",
             cheId:"$userData._id",
+            freezeTag:"$userData.freezeTag",
             _id:"$__v"
-        }}
+        }},
+        // 只能搜素 没有冻结的账号
+        // {"$match": freezeMatch}
     ], (err, searchData) =>{
-        
-        let data = []
-        // 如果搜索文字存在 就过滤 不存在就搜索全部符合情况即可
-        if(target){
-            data = searchData.filter(item =>{
-                // 此时这里根据 想要的相似度 来返回相应的数据
-                console.log(similarStr(item.objectName, target))
-                console.log(item.objectName, target)
-                if(similarStr(item.objectName, target) > 0.4) return item
-            })
-        }else{
-            data = searchData
-        }
+        console.log('------------------------------')
+        console.log(searchData.length)
+        console.log('------------------------------')
 
-        const newData = data.slice(pageNum*page, pageNum*(page+1))
+        const total = searchData.length
+
+        const newData = searchData.slice(pageNum*page, pageNum*(page+1))
+
         //此时可 返回数据 结束加载
-        console.log("长度："+ newData.length)
-        if(!newData.length) return res.json({"msg": "查找成功", "code": 0, data: []})
-        res.json({"msg": "查找成功", "code": 200, data: newData})
+        console.log("长度："+ searchData.length)
+        if(!newData.length) return res.json({"msg": "查找成功", "code": 0, data: [], total})
+        res.json({"msg": "查找成功", "code": 200, data: newData, total})
     })
 })
 
@@ -773,8 +766,8 @@ function getId(){
 }
 
 
-function getMatch({startTime, endTime, objectTypeId, objectWay, objectUserId}){
-    
+function getMatch({startTime, endTime, objectTypeId, objectWay, objectUserId, objectPassTag}){
+
     const $match = {}
 
     // 要判断 时间段是否存在
@@ -784,6 +777,9 @@ function getMatch({startTime, endTime, objectTypeId, objectWay, objectUserId}){
         $match.sendTime = {$gte : parseInt(startTime), $lt: Date.now()}
     }else if(endTime){
         $match.sendTime = {$gte : new Date('2008-01-01 00:00:00').getTime(), $lt: parseInt(endTime)}
+    }else if(objectPassTag){// 如果有传值 即为搜素 普通用户搜素
+        $match.objectPassTag = true
+        $match.objectAuthory = true
     }
 
     if(objectTypeId) $match.objectTypeId = objectTypeId
@@ -793,7 +789,7 @@ function getMatch({startTime, endTime, objectTypeId, objectWay, objectUserId}){
     if(objectUserId && mongoose.Types.ObjectId.isValid(objectUserId)) {
         $match.objectUserId = mongoose.Types.ObjectId(objectUserId)
     }else if(objectUserId && !mongoose.Types.ObjectId.isValid(objectUserId)){
-        $match.objectUserId = ''
+        $match.objectUserId = ''// 此时肯定不会搜素到数据
     }
 
 

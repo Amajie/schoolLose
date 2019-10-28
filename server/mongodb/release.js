@@ -53,6 +53,31 @@ const reSchema = new Schema({
         type: String,
         default: '0'// 0就是没有删除 1 删除了
     },
+    objectStepTag: {//审核步骤
+        type: Number,
+        default: 1// 1 信息的填写 2 未通过审核 3 通过审核
+    },
+    objectPassTag: {//消息是否通过审核
+        type: Boolean,
+        default: false // 默认没有通过审核
+    },
+    objectReason: {// 消息 不通过的时候 理由
+        type: String,
+        default: ''
+    },
+
+    objectAuthory: {// 消息 是否可以被访问
+        type: Boolean,
+        default: true
+    },
+    objectFinish: {// 消息 是否完成 默认没完成
+        type: Boolean,
+        default: true
+    },
+    finishTime: {// 消息 是否完成 默认没完成
+        type: Number,
+        required: true
+    },
 })
 
 module.exports = mongoose.model('release', reSchema)

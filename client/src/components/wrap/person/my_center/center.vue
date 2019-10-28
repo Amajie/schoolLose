@@ -173,7 +173,8 @@ export default {
 
             // 此时应该定义在函数上 当拉到底端的时候再次调用
             this.gInfo({
-                cheId: cheId
+                cheId: cheId,
+                objectPassTag: JSON.parse(true)// 获取通过审核的数据
             }).then(res =>{
                 const {code, data, userInfo} = res.data
 
@@ -381,11 +382,6 @@ export default {
                     }
                 }
             }
-        }
-        .data-end{
-            color: #666;
-            text-align: center;
-            padding: 5px 0;
         }
     }
 }

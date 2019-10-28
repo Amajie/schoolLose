@@ -36,9 +36,14 @@ exports.checkToken = (req, res, next) =>{
         // if(err) return res.json({success: false, msg: 'token信息错误.'})
 
         //否则 decoded即为解析完毕的token 可以把数据保存在 req中
-        req.userName = decoded.userName
-        req.userName = decoded.email
-        req.userId = decoded.userId
+        if(decoded.userName){
+            req.userName = decoded.userName
+            req.email = decoded.email
+            req.userId = decoded.userId
+        }else{
+            req.adminEmail = decoded.adminEmail
+            req.adminGrade = decoded.adminGrade
+        }
         next()
     })
 

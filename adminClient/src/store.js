@@ -10,7 +10,27 @@ const store = new Vuex.Store({
         lodingETag: false,
         lodingSTag: false,
         regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"),
-        
+        adminData: {adminGrade: 1, adminEmail: '651762920@qq.com'},
+        createCount: [],
+
+        fullsLoad: false,
+        // 用户
+        searchUData: null,
+        searchWord: '',
+        searchUOPage: 0,
+        searchUOTotal: 0,
+        searchUOData: [],
+        showUObjectTag: false,
+        // 帖子
+        searchOData: [],
+        searchOPage: 0,
+        searchOPageNum: 1,
+        target: '',
+
+        searchTotal: 0,
+
+        pageSize: 2, //每一页展示几条
+
         //学院
         courtyardData: [
             '物理与信息工程学院',

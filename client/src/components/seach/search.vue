@@ -76,7 +76,6 @@
             <van-list
                 v-model="searchLoad"
                 :finished="searchFinished"
-                :finished-text="noData && searchFinished? '': '没有啦，往上看看吧~~~'"
                 @load="onLoad"
                 :immediate-check="false"
                 >
@@ -122,8 +121,10 @@
                     </div>
                 </van-cell>
             </van-list>
-            <div v-if="noData">
-                <Empty />
+
+            <Empty v-if="noData"/>
+            <div v-else-if="!searchLoad" class="data-end">
+                到底啦，不能再往下啦~~~
             </div>
         </div>
         <div class="selectDate">
@@ -316,6 +317,7 @@ export default {
                 objectTypeId,
                 upDownTag,
                 objectWay: objectWay != 2?objectWay: '',
+                objectPassTag: true
             }
 
             const saveParams = {

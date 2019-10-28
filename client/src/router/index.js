@@ -9,7 +9,7 @@ import CheckEmail from '../components/entry/Check_email.vue'
 // 内容
 import Wrap from '../components/wrap/Wrap.vue'
 import Home from '../components/wrap/home/Home.vue'
-import Info from '../components/wrap/Info/Info.vue'
+import Examine from '../components/wrap/examine/examine.vue'
 import Person from '../components/wrap/person/Person.vue'
 //设置
 import Setting from '../components/wrap/person/page/setting.vue'
@@ -29,6 +29,7 @@ import Deatil from '../components/wrap/person/my_center/detail.vue'
 import Concren from '../components/wrap/person/page/concren.vue'
 import Collection from '../components/wrap/person/page/collection.vue'
 import Commit from '../components/wrap/person/page/commit.vue'
+
 
 //搜素
 import Search from '../components/seach/search.vue'
@@ -81,10 +82,11 @@ const router =  new Router({
           },
           component: Home
         },
+        //审核列表列表
         {
-          path: 'info',
-          name: 'Info',
-          component: Info
+          path: '/examine',
+          name: 'Examine',
+          component: Examine
         },
         {
           path: 'person',

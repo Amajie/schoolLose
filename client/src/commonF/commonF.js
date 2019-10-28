@@ -37,10 +37,14 @@ export const selectTypeId = (type_nav, val) =>{
  * @param {*}
  */
 export const getAuthory = () =>{
-    const {authory} = store.state.userData
-    if(authory) return authory
-    Dialog.alert({
-        message: '您的身份还没有通过审核，如已完善信息，请耐心等待'
-    })
+    const {authory, passStep} = store.state.userData
+    
+    if(!authory){
+        let message = '您的身份信息还没有完善，请尽快完善信息，并等待管理员的审核'
+        if(passStep === 1) message = '管理员还没审核您提交的信息，审核通过后才能发布帖子'
+        if(passStep === 3) message = '您的身份审核未通过，请确认信息无误后再次提交'
+        Dialog.alert({message})
+    }
+
     return authory
 }
