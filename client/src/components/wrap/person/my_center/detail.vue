@@ -159,8 +159,7 @@ export default {
             replyCommit: '',
             replyTag: false,
             options:[
-                {name: '举报', id: 1},
-                {name: '转发', id: 2}
+                {name: '转发', id: 1}
             ],
             showOption: false,
             showLoad: false,
@@ -168,6 +167,7 @@ export default {
             loadObj: {},
             loading: false,
             finished: false,
+            detailData: {},
             page: 0,
             pageNum: 1,
             collectionTag: false,
@@ -189,8 +189,7 @@ export default {
     },
     computed:{
         ...mapState([
-            'detailData',
-            'userData',
+            'userData'
         ])
     },
     methods:{                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
@@ -215,14 +214,13 @@ export default {
             if(i != -1) this.collectionTag = true
 
             if(cheId != userData.cheId) {
-                const obj = this.collectionTag ? {name: '取消收藏', id: 7} : {name: '收藏', id: 6}
+                const obj = this.collectionTag ? {name: '取消收藏', id: 5} : {name: '收藏', id: 4}
                 this.options.push(obj)
                 return
             }
 
-            this.options.push({name: '删除', id: 3})
-            this.options.push({name: '编辑', id: 4})
-            this.options.push({name: '添加', id: 5})
+            this.options.push({name: '删除', id: 2})
+            this.options.push({name: '添加', id: 3})
         },
         //获取详细信息
         handleGetDetail(){
@@ -235,12 +233,12 @@ export default {
                 objectUserId: this.cheId
             }).then(res =>{
 
-                console.log(res.data.detailData)
+                
                 const {code, detailData} = res.data
                 if(code === 0) return console.log('查找失败')
                 if(code === 200){
                     this.images = detailData.objectImg
-                    this.setState({detailData})
+                    this.detailData = detailData
                 }
             })
         },
@@ -420,13 +418,11 @@ export default {
             const {deObject, cheId, userData, objectId, maxCLen, sendCollection,  
                     handleRouter, dConfirm, tText, dAlert} = this
             switch(item.id){
-                case 1://举报
+                case 1://转发
                     break
-                case 2://转发
-                    break
-                case 3://删除
+                case 2://删除
                     dConfirm('提示', '是否删除该寻物消息?')
-                    .then(res =>{
+                    .then(() =>{
                         deObject({objectId}).then(res =>{
                            const {code} = res.data
                            if(code === 0) return dAlert('删除失败')
@@ -436,18 +432,14 @@ export default {
                            })
                         })
                         
-                    }).catch(res =>{
+                    }).catch(() =>{
                         console.log('取消')
                     })
-                    
                     break
-                case 4://编辑
-                    handleRouter({url: `/c/updata/${cheId}/${objectId}`, tag: 'p'})
-                    break
-                case 5://添加
+                case 3://添加
                     handleRouter({url: `/c/redata/${cheId}`, tag: 'p'})
                     break
-                case 6://收藏
+                case 4://收藏
 
                     if(userData.myCollection.length > maxCLen) 
                         return dConfirm('提示', '您的收藏夹满啦，需要清理一下').then(() =>{
@@ -466,7 +458,7 @@ export default {
                         this.handleCollection(true)
                     })
                     break
-                case 7://取消收藏
+                case 5://取消收藏
                     const i = this.userData.myCollection.findIndex(item => item === objectId)
                     const reList = this.userData.myCollection.slice()
                     reList.splice(i, 1)

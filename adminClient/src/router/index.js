@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import cookie from 'vue-cookies'
+import store from '../store.js'
 
 import Wrap from '../components/wrap.vue'
 import PersonInfo from '../components/person_info/person_info.vue'
@@ -65,7 +66,7 @@ const router =  new Router({
       path: '/chelogin',
       name: 'Login',
       meta: {
-        noRequireToken: true,
+        loginRequire: true
       },
       component: Login,
     },
@@ -76,16 +77,20 @@ const router =  new Router({
 
 
 router.beforeEach((to, from, next) => {
-  
-  // 不需要权限 或者权限存在 不需要重新登陆 后面在有逻辑 在使用 if...else
-  if (to.meta.noRequireToken || cookie.get('che_token')) return next()
+    const {loginRequire} = to.meta
+    console.log(222)
 
-  // 否则 跳转到登陆页面 并保存当前路由信息
-  next({
-    path: '/chelogin',
-    query: {redirect: to.fullPath}
-  })
-}) 
+    // 如果cookie存在即可以访问 如果cookie不存在 不能访问
+    if(loginRequire || cookie.get('a_che_token')) return next()
+
+    console.log(444)
+    sessionStorage.removeItem('a_state')
+    store.replaceState(JSON.parse(sessionStorage.getItem('a_empty_state')))
+    next({
+      path: '/chelogin',
+      query: {redirect: to.fullPath}
+    })
+})
 
 
 export default router

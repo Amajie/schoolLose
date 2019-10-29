@@ -142,6 +142,7 @@ export default {
             minTime: new Date(`${new Date().getFullYear()-4}-01-01`),//后四年
             showDate: false,
             showType: false,
+            detailData:{}
         }
     },
     created(){
@@ -151,8 +152,7 @@ export default {
         ...mapState([
             'type_nav',
             'type_list',
-            'userData',
-            'detailData'
+            'userData'
         ])
     },
     methods:{
@@ -160,7 +160,7 @@ export default {
         //初始化一些数据
         handleCreated(){
             const {meta, params} = this.$route
-            const {userData, detailData} = this
+            const {userData} = this
             this.reType = meta.reType
             //此时要判断 用户的id是否正确 不正确即跳转到404页面
             if(params.cheId != userData.cheId){
@@ -178,8 +178,24 @@ export default {
              */
             this.headerTitle = '消息编辑'
             this.objectId = params.objectId
-            console.log(detailData)
-            for(let item in detailData){
+
+            // 发送请求获取编辑消息
+            this.getDetail({
+                objectId: this.objectId,
+                objectUserId: params.cheId
+            }).then(res =>{
+                const {code, detailData} = res.data
+                if(code === 0) return console.log('查找失败')
+                if(code === 200){
+                    this.images = detailData.objectImg
+                    this.detailData = detailData
+                    this.setUpData(detailData)
+                }
+            })
+        },
+        
+        setUpData(detailData){
+             for(let item in detailData){
                 const val = detailData[item]
                 if(item === 'objectImg'){
                     this.objectImg = val.map(url =>{
@@ -195,8 +211,8 @@ export default {
                     this[item] = val
                 }
             }
-
         },
+
         //图片读取前调用
         beforeRead(file){
             if(file.type === 'image/png' || file.type === 'image/jpeg' || 
@@ -223,7 +239,7 @@ export default {
             this.showType = !this.showType
             this.objectType = val
             this.objectTypeId = selectTypeId(type_nav, val)
-            
+            console.log('123123: '+ this.objectTypeId)
         },
         // 处理数据的提交
         handleSubmit(){
@@ -244,13 +260,6 @@ export default {
                 return tText('请选择时间')
             }
 
-            // console.log(objectTime)
-            // console.log(new Date(this.selectTime).getTime())
-            // console.log(this.showTime(objectTime, true))
-            // console.log(this.showTime(new Date(this.selectTime).getTime(), true))
-
-            // return
-
             formData.append('objectName', objectName)
             formData.append('objectWay', objectWay)
             formData.append('objectAddress', objectAddress)
@@ -258,11 +267,12 @@ export default {
             formData.append('objectTypeId', objectTypeId)
             formData.append('objectDesc', objectDesc)
 
+
             if(this.reType) return this.addData(formData)
 
             this.upData(formData)
         },
-        //添加数据
+        //添加数据 1572235928072
         addData(formData){
             /**
              * 图片上传 分为编辑 还是添加
@@ -298,14 +308,11 @@ export default {
             const {objectImg, dAlert, objectId, sendTime, upObject} = this
             let arrImg = []
 
-            // 发布的时间不能更新
-            formData.append('sendTime', sendTime)
             //消息的id 路由参数传递
             formData.append('objectId', objectId)
             this.objectImg.forEach(item => {
                 if(item.file) return formData.append('objectPic', item.file)
                 arrImg.push(item.url)
-                console.log(item)
             })
 
             formData.append('objectImg', JSON.stringify(arrImg))

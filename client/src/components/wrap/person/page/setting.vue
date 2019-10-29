@@ -57,9 +57,6 @@
                     </van-cell>
                 </div>
             </div>
-            <div class="logout-wrap" @click="logoutCount">   
-                <van-button type="info" block>退出当前帐号</van-button>
-            </div>
         </div>
     </div>
 </template>
@@ -70,10 +67,6 @@ export default {
         return{}
     },
     methods:{
-        logoutCount(){
-            alert('账号退出')
-        }
-      
     }
 }
 </script>

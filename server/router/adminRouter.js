@@ -34,6 +34,9 @@ const {enter, cUserInfo} = require('../api/api.js')
 //生成和解析token
 const {checkToken, createToken} = require('../checkToken/jwt.js')
 
+//邮箱验证码的类型
+const {COURTYARDDATA, TYPE_NAV} = require('./CONST.js')
+
 const userInfo = require('../mongodb/userInfo.js')
 const reInfo = require('../mongodb/release.js')
 const adminInfo = require('../mongodb/admin.js')
@@ -126,7 +129,7 @@ router.get('/a_fInfo', (req, res) =>{
         // 此时要根据 这个来排序
         {$sort:{sendTime: -1}},
         {$match: {
-            "objectDelect": "0",
+            "objectDelect": true,
             "objectStepTag": 1
         }},
         { $unwind: "$userData"},
@@ -145,8 +148,12 @@ router.get('/a_fInfo', (req, res) =>{
             objectImg:"$objectImg",
             userName:"$userData.userName",
             avater:"$userData.avater",
-            cheId:"$userData._id"
-        }}
+            cheId:"$userData._id",
+            freezeTag:"$userData.freezeTag",
+        }},
+        {$match: {
+            "freezeTag": true
+        }},
     ], (err, data) =>{
         console.log(data)
         res.json({"msg": "成功", "code": 200, data, "total": data.length})
@@ -232,6 +239,7 @@ router.post('/l_admin', (req, res) =>{
         res.json({
             "msg": "密码正确，登陆成功", "code": 200, 
             token, 
+            type_nav: TYPE_NAV,
             adminData: {adminName, adminEmail, adminGrade}
         })
     })

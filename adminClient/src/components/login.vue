@@ -47,12 +47,11 @@
       }
     },
     created(){
-      
     },
     methods: {
-     handleLogin(){
-       const {adminName, adminPassword, lAdmin,
-       $message, $alert, encrypt, $msg, cookie, $store, $router} = this
+
+      handleLogin(){
+       const {adminName, adminPassword, encrypt, $message, sendLogin, $msg} = this
 
       // 可以在这里设置想要的密码
       // console.log(encrypt('huang661775'))
@@ -62,31 +61,76 @@
        if(!adminName) return this.$msg = $message('请输入用户名')
        if(!adminPassword) return this.$msg = $message('请输入密码')
        
-       lAdmin({
+        sendLogin(adminName, encrypt(adminPassword))
+     },
+     sendLogin(adminName, adminPassword){
+        const {lAdmin,
+          $message, $alert, encrypt, cookie, $store, $router} = this
+        
+        // 密码加密
+        lAdmin({
          adminName,
-         adminPassword: encrypt(adminPassword)
-       }).then(res =>{
+         adminPassword
+        }).then(res =>{
 
-         const {code, token, adminData} = res.data
-        console.log(res.data)
-         if(code === -1) return this.$msg = $message('用户名错误!')
-         if(code === -2) return $alert('该管理员账户已被冻结，暂时无法登陆', '提示', {
-            confirmButtonText: '确定',
-            //清空数据
-            callback: action => {
-              this.adminName = ''
-              this.adminPassword = ''
-           }
-         })
-         if(code === 0) return this.$msg = $message('密码错误!')
+          const {code, token, adminData, type_nav} = res.data
 
-          // 设置
-          $store.commit('setState', {adminData})
-          cookie.set('che_token', token, 300)
-          this.$router.replace('/')
-          
-       })
+          if(code === -1) return $message('用户名错误!')
+          if(code === -2) return $alert('该管理员账户已被冻结，暂时无法登陆', '提示', {
+              confirmButtonText: '确定',
+              //清空数据
+              callback: action => {
+                this.adminName = ''
+                this.adminPassword = ''
+            }
+          })
+          if(code === 0) return this.$msg = $message('密码错误!')
+            // 设置
+            $store.commit('setState', {adminData, type_nav})
+            cookie.set('a_che_token', token, 300)
+            cookie.set('a_che_in', encrypt(adminName), 300)
+            cookie.set('a_che_id', adminPassword, 300)
+            this.$router.replace('/')
+        })
      }
+    },
+    beforeRouteEnter (to, from, next) {
+      /**
+       * 这里判断 是否存在cookie 和sessionStor
+       *  1 cookie存在 说明还在登陆着 此时应该直接跳转到首页
+       *      1 sessionStor 存在 则同一页面访问登陆路由 直接跳转首页
+       *      2 sessionStor 不存在 判断cookie的用户名以及密码存在与否 
+       *          调用自动登陆函数
+       *  2 cookie不存在
+       *    清空 内容 sessionStor 以及初始化state
+       */
+      
+      next(vm =>{
+        const {cookie, sendLogin, decrypt, $store} = vm
+        const token = cookie.get('a_che_token')
+        const name = cookie.get('a_che_in')
+        const paw = cookie.get('a_che_id')
+        const sessionStor = sessionStorage.getItem('a_state')
+        // 存在
+        if(token){
+          if(sessionStor){
+            next('/')
+          }else{
+            if(name && paw)
+            sendLogin(decrypt(name), paw)
+          }
+        //不存在
+        }else{
+          sessionStorage.removeItem('a_state')
+          $store.replaceState(JSON.parse(sessionStorage.getItem('a_empty_state')))
+        }
+      })
+
+
+
+    },
+    mounted(){
+      !sessionStorage.getItem('a_empty_state') && sessionStorage.setItem('a_empty_state', JSON.stringify(this.$store.state))
     }
   }
 </script>

@@ -1,6 +1,6 @@
 <template>
     <div id="person-info">
-      <div v-if="userPageData.length">
+      <div class="content" v-if="userPageData.length">
         <div class="info"> 
             <el-table
               ref="table"
@@ -291,17 +291,6 @@ export default {
             transform: translateX(-50%);
           }
         }
-      }
-    }
-    .page{
-      position: relative;
-      width: 100%;
-      height: 60px;
-      padding-top: 35px;
-      > div{
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
       }
     }
     .bigPic{

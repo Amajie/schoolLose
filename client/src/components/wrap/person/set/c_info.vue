@@ -196,7 +196,7 @@ import {mapState, mapMutations} from 'vuex'
 export default {
     data(){
         return{
-            name: 'sad',
+            name: '',
             stId: '',
             gender: '',
             courtyard: '',
@@ -246,13 +246,12 @@ export default {
     computed:{
         ...mapState([
             'courtyardData',
-            'majorData',
             'userData'
         ])
     },
     methods:{
         ...mapMutations([
-            'setUserData',
+            'setState',
             'handleRouter'
         ]),
         /**
@@ -262,10 +261,10 @@ export default {
          */
         handleMajor(){
 
-            const {courtyard, tText, majorData} = this
+            const {courtyard, tText, courtyardData} = this
 
             if(!courtyard) return tText('先选择所在的院系')
-            this.pickerData = majorData[courtyard]
+            this.pickerData = courtyardData[courtyard]
             this.showPicker = true
             this.dataKey = 'major'
             
@@ -273,18 +272,28 @@ export default {
 
         handleClick(data, key){
             this.showPicker = true
-            this.pickerData = data
             this.dataKey = key
+            if(key === 'courtyard'){
+                let courtyardArr = []
+                for(let item in data){
+                    courtyardArr.push(item)
+                }
+                this.pickerData = courtyardArr
+            }else{
+                this.pickerData = data
+            }
+            
+            
         },
 
         selectPicker(val, index){
-            const {dataKey, majorData, userData} = this
+            const {dataKey, courtyardData, userData} = this
 
             this[dataKey] = val
             this.showPicker = false
 
             // 此时教师是不需要设置的
-            if(dataKey === 'courtyard' && userData.userType != 2) this.major = majorData[this[dataKey]][0]
+            if(dataKey === 'courtyard' && userData.userType != 2) this.major = courtyardData[this[dataKey]][0]
 
         },
         /**
@@ -295,7 +304,7 @@ export default {
 
             let formData = new FormData()
             //获取相应的数据
-            const {name, stId, gender, courtyard, userData, userType, credePic, handleRouter, setUserData,
+            const {name, stId, gender, courtyard, userData, userType, credePic, handleRouter, setState,
                 major, classes, address, cInfo, tText, dAlert} = this
             
             if(!name || !stId || !gender || !address ||
@@ -330,9 +339,11 @@ export default {
                 if(code === 0) return tText('修改失败，请稍后再试')
                 if(code === 200) return dAlert('操作成功').then(() =>{
                     
-                    setUserData({...userData,
-                        name, stId, gender, courtyard, passStep: 1,
-                        major, classes, address, credePic,
+                    setState({
+                        userData:{...userData,
+                            name, stId, gender, courtyard, passStep: 1,
+                            major, classes, address, credePic,
+                        }
                     })
                     handleRouter({})
                 })
@@ -354,6 +365,7 @@ export default {
 <style lang="less" scoped>
 #change-info{
     .info-wrap{
+        padding-bottom: 20px;
         .c_i{
             padding: 10px;
         }

@@ -2,7 +2,6 @@
 const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
-const http = require('http')
 
 const multer = require('multer')
 const storage = multer.diskStorage({
@@ -61,6 +60,10 @@ router.get('/gi', checkToken, (req, res) =>{
         res.json({"msg": "查询成功", "code": 200, data, authory: data.authory})
     })
 })
+
+
+// 导航我的列表数据
+
 
 
 // 关注用户
@@ -359,6 +362,7 @@ router.post('/upObject', checkToken, upload.array('objectPic', 3), (req, res) =>
     }else if(!objectImg.length){
         objectImg = ['http://192.168.43.124:7070/av/init.png']
     }
+    console.log(req.body.objectTypeId)
 
     //消息的 id不用在此获取上传过来
     reInfo.updateOne({
@@ -373,18 +377,17 @@ router.post('/upObject', checkToken, upload.array('objectPic', 3), (req, res) =>
 })
 /**
  * @function 这里是发布消息的删除
- *          其实就是把字段 objectDelect 设置为 1
+ *          其实就是把字段 objectDelect 设置为 false
  */
 router.get('/deObject', checkToken, (req, res) =>{
     const {objectId} = req.query
-
 
     //消息的 id不用在此获取上传过来
     reInfo.updateOne({
         objectUserId: mongoose.Types.ObjectId(req.userId),
         objectId,
     },
-    {objectDelect: '1'}, (err, upData) =>{
+    {objectDelect: false}, (err, upData) =>{
        
         if(!upData.n) return res.json({"msg": "删除失败", "code": 0})
         //此时返回数据
@@ -395,22 +398,36 @@ router.get('/deObject', checkToken, (req, res) =>{
 //个人中心 消息的查找
 router.get('/fInfo', (req, res) =>{
 
-    const {cheId, objectPassTag, objectStepTag} = req.query
+    const {cheId, objectFinish, objectPassTag, 
+            objectStepTag, stopShow} = req.query
 
     if(!cheId || (cheId && !mongoose.Types.ObjectId.isValid(cheId)))
         return res.status(404).json({success: false, msg: '访问的页面不存在'})
         
-
+    
+    // 默认为未删除
     const $match = {
         "objectUserId": mongoose.Types.ObjectId(cheId),
-        "objectDelect": "0",
+        "objectDelect": true,
     }
+
+    // 是否是需要通过审核的
     if(objectPassTag){
         $match.objectPassTag = JSON.parse(objectPassTag)
     }
 
+    // 是否需要已经完成的
+    if(objectFinish){
+        $match.objectFinish = JSON.parse(objectFinish)
+    }
+
+    // 是否需要哪个步骤的
     if(objectStepTag){
         $match.objectStepTag = parseInt(objectStepTag)
+    }
+    // 完成列表 需要获取已经完成的
+    if(stopShow){
+        $match.stopShow = parseInt(stopShow)
     }
 
     reInfo.aggregate([
@@ -435,6 +452,7 @@ router.get('/fInfo', (req, res) =>{
             objectTime:"$objectTime",
             objectPassTag:"$objectPassTag",
             objectStepTag:"$objectStepTag",
+            objectFinish:"$objectFinish",
             objectId:"$objectId",
             objectTypeId:"$objectTypeId",
             objectWay:"$objectWay",
@@ -488,8 +506,10 @@ router.get('/home_f_info', (req, res) =>{
         // 此时要根据 这个来排序
         {$sort:{sendTime: -1}},
         {"$match": {
-            objectPassTag: true,
-            objectAuthory: true
+            objectPassTag: true, // 审核通过
+            objectAuthory: true, // 管理员没有冻结
+            objectFinish : true, // 没有完成的
+            objectDelect : true // 没有删除的
         }},
         {$skip : pageNum*page},
         {$limit: pageNum},
@@ -519,20 +539,24 @@ router.get('/home_f_info', (req, res) =>{
 })
 
 //搜素 消息的查找
-router.get('/search_f_info', (req, res) =>{
+router.get('/search_f_info', checkToken, (req, res) =>{
     // target 用户搜索关键字
     let {target, page, pageNum, upDownTag} = req.query
     page = parseInt(page)
     pageNum = parseInt(pageNum)
+
+    // 正则搜素
     let regText = ''
     let $regex = new RegExp(``)
 
-    let freezeMatch = {
-        freezeTag: false
+    // 如果为 存在req.adminGrade则为管理员搜素 
+    // 否则用户搜素 需要搜素没有冻结的
+    let freezeMatch = req.adminGrade ? {}: {
+        // 没有删除
+        objectDelect: true,
+        freezeTag: true
     }
-    if(req.adminGrade){ 
-        freezeMatch = {}
-    }
+
 
     // 如果有关键字 则使用正则
     if(target){
@@ -576,6 +600,8 @@ router.get('/search_f_info', (req, res) =>{
             objectStepTag:"$objectStepTag",
             objectPassTag:"$objectPassTag",
             objectAuthory:"$objectAuthory",
+            objectFinish:"$objectFinish",
+            objectDelect:"$objectDelect",
             userName:"$userData.userName",
             avater:"$userData.avater",
             cheId:"$userData._id",
@@ -583,18 +609,14 @@ router.get('/search_f_info', (req, res) =>{
             _id:"$__v"
         }},
         // 只能搜素 没有冻结的账号
-        // {"$match": freezeMatch}
+        {"$match": freezeMatch}
     ], (err, searchData) =>{
-        console.log('------------------------------')
-        console.log(searchData.length)
-        console.log('------------------------------')
 
         const total = searchData.length
 
         const newData = searchData.slice(pageNum*page, pageNum*(page+1))
 
         //此时可 返回数据 结束加载
-        console.log("长度："+ searchData.length)
         if(!newData.length) return res.json({"msg": "查找成功", "code": 0, data: [], total})
         res.json({"msg": "查找成功", "code": 200, data: newData, total})
     })
@@ -604,10 +626,13 @@ router.get('/search_f_info', (req, res) =>{
 router.get('/fDetailInfo', (req, res) =>{
     // 此时需要判断以下 这个userId是否符合情况
     const {objectId, objectUserId} = req.query
+
+    console.log(objectId)
+    console.log(objectUserId)
     // 此时要判断 用户的id是否正确
     reInfo.findOne({
         objectId, 
-        objectDelect: '0',
+        objectDelect: true,
         objectUserId: mongoose.Types.ObjectId(objectUserId)
     }, (err, data) =>{
         if(!data) return res.json({"msg": "查找失败", "code": 0})

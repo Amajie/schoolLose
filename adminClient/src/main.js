@@ -30,9 +30,15 @@ Vue.prototype.aFInfo = aFInfo//获取待审核的帖子
 Vue.prototype.aUpOInfo = aUpOInfo// 帖子的审核
 Vue.prototype.gSearchInfo = gSearchInfo//帖子的搜索
 
-import {encrypt} from '../.../../../client/src/assets/crypto/encrypt.js'
+import {encrypt, decrypt} from '../.../../../client/src/assets/crypto/encrypt.js'
 Vue.prototype.encrypt = encrypt//加密
+Vue.prototype.decrypt = decrypt//解密
 
+import * as filters from './filter/filter.js';
+
+Object.keys(filters).forEach(key => {
+  return  Vue.filter(key, filters[key])
+})
 
 Vue.config.productionTip = false
 

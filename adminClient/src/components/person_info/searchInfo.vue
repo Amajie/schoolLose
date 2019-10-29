@@ -71,6 +71,7 @@ export default {
         setState({searchOPage: 0, searchTotal: 0})
         searchData()
     },
+
     searchData(){
         const {gSearchInfo, objectTypeId, $message,
           searchOPage, target, pageSize, setState} = this
@@ -204,8 +205,6 @@ export default {
   watch:{
     keyWord(newData){
       this.setState({target: newData})
-
-      console.log(this.target)
     }
   },
   components:{
@@ -218,11 +217,8 @@ export default {
 <style lang="less" scoped>
   #examine-info{
     .content{
-      width: 980px;
-      margin-left: 50px;
-      padding-bottom: 100px;
       .search{
-        padding: 20px 0;
+        padding: 10px 0;
       }
       .bigPic{
         position: fixed;

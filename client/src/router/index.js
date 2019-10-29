@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import cookie from 'vue-cookies'
 
 // 登陆注册
 import Login from '../components/entry/Login.vue'
@@ -33,9 +34,6 @@ import Commit from '../components/wrap/person/page/commit.vue'
 
 //搜素
 import Search from '../components/seach/search.vue'
-
-import store from '../store.js'
-
 
 Vue.use(Router)
 
@@ -77,9 +75,6 @@ const router =  new Router({
         {
           path: 'home',
           name: 'Home',
-          meta: {
-            noRequireToken: true,
-          },
           component: Home
         },
         //审核列表列表
@@ -130,47 +125,30 @@ const router =  new Router({
       path: '/c',
       name: 'CWrap',
       redirect: '/c/center',
-      meta: {
-        noRequireToken: true,
-      },
       component: CWrap,
       children:[
         // 个人首页
         {
           path: 'center/:cheId',
           name: 'Center',
-          meta: {
-            noRequireToken: true,
-          },
           component: Center
         },
         //消息的发布
         {
           path: 'redata/:cheId',
           name: 'Releasedata',
-          meta: {
-            noRequireToken: true,
-            reType: true
-          },
           component: Releasedata
         },
         //消息的更新
         {
           path: 'updata/:cheId/:objectId',
           name: 'Releasedata',
-          meta: {
-            noRequireToken: true,
-            reType: false
-          },
           component: Releasedata
         },
         //消息的详情页
         {
           path: 'detail/:cheId/:objectId',
           name: 'Deatil',
-          meta: {
-            noRequireToken: true,
-          },
           component: Deatil
         },
       ]
@@ -185,27 +163,18 @@ const router =  new Router({
     {
       path: '/concren',
       name: 'Concren',
-      meta: {
-        noRequireToken: true,
-      },
       component: Concren
     },
     //收藏列表
     {
       path: '/collection',
       name: 'Collection',
-      meta: {
-        noRequireToken: true,
-      },
       component: Collection
     },
     //留言列表
     {
       path: '/commit/:cheId',
       name: 'Commit',
-      meta: {
-        noRequireToken: true,
-      },
       component: Commit
     },
     // 首页的搜索
@@ -221,9 +190,6 @@ const router =  new Router({
     {
       path: '/pSearch/:cheId',
       name: 'Search',
-      meta: {
-        noRequireToken: true,
-      },
       component: Search
     },
     {
@@ -236,8 +202,15 @@ const router =  new Router({
 
 router.beforeEach((to, from, next) => {
   
+  // 此时打开新的窗口 但是cookie信息存在 但是store 状态数据初始化了 此时跳转到登陆页面
+  if(!to.meta.noRequireToken && cookie.get('c_che_token') && !sessionStorage.getItem('c_empty_state')){
+    console.log('啦啦啦')
+    return next('/login')
+  }
+
   // 不需要权限 或者权限存在 不需要重新登陆 后面在有逻辑 在使用 if...else
-  if (to.meta.noRequireToken || localStorage.getItem('token')) return next()
+  if (to.meta.noRequireToken || cookie.get('c_che_token')) return next()
+
 
   // 否则 跳转到登陆页面 并保存当前路由信息
   next({

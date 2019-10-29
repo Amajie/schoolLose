@@ -105,7 +105,14 @@
                           <el-button :disabled="searchUData.freezeTag" @click.native="handleUser(true)" size="mini" type="success">解冻账户</el-button>
                         </div>
                       </el-form-item>                
-                      <el-form-item label="他的贴子">
+                                  
+                  </el-form>
+                </div>
+                <div class="info-list">
+                  <h2>他的帖子</h2>
+                  <!-- 两种方法都可以解决刷新问题 -->
+                    <el-form @submit.native.prevent label-position="left" inline class="demo-table-expand">              
+                      <el-form-item label="操作">
                         <div>
                           <el-button @click.native="handleshowObject" 
                               size="mini" type="success">{{showUObjectTag?'收起': '查看'}}</el-button>
@@ -120,6 +127,8 @@
               @click-page="handleCPage"
               :page-size="pageSize"
               :total="searchUOTotal"
+              :is-freeze="searchUData.freezeTag"
+              :user-tag="true"
              />
           </div>
           <NoData :showText="showText" v-else />
@@ -143,6 +152,7 @@
     created(){
       this.keyWord = this.searchWord
     },
+
     computed:{
       ...mapState([
         'searchUData',
@@ -384,13 +394,13 @@
 #searchUser{
   height: 100%;
   .content{
-    height: 100%;
-    width: 980px;
-    margin-left: 50px;
     .search{
       padding: 10px 0;
     }
     .user-info{
+      h2{
+        margin: 10px 0;
+      }
       .info-opa{
         .change-paw{
           > div{

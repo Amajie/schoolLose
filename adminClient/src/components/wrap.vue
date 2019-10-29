@@ -63,6 +63,6 @@ import {mapState} from 'vuex'
 
 <style lang="less" scoped>
 #wrap{
-  height: 100%;
+  min-height: 100%;
 }
 </style>

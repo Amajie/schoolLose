@@ -45,8 +45,16 @@ export default {
       this.$nextTick(() =>{
         this.isFreshTag = true
       })
+    },
+   //数据的保存
+    sateSave(){
+      sessionStorage.setItem('c_state', JSON.stringify(this.$store.state))
     }
-  }
+  },
+  //监听刷新的时候 保存数据
+  mounted() {
+      window.addEventListener('unload', this.sateSave)
+  },
 }
 </script>
 

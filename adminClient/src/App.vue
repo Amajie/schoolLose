@@ -4,6 +4,7 @@
   >
 
     <router-view/>
+    <p class="copyright">Copyright © 车神寻物网 All Rights Reserved.</p>
   </div>
 </template>
 
@@ -15,7 +16,17 @@ export default {
     ...mapState([
       'fullsLoad'
     ])
-  }
+  },
+  methods:{
+     //数据的保存
+      sateSave(){
+        sessionStorage.setItem('a_state', JSON.stringify(this.$store.state))
+      }
+  },
+  //监听刷新的时候 保存数据
+  mounted() {
+      window.addEventListener('unload', this.sateSave)
+  },
 }
 </script>
 

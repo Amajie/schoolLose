@@ -174,7 +174,8 @@ export default {
             // 此时应该定义在函数上 当拉到底端的时候再次调用
             this.gInfo({
                 cheId: cheId,
-                objectPassTag: JSON.parse(true)// 获取通过审核的数据
+                objectPassTag: JSON.parse(true),// 获取通过审核的数据
+                objectFinish: JSON.parse(true)// 获取通过未完成
             }).then(res =>{
                 const {code, data, userInfo} = res.data
 

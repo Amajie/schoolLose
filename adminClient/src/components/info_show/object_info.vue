@@ -2,7 +2,7 @@
     <div id="object-info">
         <div class=" object-wrap"
         >
-          <div class="object-info"> 
+          <div class="info object-info"> 
               <el-table
                 ref="table"
                 :data="objectData"
@@ -34,7 +34,7 @@
                             </el-form-item>
 
                             <el-form-item label="分类">
-                              <span>{{ props.row.objectTypeId}}</span>
+                              <span>{{ props.row.objectTypeId | filterTypeName}}</span>
                             </el-form-item>
                             <el-form-item label="物品名称">
                               <span>{{ props.row.objectName}}</span>
@@ -43,39 +43,54 @@
                               <span>{{ props.row.objectAddress}}</span>
                             </el-form-item>
                             <el-form-item label="丢失时间">
-                              <span>{{ props.row.objectTime}}</span>
+                              <span>{{ props.row.objectTime | filterTime(true)}}</span>
                             </el-form-item>
                             <el-form-item label="楼主说明">
                               <span>{{ props.row.objectDesc}}</span>
                             </el-form-item>
                             <el-form-item label="发布时间">
-                              <span>{{ props.row.sendTime}}</span>
+                              <span>{{ props.row.sendTime | filterTime(true)}}</span>
                             </el-form-item>
                             
                             <el-form-item label="帖子状态">
-                              <div>
+                              <!-- <div> -->
                                 <el-link type="danger" v-if="props.row.objectStepTag === 1" disabled >待审核</el-link>
                                 <el-link type="warning" v-else-if="props.row.objectStepTag === 3" disabled >未通过验证</el-link>
                                 <el-link type="success" v-else-if="props.row.objectStepTag === 2" disabled >已通过验证</el-link>
-                                <span style="padding:0 10px;"></span>
                                 <el-button size="mini" v-if="props.row.objectStepTag === 1" 
                                   @click.native="sendComfirm(props.row)"
                                   type="success">通过</el-button>
-                              </div>
+                              <!-- </div> -->
                             </el-form-item> 
                             <el-form-item label="权限设置">
                               <div>
                                 <el-link :type="props.row.objectAuthory? 'success':'danger'" disabled >
-                                  {{props.row.objectAuthory? '正常':'已冻结'}}
+                                  {{props.row | filterText(isFreeze, userTag)}}
                                 </el-link>
                                 <span style="padding:0 10px;"></span>
-                                <el-button :disabled="!props.row.objectAuthory"
+                                <!-- 如果已经完成 无需在设置禁止访问字段  -->
+                                <!-- 不允许访问或者已完成 没通过审核或者楼主账号已冻结 都无需设置 -->
+                                <el-button :disabled="props.row | filterClick(!props.row.objectAuthory, isFreeze)"
                                   @click.native="handleAuthory(false, props.row)" 
                                   size="mini" type="info">禁止访问</el-button>
-                                <el-button :disabled="props.row.objectAuthory" 
+                                <el-button :disabled="props.row | filterClick(props.row.objectAuthory, isFreeze)" 
                                   @click.native="handleAuthory(true, props.row)"
                                   size="mini" type="success">允许访问</el-button>
                               </div>
+                            </el-form-item> 
+                            <el-form-item label="账户状态">
+                                <el-link v-if="userTag" :type="isFreeze? 'success':'danger'" disabled >
+                                  {{isFreeze ? '正常':'已被冻结'}}</el-link>
+                                <el-link v-else :type="props.row.freezeTag? 'success':'danger'" disabled >
+                                  {{props.row.freezeTag ? '正常':'已被冻结'}}
+                                <!-- <el-link :type="(isFreeze != '1' && isFreeze) || props.row.freezeTag ? 'success':'danger'" disabled >
+                                  {{(isFreeze != '1' && isFreeze) || props.row.freezeTag ? '正常':'已被冻结'}} -->
+                                </el-link>
+                            </el-form-item> 
+                            <el-form-item label="是否删除">
+                                <el-link :type="props.row.objectDelect? 'success':'danger'" disabled >
+                                  {{props.row.objectDelect?'未删除':'已删除'}}
+                                </el-link>
                             </el-form-item> 
                           </el-form>
                       </div>
@@ -104,9 +119,10 @@
                     <template slot-scope="scope">
                       <el-button
                         size="mini"
-                        type="danger"
-                        @click.native.stop="handleFinish(scope.row)">点击完成</el-button>
-        
+                        :type="scope.row.objectFinish?'success': 'danger'"
+                        :disabled="scope.row | filterClick(!scope.row.objectAuthory, isFreeze)"
+                        @click.native.stop="handleFinish(scope.row)">
+                            {{scope.row.objectFinish?'点击完成': '已完成'}}</el-button>
                     </template>
                   </el-table-column>
 
@@ -142,8 +158,8 @@ import {mapState} from 'vuex'
         pageCount: 0
       }
     },
-
     created(){
+      console.log(this.isFreeze)
         this.pageCount = Math.ceil(this.total/this.pageSize)
     },
     
@@ -244,7 +260,7 @@ import {mapState} from 'vuex'
           aUpOInfo({
             objectId: row.objectId,
             data:{
-              objectAuthory: false
+              objectFinish: false
             }
           }).then(res =>{
             const {code} = res.data
@@ -252,7 +268,7 @@ import {mapState} from 'vuex'
             if(!code) return $message('操作失败，请稍后再试')
 
             // 操作成功了完成失物找回
-            row.objectAuthory = false
+            row.objectFinish = false
 
             // 成功
             $message({
@@ -273,62 +289,45 @@ import {mapState} from 'vuex'
       }
     },
     filters:{
-      filterType(userType){
-        if(userType === 1){
-          return '学生'
-        }else if(userType === 2){
-          return '教师'
-        }else{
-          return '访客'
+      // isFreeze 搜素用户传过来的
+      filterClick({objectFinish, objectStepTag, objectDelect, freezeTag}, objectAuthoryTag, isFreeze){
+        
+        // 如果不存在 则靠拿取
+        if(!isFreeze){
+          isFreeze = freezeTag
         }
+
+        if(objectAuthoryTag || !objectFinish || !objectDelect
+            || objectStepTag !=2 || !isFreeze) return true
+
+        return false
       },
-      filterStId(userType){
-        if(userType === 1){
-          return '学号'
-        }else if(userType === 2){
-          return '教工号'
-        }else{
-          return '证件号'
+
+      // 根据权限的设置显示不同的提示信息
+      filterText({object, freezeTag, objectAuthory}, isFreeze, userTag){
+        
+        // 如果不存在 则靠拿取
+        if(!userTag){
+          isFreeze = freezeTag
         }
-      },
-      filterMajor(userType){
-        if(userType === 1){
-          return '专业'
-        }else{
-          return '职业'
-        }
-      },
-      filterTime(time, tag){
-          const data = new Date(Number(time))
-          if(!tag) return `${data.getFullYear()}-${('0'+(1+data.getMonth())).slice(-2)}-${('0'+data.getDate()).slice(-2)}`
-          return `${data.getFullYear()}-${('0'+(1+data.getMonth())).slice(-2)}-${('0'+data.getDate()).slice(-2)} 
-                          ${('0'+data.getHours()).slice(-2)}:
-                          ${('0'+data.getMinutes()).slice(-2)}`
+
+        // 已被冻结
+        if(!objectAuthory) return '已冻结'
+        if(!isFreeze) return '账户已冻结'
+
+        return '正常'
       }
     },
-    props: ['objectData', 'pageSize', 'total']
+    props: ['objectData', 'pageSize', 'total', 'isFreeze', 'userTag']
   }
 </script>
 
 <style lang="less" scoped>
   #object-info{
     .object-wrap{
-      padding-bottom: 100px;
       .object-info{
         min-height: 400px;
       }
-      .page{
-        position: relative;
-        width: 100%;
-        height: 60px;
-        padding-top: 15px;
-        > div{
-          position: absolute;
-          left: 50%;
-          transform: translateX(-50%);
-        }
-      }
-
       .bigPic{
         position: fixed;
         top: 0;

@@ -123,7 +123,7 @@
             </van-list>
 
             <Empty v-if="noData"/>
-            <div v-else-if="!searchLoad" class="data-end">
+            <div v-else-if="!noData || !searchLoad" class="data-end">
                 到底啦，不能再往下啦~~~
             </div>
         </div>

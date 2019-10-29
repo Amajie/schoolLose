@@ -1,6 +1,18 @@
 <template>
     <div id="senior">
-        <div class="wrap">
+        <div class="content wrap">
+            <div class="my-info">
+                <h2 class="a-title">我</h2>
+                <div class="my-count">
+                    <el-input
+                        readonly
+                        v-model="adminData.adminEmail">
+                    </el-input>
+                </div>
+                <div class="logout">
+                    <el-button @click.native="handleOut" type="danger">退出登陆</el-button>
+                </div>
+            </div>
             <div class="changePaw">
                 <h2 class="a-title">修改密码</h2>
                 <div class="newpaw">
@@ -166,7 +178,8 @@ export default {
     },
     methods:{
         ...mapMutations([
-            'setState'
+            'setState',
+            'logoutCount'
         ]),
         // 初始化一些数据
         handleCreate(){
@@ -178,6 +191,18 @@ export default {
                     console.log('没有创建账号')
                 })
             }
+        },
+        handleOut(){
+            const {logoutCount, $confirm, $router, cookie} = this
+            $confirm('是否退出登陆?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                logoutCount({cookie, $router})
+            }).catch(() => {
+                    
+            })
         },
         // 创建账户
         handleCreateCount(){
@@ -341,6 +366,13 @@ export default {
         > div{
             margin: 10px 0;
             overflow: hidden;
+        }
+        .my-info{
+           
+            > div{
+                float: left;
+                margin-right: 10px;
+            }
         }
         .changePaw{
             > div{

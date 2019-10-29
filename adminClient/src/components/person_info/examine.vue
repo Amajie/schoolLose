@@ -15,7 +15,7 @@
                         <div class="expand-wrap">
                             <el-form label-position="left" inline class="demo-table-expand">
                               <el-form-item label="分类">
-                                <span>{{ props.row.objectTypeId}}</span>
+                                <span>{{ props.row.objectTypeId | filterTypeName}}</span>
                               </el-form-item>
                               <el-form-item label="物品名称">
                                 <span>{{ props.row.objectName}}</span>
@@ -24,13 +24,13 @@
                                 <span>{{ props.row.objectAddress}}</span>
                               </el-form-item>
                               <el-form-item label="丢失时间">
-                                <span>{{ props.row.objectTime}}</span>
+                                <span>{{ props.row.objectTime | filterTime(true)}}</span>
                               </el-form-item>
                               <el-form-item label="楼主说明">
                                 <span>{{ props.row.objectDesc}}</span>
                               </el-form-item>
                               <el-form-item label="发布时间">
-                                <span>{{ props.row.sendTime}}</span>
+                                <span>{{ props.row.sendTime | filterTime(true)}}</span>
                               </el-form-item>
                               <el-form-item label="上传图片">
                                 <el-image
@@ -282,17 +282,6 @@ export default {
               transform: translateX(-50%);
             }
           }
-        }
-      }
-      .page{
-        position: relative;
-        width: 100%;
-        height: 60px;
-        padding-top: 35px;
-        > div{
-          position: absolute;
-          left: 50%;
-          transform: translateX(-50%);
         }
       }
       .bigPic{

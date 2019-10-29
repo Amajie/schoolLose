@@ -3,7 +3,9 @@
         <div class="header b">
             <van-nav-bar
                 :border="false"
-                title="审核列表"
+                title="我的帖子"
+                :right-text="!infoTag?'已完成':'未完成'"
+                @click-right="handleInfoTag"
             />
         </div>
         <div class="examine-wrap">
@@ -15,6 +17,11 @@
                       :name="index">
                         <div class="title-info" slot="title">
                                 <span class="n">{{item.objectName}}</span>
+                                <span class="t" v-if="item.objectFinish">
+                                    <b v-if="item.objectStepTag === 1" style="color:#007acc;">待审核</b>
+                                    <b v-else-if="item.objectStepTag === 2" style="color:#07c160;">通过</b>
+                                    <b v-if="item.objectStepTag === 3" style="color:red;">未通过</b>
+                                </span>
                                 <span class="t">{{item.sendTime | filterTime(false)}}</span>
                         </div>
                         <div class="item">
@@ -55,14 +62,13 @@
                                 <div class="i">
                                     <van-button type="info" @click.native="handlePic(item.objectImg)" block>图片预览</van-button>
                                 </div>
-                                <div v-if="item.objectStepTag === 1" class="i">
-                                    <van-button type="danger" @click.native="handlePic(item.objectImg)" block>取消发布</van-button>
+                                <div v-if="item.objectFinish" class="i">
+                                    <van-button type="warning" v-if="item.objectStepTag === 3" @click.native="handleReason(item)" block>查看理由</van-button>
+                                    <van-button type="danger" v-else @click.native="handleReject(index, item.objectId, true)" block>取消发布</van-button>
                                 </div>
-                                <div v-if="item.objectStepTag === 2" class="i">
-                                    <van-button type="primary" @click.native="handlePic(item.objectImg)" block>不再显示</van-button>
-                                </div>
-                                <div v-if="item.objectStepTag === 3" class="i">
-                                    <van-button type="warning" @click.native="handleReason(item)" block>查看理由</van-button>
+                                <div v-else class="i">
+                                    <van-button type="danger" @click.native="handleReject(index, item.objectId, false)" block>删除</van-button>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -112,12 +118,13 @@ export default {
             showReason: false,
             objectPic: [],
             reason: '',
-            currentObjectId: ''
+            currentObjectId: '',
         }
     },
     computed:{
         ...mapState([
-            'userData'
+            'userData',
+            'infoTag'
         ])
     },
     inject: ['reload'],
@@ -125,24 +132,31 @@ export default {
         /**
          *  此时这里 需要判断一下如果路由传递过来的 id
          */
-        const {userData, getExamineData} = this
+        const {userData, getExamineData, examineData, infoTag} = this
         this.cheId = userData.cheId
-        getExamineData()
+        
+        !examineData.length && getExamineData(infoTag)
     },
     methods:{
         ...mapMutations([
             'setState',
             'handleRouter'
         ]),
-                // 获取数据
-        getExamineData(){
+        // 获取数据
+        getExamineData(tag){
             const {cheId} = this
-
-            // 此时应该定义在函数上 当拉到底端的时候再次调用
-            this.gInfo({
+            // 默认未完成列表
+            let params = {
                 cheId: cheId,
-                //objectPassTag: JSON.parse(false)//未通过数据
-            }).then(res =>{
+                objectFinish: JSON.parse(true)//未完成列表
+            }
+            if(tag){
+                params = {
+                    cheId: cheId,
+                    objectFinish: JSON.parse(false) // 已完成列表
+                }
+            }
+            this.gInfo(params).then(res =>{
                 const {code, data} = res.data
                 if(!data) return this.isEmpty = true
                 this.examineData = data
@@ -150,6 +164,40 @@ export default {
             }, () =>{
                 console.log('错误')
             })
+        },
+
+        // 取消发布 tag true 取消发布 false 删除帖子
+        // 都是后台没有删除 只是修改一个字段
+        handleReject(index, objectId, tag){
+
+            const {dConfirm, deObject, handleRouter, dAlert, 
+                reload} = this
+
+            dConfirm('提示', tag?'是否取消发布该帖子?': '是否删除该帖子？一旦删除不可找回！')
+            .then(() =>{
+                deObject({objectId}).then(res =>{
+                    const {code} = res.data
+                    if(code === 0) return dAlert('取消失败')
+                    // 刷新
+                    reload()
+                    dAlert('操作成功')
+                }, (err) =>{
+                    console.log(err)
+                })
+                
+            }).catch(() =>{
+                console.log('取消')
+            })
+        },
+        // 获取不同的数据
+        handleInfoTag(){
+            const {infoTag, getExamineData, setState} = this
+            setState({infoTag: !infoTag})
+            this.examineData = []
+            this.isEmpty = false
+            getExamineData(this.infoTag)
+
+            
         },
         handlePic(objectPic){
             this.show_img = !this.show_img
@@ -162,6 +210,7 @@ export default {
         }
     },
     filters:{
+        // 进度显示
         filterExa(index){
             if(index === 2 || index === 3) return 2
 

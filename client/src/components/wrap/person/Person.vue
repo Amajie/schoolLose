@@ -80,7 +80,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="logout-wrap" @click="logoutCount">   
+                <div class="logout-wrap" @click="handleLogout">   
                     <van-button type="danger" block>退出当前帐号</van-button>
                 </div>
             </div>
@@ -132,7 +132,8 @@ export default {
     methods:{
         ...mapMutations([
             'setUserData',
-            'handleRouter'
+            'handleRouter',
+            'logoutCount'
         ]),
         handleCreated(){
             const {getUInfo, userData} = this
@@ -156,8 +157,12 @@ export default {
          *  2 还有信息的清除
          * 
          */
-        logoutCount(){
-            this.handleRouter({url:`/login`, tag: 'r'})
+        handleLogout(){
+            const {logoutCount, cookie, $router} = this
+            logoutCount({
+                cookie,
+                $router
+            })
         },
                 //这个是 上拉菜单选项框
         onSelect(item){

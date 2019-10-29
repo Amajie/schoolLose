@@ -3,11 +3,9 @@
         <div class="header lr">
             <van-nav-bar
                 title="车神登陆"
-                @click-left="backToHome"
                 @click-right="backToRegister"
             >
                 <van-icon slot="right" color="#fff" >注册</van-icon>
-                <van-icon slot="left" color="#fff" >首页</van-icon>
             </van-nav-bar>
         </div>
         <div class="logo">
@@ -52,7 +50,7 @@
 
 <script>
 import {register} from '../../axios/api.js'
-import {mapMutations} from 'vuex'
+import {mapMutations, mapState} from 'vuex'
 export default {
     name: 'Login',
     data(){
@@ -60,27 +58,27 @@ export default {
             userName: '',
             password: '',
             remember: false,
-            che_in: '',//cookie 用户名
-            che_id: ''//cookie 密码
+            c_che_in: '',//cookie 用户名
+            c_che_id: ''//cookie 密码
         }
     },
     created(){
         //记住密码自动登陆
         this.handleAuto()
+        console.log(this.$route.params.logoutTag)
+    },
+    computed:{
+        ...mapState([
+            'remeberCount'
+        ])
     },
     methods:{
         ...mapMutations([
-            'setUserData'
+            'setState'
         ]),
-        //返回首页按钮
-        backToHome(){
-            this.$router.replace('/').catch(error =>{
-                console.log(error)
-            })
-        },
         //前往注册
         backToRegister(){
-            this.$router.push('/register')
+            this.$router.replace('/register')
         },
 
         /**
@@ -90,8 +88,7 @@ export default {
         handleLogin(){
 
             //获取数据
-            const {userName, remember, $router, $route, dAlert, dConfirm,
-                tText, login, encrypt, cookie, che_in, che_id, setUserData} = this
+            const {userName, remember, sendLogin, tText, encrypt, c_che_in, c_che_id} = this
 
             let password = this.password
 
@@ -99,18 +96,28 @@ export default {
                 return tText('用户名不能为空')
             }else if(!password){
                 return tText('密码不能为空')
-            }else if(che_in && che_id){
-                password = che_id
+            }else if(c_che_in && c_che_id){
+                password = c_che_id
             }else{
                 password = encrypt(password)
             }
+
+            // 发送登陆请求
+            sendLogin(userName, password, remember)
+        },
+        
+        // 发送登陆请求
+        sendLogin(userName, password, remember){
+            //获取数据
+            const {$router, $route, dAlert, dConfirm, c_che_token, c_che_in, c_che_id,
+                login, encrypt, cookie, setState} = this
 
             login({
                 userName,
                 password,
                 remember
             }).then(res =>{
-                const {code, token, userData} = res.data
+                const {code, token, userData, courtyardData, type_nav} = res.data
                 console.log(userData)
                 
                 if(code === -1) return dAlert('该用户不存在')
@@ -131,28 +138,25 @@ export default {
                 })
 
                 if(code === 0) return dAlert('密码错误')
-                
-                // 设置token
-                localStorage.setItem('token', token)
 
-                // 此时跳转指定路由
-                if($route.query.redirect){
-                    $router.replace($route.query.redirect)
-                }else{
-                //否则跳转到首页
-                    $router.replace('/home')
+                //设置保存在 store 的个人信息
+                setState({
+                    userData,
+                    courtyardData,
+                    type_nav
+                })
+
+                // 如果c_che_token c_che_in c_che_id 存在无需再次设置
+                if(!(c_che_token && c_che_in && c_che_id)){
+                    cookie.set('c_che_token', token, 1200)
+                    cookie.set('c_che_in', encrypt(userName), 1200)
+                    cookie.set('c_che_id', password, 1200)
                 }
 
-                //设置保存在 store 的个人信息 userInfo
-                setUserData(userData)
-
-                //没有记住密码 或者 cookie存在 无需设置 cookie 之后在跳转到首页
-                if(!remember || (che_in && che_id)) return console.log('欢迎再次登陆')
-
-                console.log('首次登陆')   
-                // 设置 cookie
-                cookie.set('che_in', encrypt(userName), 1200)
-                cookie.set('che_id', password, 1200)
+                // 此时跳转指定路由
+                const path = $route.query.redirect? $route.query.redirect: '/home'
+                // 跳转
+                $router.replace(path)
             })
         },
 
@@ -161,19 +165,86 @@ export default {
          * 
          */
         handleAuto(){
+            const {remeberCount, cookie, $route} = this
 
-            this.che_in = this.cookie.get('che_in')
-            this.che_id = this.cookie.get('che_id')
+            // 此时不是记住密码  删除cookie 信息
+            // 此时 如果已经登陆 但是再开新窗口访问 不应该删除cookie信息
+            
+            if(!remeberCount && sessionStorage.getItem('e_empty_state')){
+                cookie.remove('c_che_in')
+                cookie.remove('c_che_id')
+                cookie.remove('c_che_token')
+                return
+            }
+            
+            // 此时 又退出账号 sessionStor数据没有 此时又没记住密码 会继续往下执行
+            // 解决: 如果是 点击退出账号按钮 退出登陆 传递是否记住密码标志
+            // true 即可继续往下执行
+            // 新问题：
+            //  但是 如果新的窗口打开此时 没有传递值 
+            //  因此 如果没有token 不会因为上一次记住密码 
+            //  新窗口也会记住密码
+            if(!$route.params.logoutTag) return
+
+            // 记住密码获取数据 填充到文本框中
+            this.c_che_in = this.cookie.get('c_che_in')
+            this.c_che_id = this.cookie.get('c_che_id')
+            this.c_che_token = this.cookie.get('c_che_token')
 
             // cookie不存在 用户名 和密码 无需自动登陆
-            if(!(this.che_in && this.che_id)) return
+            if(!(this.c_che_in && this.c_che_id)) return
 
             //解密 自动 同步到文本框
-            this.userName = this.decrypt(this.che_in)
-            this.password = this.encrypt(this.che_id).slice(0, 13)//截取12显示即可
+            this.userName = this.decrypt(this.c_che_in)
+            this.password = this.encrypt(this.c_che_id).slice(0, 13)//截取12显示即可
 
-            this.remember = true//这里可以不设置
+            // 默认 本来就记住密码 登陆后新打开窗口之后 默认记住密码
+            this.remember = true
         }
+    },
+    watch:{
+        remember(newData){
+            this.setState({
+                remeberCount: newData
+            })
+        }
+    },
+    beforeRouteEnter (to, from, next) {
+        /**
+         * 这里判断 是否存在cookie 和sessionStor
+         *  1 cookie存在 说明还在登陆着 此时应该直接跳转到首页
+         *      1 sessionStor 存在 则同一页面访问登陆路由 直接跳转首页
+         *      2 sessionStor 不存在 判断cookie的用户名以及密码存在与否 
+         *          调用自动登陆函数
+         *  2 cookie不存在
+         *    清空 内容 sessionStor 以及初始化state
+         */
+        
+        next(vm =>{
+            const {cookie, sendLogin, decrypt, $store} = vm
+            const token = cookie.get('c_che_token')
+            const name = cookie.get('c_che_in')
+            const paw = cookie.get('c_che_id')
+            const sessionStor = sessionStorage.getItem('c_state')
+            // 存在
+            if(token){
+                console.log('存在token')
+                if(sessionStor){
+                    next('/home')
+                }else{
+                    if(name && paw)
+                        sendLogin(decrypt(name), paw)
+                }
+            //不存在
+            }else{
+                console.log('不存在token')
+                sessionStorage.removeItem('c_state')
+                $store.replaceState(JSON.parse(sessionStorage.getItem('c_empty_state')))
+            }
+        })
+    },
+    mounted(){
+      !sessionStorage.getItem('c_empty_state') && sessionStorage.setItem('c_empty_state', JSON.stringify(this.$store.state))
     }
 }
 </script>

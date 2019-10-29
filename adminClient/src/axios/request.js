@@ -25,7 +25,7 @@ service.interceptors.request.use(config =>{
     store.commit('setState', {fullsLoad: true})
 
     //此时需要token 后台判断是否需要 token 
-    config.headers['jie412.com-token'] = cookie.get('che_token')
+    config.headers['jie412.com-token'] = cookie.get('a_che_token')
 
     return config
 

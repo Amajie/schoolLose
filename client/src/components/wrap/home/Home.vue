@@ -79,7 +79,7 @@
                 </van-cell>
             </van-list>
             <Empty v-if="noData" />
-            <div v-else-if="!homeLoad" class="data-end">
+            <div v-else-if="!noData || !homeLoad" class="data-end">
                 到底啦，不能再往下啦~~~
             </div>
             <Load @fresh="getHomeData" v-bind="loadObj" />

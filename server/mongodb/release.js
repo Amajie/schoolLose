@@ -45,13 +45,11 @@ const reSchema = new Schema({
         type: String,
         default: ''
     },
-    objectTag: {//标志着是否完成
-        type: String,
-        default: '0'// 0就是没有完成 1 完成了
-    },
     objectDelect: {//消息是否删除
-        type: String,
-        default: '0'// 0就是没有删除 1 删除了
+        type: Boolean,
+        default: true// true 未删除 false 已经删除
+        // type: String,
+        // default: '0'// 0就是没有删除 1 删除了
     },
     objectStepTag: {//审核步骤
         type: Number,
@@ -66,7 +64,8 @@ const reSchema = new Schema({
         default: ''
     },
 
-    objectAuthory: {// 消息 是否可以被访问
+    objectAuthory: {// 消息 管理员可以通过设置该字段
+                    // 决定是否可以访问
         type: Boolean,
         default: true
     },
@@ -77,7 +76,7 @@ const reSchema = new Schema({
     finishTime: {// 消息 是否完成 默认没完成
         type: Number,
         required: true
-    },
+    }
 })
 
 module.exports = mongoose.model('release', reSchema)

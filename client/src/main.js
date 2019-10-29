@@ -86,7 +86,7 @@ Uploader, Loading, Notify, Switch,
 DatetimePicker, List, PullRefresh,
 DropdownMenu, DropdownItem, Image,
 Swipe, SwipeItem, Lazyload, SwipeCell,
-Step, Steps, Collapse, CollapseItem} from 'vant'
+Step, Steps, Collapse, CollapseItem, Tag} from 'vant'
 Vue.use(Button)
   .use(Icon)
   .use(NavBar)
@@ -129,6 +129,7 @@ Vue.use(Button)
   .use(Steps)
   .use(Collapse)
   .use(CollapseItem)
+  .use(Tag)
 
 
 import * as filters from './filter/filter.js';

@@ -156,12 +156,30 @@ export default {
             })
         }
       
+    },
+    beforeRouteEnter (to, from, next) {
+        next(vm =>{
+            const {cookie, sendLogin, decrypt, $store} = vm
+            const token = cookie.get('c_che_token')
+            
+            // token 存在 直接返回首页
+            if(token){
+                next('/home')
+            
+            // token不存在 则删除数据
+            }else{
+                sessionStorage.removeItem('c_state')
+                $store.replaceState(JSON.parse(sessionStorage.getItem('c_empty_state')))
+            }
+
+        })
     }
 }
 </script>
 
 <style lang="less" scoped>
 #register{
+    padding-bottom: 20px;
     .register-wrap{
         .logo{
             img{

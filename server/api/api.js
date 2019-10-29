@@ -7,7 +7,7 @@ const userInfo = require('../mongodb/userInfo.js')
 //邮箱 验证码信息表
 const {emailInfo, emailSchema} = require('../mongodb/email.js')
 //邮箱验证码的类型
-const {CREGISTER} = require('../router/CONST.js')
+const {CREGISTER, COURTYARDDATA, TYPE_NAV} = require('../router/CONST.js')
 
 //加密与解密
 const {decrypt, encrypt} = require('../crypto/encrypt.js')
@@ -105,7 +105,9 @@ exports.enter = {
                     avater, name, stId, gender, myConcern, myCollection, 
                     courtyard, major, classes, address, credePic, passStep,
                     authory     
-                }
+                },
+                courtyardData: COURTYARDDATA,
+                type_nav: TYPE_NAV
             })
         })
     },
