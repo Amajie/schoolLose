@@ -204,7 +204,6 @@ router.beforeEach((to, from, next) => {
   
   // 此时打开新的窗口 但是cookie信息存在 但是store 状态数据初始化了 此时跳转到登陆页面
   if(!to.meta.noRequireToken && cookie.get('c_che_token') && !sessionStorage.getItem('c_empty_state')){
-    console.log('啦啦啦')
     return next('/login')
   }
 

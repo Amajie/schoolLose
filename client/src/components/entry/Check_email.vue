@@ -52,7 +52,8 @@ export default {
             checkCode: '',//验证码
             confirmBtn: true,// 一开始 确认按钮是不可以点击的 只有输入验证码长度够了 才可以点击 
             checkLen: 6, // 验证码长度
-            checkCodeTag: false// 输入邮箱和验证码界面切换标志位
+            checkCodeTag: false,// 输入邮箱和验证码界面切换标志位
+            regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$")
         }
     },
     created(){
@@ -65,7 +66,7 @@ export default {
     },
     computed:{
         ...mapState([
-            'regEmail'
+            // 'regEmail'
         ])
     },
     methods:{

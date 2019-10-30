@@ -10,7 +10,6 @@ const store = new Vuex.Store({
         token: '',
         lodingETag: false,
         lodingSTag: false,
-        regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"),
         adminData: {},
         createCount: [],
 
@@ -105,7 +104,7 @@ const store = new Vuex.Store({
             sessionStorage.removeItem('a_state')
             cookie.remove('a_che_token')
             store.replaceState(JSON.parse(sessionStorage.getItem('a_empty_state')))
-            $router.replace('/chelogin')
+            $router.replace('/login')
         }
     },
     actions:{

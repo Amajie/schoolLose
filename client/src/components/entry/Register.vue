@@ -82,13 +82,9 @@ export default {
             userType: 1,
             student: '学生',           
             teacher: '老师',           
-            friend: '访客'           
+            friend: '访客',
+            regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"),           
         }
-    },
-    computed:{
-        ...mapState([
-            'regEmail'
-        ])
     },
     methods:{
         //返回首页按钮

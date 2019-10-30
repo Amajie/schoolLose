@@ -12,7 +12,7 @@
             <el-menu-item index="2">待审核帖子</el-menu-item>
             <el-menu-item index="3">账户搜索</el-menu-item>
             <el-menu-item index="4">帖子搜索</el-menu-item>
-            <el-menu-item v-if="adminData.adminGrade === 1" index="che_hj">高级管理</el-menu-item>
+            <el-menu-item v-if="adminData.adminGrade === 1" index="che_hj">{{adminData.adminGrade === 1?'高级管理':'管理我'}}</el-menu-item>
             <el-menu-item v-else index="5">个人管理</el-menu-item>
         </el-menu>
         <router-view/>

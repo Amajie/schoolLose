@@ -9,7 +9,6 @@ const store = new Vuex.Store({
         remeberCount: false,
         lodingETag: false,
         lodingSTag: false,
-        regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"),
         userData: {},
 
         homeData: [],

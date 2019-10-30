@@ -63,7 +63,7 @@ const router =  new Router({
       ]
     },
     {
-      path: '/chelogin',
+      path: '/login',
       name: 'Login',
       meta: {
         loginRequire: true
@@ -78,16 +78,18 @@ const router =  new Router({
 
 router.beforeEach((to, from, next) => {
     const {loginRequire} = to.meta
-    console.log(222)
-
+    console.log(to)
+    // 此时打开新的窗口 但是cookie信息存在 但是store 状态数据初始化了 此时跳转到登陆页面
+    if(!loginRequire && cookie.get('a_che_token') && !sessionStorage.getItem('a_empty_state')){
+      console.log(11111)
+      return next('/login')
+    }
+    
     // 如果cookie存在即可以访问 如果cookie不存在 不能访问
     if(loginRequire || cookie.get('a_che_token')) return next()
 
-    console.log(444)
-    sessionStorage.removeItem('a_state')
-    store.replaceState(JSON.parse(sessionStorage.getItem('a_empty_state')))
     next({
-      path: '/chelogin',
+      path: '/login',
       query: {redirect: to.fullPath}
     })
 })

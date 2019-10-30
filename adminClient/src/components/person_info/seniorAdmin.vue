@@ -36,7 +36,7 @@
                     <el-button @click.native="handleChangePaw" type="success">提交</el-button>
                 </div>
             </div>
-            <div class="createCount">
+            <div v-if="adminData.adminGrade === 1" class="createCount">
                 <h2 class="a-title">创建普通账号</h2>
                 <div class="cemail">
                     <el-input
@@ -50,7 +50,7 @@
                     <el-button @click.native="handleCreateCount" type="success">创建</el-button>
                 </div>
             </div>
-            <div class="myCreateCount">
+            <div v-if="adminData.adminGrade === 1" class="myCreateCount">
                 <h2 class="a-title">我的创建</h2>
                 <div class="list">
                     <el-table
@@ -101,7 +101,7 @@
                     </el-table>
                 </div>
             </div>
-            <div class="myCreateCount">
+            <div v-if="adminData.adminGrade === 1" class="myCreateCount">
                 <h2 class="a-title">我的账户</h2>
                 <div class="change-name">
                     <div class="c-name">
@@ -163,18 +163,19 @@ export default {
             changeEmailPaw: '',
             changeKey: '',
             createAdminEmail: '',
-            tabW: 220
+            tabW: 220,
+            regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$"),
         }
     },
     computed:{
         ...mapState([
             'adminData',
             'createCount',
-            'regEmail'
         ])
     },
     created(){
         this.handleCreate()
+        console.log(this.$store.state)
     },
     methods:{
         ...mapMutations([

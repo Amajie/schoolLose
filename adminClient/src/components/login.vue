@@ -47,6 +47,7 @@
       }
     },
     created(){
+      console.log(this.$store.state)
     },
     methods: {
 
@@ -74,7 +75,7 @@
         }).then(res =>{
 
           const {code, token, adminData, type_nav} = res.data
-
+          console.log(2222222222222222)
           if(code === -1) return $message('用户名错误!')
           if(code === -2) return $alert('该管理员账户已被冻结，暂时无法登陆', '提示', {
               confirmButtonText: '确定',
@@ -84,6 +85,7 @@
                 this.adminPassword = ''
             }
           })
+          console.log(3333333333333333333)
           if(code === 0) return this.$msg = $message('密码错误!')
             // 设置
             $store.commit('setState', {adminData, type_nav})
@@ -91,6 +93,7 @@
             cookie.set('a_che_in', encrypt(adminName), 300)
             cookie.set('a_che_id', adminPassword, 300)
             this.$router.replace('/')
+            console.log(4444444444)
         })
      }
     },
@@ -107,17 +110,21 @@
       
       next(vm =>{
         const {cookie, sendLogin, decrypt, $store} = vm
+        debugger
         const token = cookie.get('a_che_token')
         const name = cookie.get('a_che_in')
         const paw = cookie.get('a_che_id')
         const sessionStor = sessionStorage.getItem('a_state')
+        
         // 存在
         if(token){
           if(sessionStor){
             next('/')
+          
           }else{
-            if(name && paw)
-            sendLogin(decrypt(name), paw)
+            if(name && paw){
+              sendLogin(decrypt(name), paw)
+            }
           }
         //不存在
         }else{
@@ -130,6 +137,7 @@
 
     },
     mounted(){
+      console.log(this.$store.state)
       !sessionStorage.getItem('a_empty_state') && sessionStorage.setItem('a_empty_state', JSON.stringify(this.$store.state))
     }
   }
@@ -140,7 +148,6 @@
   position: relative;
   width: 100%;
   height: 100%;
-  // background: url('../assets/img/login-bg.jpg');
   background: #034dd3;
   background-size: 100% 100%;
   .header{
