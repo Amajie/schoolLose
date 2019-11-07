@@ -131,8 +131,6 @@
           <div class="page">
               <div>
                   <el-pagination
-                    @prev-click="handlePrev(false)"
-                    @next-click="handlePrev(true)"
                     @current-change="handleCPage"
                     background
                     :page-size="pageSize"
@@ -159,7 +157,6 @@ import {mapState} from 'vuex'
       }
     },
     created(){
-      console.log(this.isFreeze)
         this.pageCount = Math.ceil(this.total/this.pageSize)
     },
     
@@ -178,14 +175,14 @@ import {mapState} from 'vuex'
       },
 
       sendComfirm(row){
-        const {aUpOInfo, $confirm, $alert} = this
+        const {updataObject, $confirm, $alert} = this
 
         $confirm(`是否通过 ${row.userName} 发布的帖子？`, '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
         }).then(() => {
-          aUpOInfo({
+          updataObject({
             objectId: row.objectId,
             data: {
               objectStepTag : 2,
@@ -215,14 +212,14 @@ import {mapState} from 'vuex'
       // 处理权限的问题
       handleAuthory(objectAuthory, row){
 
-        const {searchUData, $message, aUpOInfo} = this
+        const {searchUData, $message, updataObject} = this
 
         this.$confirm(objectAuthory?'是否解除该帖子的冻结？':'是否冻结该帖子？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          aUpOInfo({
+          updataObject({
             objectId: row.objectId,
             data:{
               objectAuthory
@@ -250,14 +247,14 @@ import {mapState} from 'vuex'
       // 完成交易
       handleFinish(row){
 
-        const {searchUData, $message, aUpOInfo, $confirm} = this
+        const {searchUData, $message, updataObject, $confirm} = this
 
         $confirm(`是否完成发布的帖子`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          aUpOInfo({
+          updataObject({
             objectId: row.objectId,
             data:{
               objectFinish: false
@@ -282,10 +279,6 @@ import {mapState} from 'vuex'
       },
       handleCPage(page){
         this.$emit('click-page', page)
-      },
-      // 上下一页
-      handlePrev(tag){
-        this.$emit('p-n-page', tag)
       }
     },
     filters:{

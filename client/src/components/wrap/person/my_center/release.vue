@@ -161,13 +161,14 @@ export default {
         handleCreated(){
             const {meta, params} = this.$route
             const {userData} = this
-            this.reType = meta.reType
+            this.addObjectTag = meta.addObjectTag
             //此时要判断 用户的id是否正确 不正确即跳转到404页面
             if(params.cheId != userData.cheId){
                 console.log('用户id不相等，跳转到404页面')
             }
+            console.log(meta.addObjectTag)
             //此时是添加
-            if(meta.reType) return console.log('添加数据')
+            if(meta.addObjectTag) return console.log('添加数据')
 
             /**
              * 1 设置标题
@@ -239,7 +240,6 @@ export default {
             this.showType = !this.showType
             this.objectType = val
             this.objectTypeId = selectTypeId(type_nav, val)
-            console.log('123123: '+ this.objectTypeId)
         },
         // 处理数据的提交
         handleSubmit(){
@@ -268,7 +268,7 @@ export default {
             formData.append('objectDesc', objectDesc)
 
 
-            if(this.reType) return this.addData(formData)
+            if(this.addObjectTag) return this.addData(formData)
 
             this.upData(formData)
         },
@@ -284,7 +284,7 @@ export default {
              *          1 选取 那这就要
              */
 
-            const {objectImg, reObject, dAlert} = this
+            const {objectImg, insertObject, dAlert} = this
 
             // 发布的时间不能更新
             const currentTime = new Date().getTime()
@@ -295,7 +295,7 @@ export default {
                 formData.append('objectPic', item.file)
             })
 
-            reObject(formData).then(res =>{
+            insertObject(formData).then(res =>{
                 const {code} = res.data
                 if(code === 0) return dAlert('发布失败, 请稍后再试')
 
@@ -305,7 +305,7 @@ export default {
         //更新数据
         upData(formData){
             
-            const {objectImg, dAlert, objectId, sendTime, upObject} = this
+            const {objectImg, dAlert, objectId, sendTime, editObject} = this
             let arrImg = []
 
             //消息的id 路由参数传递
@@ -317,7 +317,7 @@ export default {
 
             formData.append('objectImg', JSON.stringify(arrImg))
             
-            upObject(formData).then(res =>{
+            editObject(formData).then(res =>{
                 const {code} = res.data
                 if(code === 0) return dAlert('发布失败, 请稍后再试')
 

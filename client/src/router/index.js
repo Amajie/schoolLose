@@ -137,6 +137,9 @@ const router =  new Router({
         {
           path: 'redata/:cheId',
           name: 'Releasedata',
+          meta:{
+            addObjectTag: true
+          },
           component: Releasedata
         },
         //消息的更新

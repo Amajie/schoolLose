@@ -74,8 +74,6 @@
             <div class="page">
                 <div>
                     <el-pagination
-                      @prev-click="handlePage(false)"
-                      @next-click="handlePage(true)"
                       @current-change="handleCPage"
                       background
                       :page-size="pageSize"
@@ -91,7 +89,7 @@
     </div>
 </template>
 <script>
-import NoData from '../info_show/no_data.vue'
+import NoData from '../common/no_data.vue'
 export default {
   data() {
     return {
@@ -115,7 +113,7 @@ export default {
   methods: {
     
     getEData(){
-        this.aFInfo({
+        this.examineObject({
               
           }).then(res =>{
               const {code, data, total} = res.data
@@ -181,7 +179,7 @@ export default {
         objectReason
       }
 
-      this.aUpOInfo({
+      this.updataObject({
           objectId: row.objectId,
           data
       }).then(res =>{
@@ -210,21 +208,13 @@ export default {
       })
     },
 
-    // true 下一页 false 上一页
-    handlePage(tag){
-      if(tag){
-        this.page++
-      }else{
-        this.page--
-      }
-      const {examineData, pageSize, page} = this
-      this.examinePageData = examineData.slice(page*pageSize, (page+1)*pageSize)
-    },
     // 直接点击页码
     handleCPage(page){
-
       const {examineData, pageSize} = this
+      // this.page = page
+      console.log(page)
       this.examinePageData = examineData.slice((page - 1)*pageSize, page*pageSize)
+
     }
   },
   filters:{

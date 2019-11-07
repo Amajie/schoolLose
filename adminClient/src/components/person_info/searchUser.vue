@@ -37,7 +37,7 @@
                       <el-form-item label="身份">
 
                         <el-link v-if="searchUData.passStep === 0" type="danger" disabled >
-                          信息信息未完善
+                          信息未完善
                         </el-link>
                         <el-link v-if="searchUData.passStep === 1" type="danger" disabled >
                           信息已完善，未审核
@@ -123,7 +123,6 @@
             </div>
             <ObjectShow v-if="showUObjectTag" 
               :object-data="searchUOData"
-              @p-n-page="handlePN" 
               @click-page="handleCPage"
               :page-size="pageSize"
               :total="searchUOTotal"
@@ -137,8 +136,8 @@
 </template>
 <script>
   import {mapState, mapMutations} from 'vuex'
-  import ObjectShow from '../info_show/object_info.vue'
-  import NoData from '../info_show/no_data.vue'
+  import ObjectShow from '../common/object_info.vue'
+  import NoData from '../common/no_data.vue'
   export default {
     data() {
       return {
@@ -170,7 +169,7 @@
       ]),
       // 搜索用户
       handleSearch(){
-        const {searchWord, aSearchUser, $message, setState, $msg} = this
+        const {searchWord, searchUser, $message, setState, $msg} = this
 
         // 存在则关闭
         $msg && $msg.close()
@@ -178,7 +177,7 @@
         if(!searchWord) return this.$msg = $message('请输入搜索账户')
 
         //否则搜索内容
-        aSearchUser({searchWord}).then(res =>{
+        searchUser({searchWord}).then(res =>{
           const {code, searchUData} = res.data
         
           if(!code) {
@@ -191,7 +190,7 @@
       },
       // 修改密码
       changePaw(){
-        const {password, searchUData, aUpUInfo,
+        const {password, searchUData, updataUser,
         encrypt, $message} = this
         if(!password){
             return $message('请输入密码')
@@ -201,7 +200,7 @@
             return $message('密码长度过长')
         } 
 
-        aUpUInfo({
+        updataUser({
             _id: searchUData._id,
             data:{
               password: encrypt(password)
@@ -218,14 +217,14 @@
       },
       // 冻结 解冻
       handleUser(freezeTag){
-        const {searchUData, $message, aUpUInfo} = this
+        const {searchUData, $message, updataUser} = this
 
         this.$confirm(freezeTag?'是否取消冻结该账户？':'是否冻结该账户？', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          aUpUInfo({
+          updataUser({
               _id: searchUData._id,
               data:{
                 freezeTag
@@ -252,13 +251,13 @@
       },
       //通过身份验证
       sendComfirm(){
-        const {aUpUInfo, searchUData, $alert, $message} = this
+        const {updataUser, searchUData, $alert, $message} = this
         this.$confirm(`是否通过 ${searchUData.userName} 的身份验证？`, '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
         }).then(() =>{
-          aUpUInfo({
+          updataUser({
               _id: searchUData._id,
               email: searchUData.email,
               data:{
@@ -286,11 +285,11 @@
       },
       // 搜素帖子
       searchObjectData(){
-          const {gSearchInfo, searchUData,
+          const {searchObject, searchUData,
            searchUOPage, pageSize, setState} = this
            
           // 发送请求
-          gSearchInfo({
+          searchObject({
                objectUserId: searchUData._id,
                page: searchUOPage,
                pageNum: pageSize,
@@ -316,27 +315,14 @@
       handleshowObject(){
         const {searchObjectData, showUObjectTag, searchUOData, setState} = this
         
-        
-        // 没值搜素 搜素成功后在显示
-        if(!searchUOData.length) return searchObjectData()
-
-        // 如果显示状态 则设置
+        // 取反操作
         setState({showUObjectTag: !showUObjectTag})
+        // 没值搜素 搜素成功后在显示
+        if(!searchUOData.length && !showUObjectTag) return searchObjectData()
+
+       
 
       },
-      //处理上下一夜
-      handlePN(tag){
-        let {setState, searchUOPage, searchObjectData} = this
-        // true 即为下一页 false 上一页
-        if(tag){
-          ++searchUOPage
-        }else{
-          --searchUOPage
-        }
-        this.setState({searchUOPage: searchUOPage})
-        searchObjectData()
-      },
-
       // 页码
       handleCPage(page){
         this.setState({searchUOPage: --page})

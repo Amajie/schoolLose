@@ -58,7 +58,7 @@
                         </div>
                         <div class="cell-item">
                             <img src="../../../assets/person/person_word.png" alt="">
-                            <van-cell :to="`/commit/${userData.cheId}`" title-class="text" title="留言管理" is-link>
+                            <van-cell :to="`/commit/${userData.cheId}`" title-class="text" title="评论管理" is-link>
                                 <van-icon
                                     slot="right-icon"
                                     name="arrow"
@@ -136,11 +136,11 @@ export default {
             'logoutCount'
         ]),
         handleCreated(){
-            const {getUInfo, userData} = this
+            const {getAuthoryTag, userData} = this
             this.bigAvater[0] = userData.avater
             if(userData.authory) return
             
-            getUInfo({_id: userData.cheId}).then(res =>{
+            getAuthoryTag().then(res =>{
                 const {authory} = res.data
                 userData.authory = authory
             })

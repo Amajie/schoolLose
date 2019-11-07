@@ -91,7 +91,7 @@
                             />
                         </div>
                         <div class="item_info">
-                            <!-- 标题 -->
+                            <!-- 类型 -->
                             <div class="info_title">
                                 <p>
                                     <span class="title_p">{{item.objectTypeId | filterTypeName}}</span>
@@ -106,7 +106,7 @@
                                     <span>{{item.objectDesc}}</span>
                                 </p>
                             </div>
-                            <!-- 配送 -->
+                            <!-- 名称 -->
                             <div class="info_tack">
                                 <div class="user">
                                     <icon name="center_object" :w="12" :h="12"></icon>
@@ -123,7 +123,7 @@
             </van-list>
 
             <Empty v-if="noData"/>
-            <div v-else-if="!noData || !searchLoad" class="data-end">
+            <div v-else-if="!noData && !searchLoad" class="data-end">
                 到底啦，不能再往下啦~~~
             </div>
         </div>
@@ -305,7 +305,7 @@ export default {
             
             let {cheId, startTime, endTime, objectWay, target, tText,
                  objectTypeId, objectType, showStartTime, showEndTime,
-                 upDownTag, gSearchInfo, $route, searchParams, setState,
+                 upDownTag, searchObject, $route, searchParams, setState,
                  searchPage, searchPageNum, concatArr} = this 
 
             const params = {
@@ -347,7 +347,7 @@ export default {
             // 点击搜素不应该再出现
             this.noData = false
 
-            gSearchInfo(params).then(res =>{
+            searchObject(params).then(res =>{
                 // 获取完数据 就关闭了
                 this.loadObj = {
                     loadTag: false,

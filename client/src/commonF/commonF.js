@@ -36,10 +36,10 @@ export const selectTypeId = (type_nav, val) =>{
  * @param {*}
  * @param {*}
  */
-export const getAuthory = () =>{
+export const getAuthory = (showTag) =>{
     const {authory, passStep} = store.state.userData
     
-    if(!authory){
+    if(!authory && !showTag){
         let message = '您的身份信息还没有完善，请尽快完善信息，并等待管理员的审核'
         if(passStep === 1) message = '管理员还没审核您提交的信息，审核通过后才能发布帖子'
         if(passStep === 3) message = '您的身份审核未通过，请确认信息无误后再次提交'

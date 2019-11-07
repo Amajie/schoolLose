@@ -76,9 +76,9 @@ export default {
     name: 'Register',
     data(){
         return{
-            userName: '车神-黄杰',
-            password: 'huang661775',
-            email: '2291945117@qq.com',
+            userName: '',
+            password: '',
+            email: '',
             userType: 1,
             student: '学生',           
             teacher: '老师',           
@@ -105,7 +105,7 @@ export default {
              userType, regEmail, $router, tText,
              dConfirm, dAlert, register,
              encrypt} = this
-
+            console.log(userName.length)
             //验证 用户填写的信息是否正确
             if(!userName){
                 return tText('用户名不能为空')
@@ -144,7 +144,10 @@ export default {
                         // 把邮箱传递过去
                         $router.replace({name: 'CheckEmail', params: {email}})
                     }).catch(() =>{
-                        console.log('此时需要清空文本框')
+                        this.userName = ''
+                        this.password = ''
+                        this.email = ''
+                        this.userType = 1
                     })
                 }else if(code === -1){// 注册失败
                     dAlert('注册失败，请稍后再试')

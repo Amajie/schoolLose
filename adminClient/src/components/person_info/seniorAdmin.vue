@@ -1,42 +1,8 @@
 <template>
     <div id="senior">
         <div class="content wrap">
-            <div class="my-info">
-                <h2 class="a-title">我</h2>
-                <div class="my-count">
-                    <el-input
-                        readonly
-                        v-model="adminData.adminEmail">
-                    </el-input>
-                </div>
-                <div class="logout">
-                    <el-button @click.native="handleOut" type="danger">退出登陆</el-button>
-                </div>
-            </div>
-            <div class="changePaw">
-                <h2 class="a-title">修改密码</h2>
-                <div class="newpaw">
-                    <el-input
-                        clearable
-                        type="password"
-                        placeholder="请输入新密码"
-                        maxlength="16"
-                        v-model="newChangePassword">
-                    </el-input>
-                </div>
-                <div class="oldpaw">
-                    <el-input
-                        clearable
-                        type="password"
-                        placeholder="请输入旧密码"
-                        v-model="changePasswordPaw">
-                    </el-input>
-                </div>
-                <div class="c-paw">
-                    <el-button @click.native="handleChangePaw" type="success">提交</el-button>
-                </div>
-            </div>
-            <div v-if="adminData.adminGrade === 1" class="createCount">
+            <Admin />
+            <div class="createCount">
                 <h2 class="a-title">创建普通账号</h2>
                 <div class="cemail">
                     <el-input
@@ -50,7 +16,7 @@
                     <el-button @click.native="handleCreateCount" type="success">创建</el-button>
                 </div>
             </div>
-            <div v-if="adminData.adminGrade === 1" class="myCreateCount">
+            <div class="myCreateCount">
                 <h2 class="a-title">我的创建</h2>
                 <div class="list">
                     <el-table
@@ -101,7 +67,7 @@
                     </el-table>
                 </div>
             </div>
-            <div v-if="adminData.adminGrade === 1" class="myCreateCount">
+            <div class="myCreateCount">
                 <h2 class="a-title">我的账户</h2>
                 <div class="change-name">
                     <div class="c-name">
@@ -149,11 +115,10 @@
 
 <script>
 import {mapState, mapMutations} from 'vuex'
+import Admin from '../common/admin_opa.vue'
 export default {
     data(){
         return {
-            changePasswordPaw: '',
-            newChangePassword: '',
             // 修改用户名
             newChangeName: '',
             changeNamePaw: '',
@@ -175,7 +140,6 @@ export default {
     },
     created(){
         this.handleCreate()
-        console.log(this.$store.state)
     },
     methods:{
         ...mapMutations([
@@ -184,35 +148,23 @@ export default {
         ]),
         // 初始化一些数据
         handleCreate(){
-            const {createCount, fAdminCount, setState} = this
+            const {createCount, getAdmin, setState} = this
             if(!createCount.length){
-                fAdminCount().then(res =>{
+                getAdmin().then(res =>{
                     const {code, createCount} = res.data
                     if(code === 200) return setState({createCount})
-                    console.log('没有创建账号')
                 })
             }
         },
-        handleOut(){
-            const {logoutCount, $confirm, $router, cookie} = this
-            $confirm('是否退出登陆?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-                logoutCount({cookie, $router})
-            }).catch(() => {
-                    
-            })
-        },
+
         // 创建账户
         handleCreateCount(){
-            const {$message, cAdmin, createAdminEmail, 
+            const {$message, createAdmin, createAdminEmail, 
             encrypt, showMsg, regEmail} = this
             if(!createAdminEmail) return $message('请输入邮箱')
             if(!regEmail.test(createAdminEmail)) return $message('邮箱格式不正确')
             this.changeKey = 'c'
-            cAdmin({
+            createAdmin({
                 adminEmail: createAdminEmail,
                 adminPassword: encrypt(createAdminEmail)
             }).then(res =>{
@@ -243,21 +195,10 @@ export default {
             }, encrypt(changeEmailPaw))
         },
 
-        //修改密码
-        handleChangePaw(){
-            const {$message, sendChange, encrypt, changePasswordPaw, newChangePassword} = this
-            if(!changePasswordPaw) return $message('请输入旧密码')
-            if(!newChangePassword) return $message('请输入新密码')
-            if(newChangePassword.length < 8) return $message('密码长度至少8位数')
-            this.changeKey = 'p'
-            sendChange({
-                adminPassword: encrypt(newChangePassword)
-            }, encrypt(changePasswordPaw))
-        },
 
         // 冻结 解冻
         handleFreezeCount(adminTag, currentRow){
-            const {$message, cAdminPaw} = this
+            const {$message, updataAdmin} = this
             
             this.$confirm(adminTag?'是否解冻该账号': '是否冻结该账号', '提示', {
                 confirmButtonText: '确定',
@@ -265,7 +206,7 @@ export default {
                 type: 'warning'
             }).then(() => {
                 // 发送请求
-                cAdminPaw({
+                updataAdmin({
                     adminEmail: currentRow.adminEmail,
                     upData:{
                         adminTag
@@ -286,7 +227,7 @@ export default {
         // 销毁账号
         handleDestoryCount(index, adminEmail){
 
-            const {$message, aDestroyCount, createCount} = this
+            const {$message, destroyCount, createCount} = this
             
             this.$confirm('一旦销毁，不可找回，请谨慎处理', '谨慎', {
                 confirmButtonText: '确定',
@@ -294,7 +235,7 @@ export default {
                 type: 'warning'
             }).then(() => {
                 // 发送请求
-                aDestroyCount({
+                destroyCount({
                     adminEmail
                 }).then(res =>{
                     const {code, msg} = res.data
@@ -315,14 +256,15 @@ export default {
         //发送修改请求
         sendChange(upData, cPawIpu){
 
-            const {cAdminPaw, showMsg} = this
-            cAdminPaw({
+            const {updataAdmin, showMsg} = this
+            updataAdmin({
                 cPawIpu,
                 upData
             }).then(res =>{
                 showMsg(res.data)
             })
         },
+        
         // 显示信息
         showMsg({code, msg}){
             if(code != 200) return this.$message(msg)
@@ -332,10 +274,7 @@ export default {
                 type: 'success'
             })
 
-            if(this.changeKey === 'p'){
-                this.changePasswordPaw = ''
-                this.newChangePassword = ''
-            }else if(this.changeKey === 'n'){
+            if(this.changeKey === 'n'){
                 this.newChangeName = ''
                 this.changeNamePaw = ''
             }else if(this.changeKey === 'e'){
@@ -353,6 +292,9 @@ export default {
                 this.createAdminEmail = ''
             }
         }
+    },
+    components:{
+        Admin
     }
 }
 </script>
@@ -368,19 +310,7 @@ export default {
             margin: 10px 0;
             overflow: hidden;
         }
-        .my-info{
-           
-            > div{
-                float: left;
-                margin-right: 10px;
-            }
-        }
-        .changePaw{
-            > div{
-                float: left;
-                margin: 0 3px;
-            }
-        }
+        
         .createCount{
             > div{
                 float: left;

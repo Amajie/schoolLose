@@ -5,10 +5,10 @@ import cookie from 'vue-cookies'
 import store from '../store.js'
 
 import Wrap from '../components/wrap.vue'
-import PersonInfo from '../components/person_info/person_info.vue'
+import ExamineUser from '../components/person_info/examin_user.vue'
 import Examine from '../components/person_info/examine.vue'
 import SearchUser from '../components/person_info/searchUser.vue'
-import SearchInfo from '../components/person_info/searchInfo.vue'
+import searchObject from '../components/person_info/searchObject.vue'
 
 import Login from '../components/login.vue'
 
@@ -30,8 +30,8 @@ const router =  new Router({
       children:[
         {
           path: 'p/:key',
-          name: 'PersonInfo',
-          component: PersonInfo,
+          name: 'ExamineUser',
+          component: ExamineUser,
         },
         {
           path: 'e/:key',
@@ -45,12 +45,12 @@ const router =  new Router({
         },
         {
           path: 'si/:key',
-          name: 'SearchInfo',
-          component: SearchInfo,
+          name: 'searchObject',
+          component: searchObject,
         },
         // 普通管理员
         {
-          path: '/g/:key',
+          path: '/che_gen',
           name: 'GeneralAdmin',
           component: GeneralAdmin
         },

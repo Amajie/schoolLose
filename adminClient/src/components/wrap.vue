@@ -12,7 +12,7 @@
             <el-menu-item index="2">待审核帖子</el-menu-item>
             <el-menu-item index="3">账户搜索</el-menu-item>
             <el-menu-item index="4">帖子搜索</el-menu-item>
-            <el-menu-item v-if="adminData.adminGrade === 1" index="che_hj">{{adminData.adminGrade === 1?'高级管理':'管理我'}}</el-menu-item>
+            <el-menu-item v-if="adminData.adminGrade === 1" index="che_hj">高级管理</el-menu-item>
             <el-menu-item v-else index="5">个人管理</el-menu-item>
         </el-menu>
         <router-view/>
@@ -40,7 +40,6 @@ import {mapState} from 'vuex'
       },
       handleSelect(key, keyPath) {
         const {prevKey, adminData, $router} = this
-        console.log(prevKey, key)
         if(prevKey === key) return console.log('重复点击')
 
         this.prevKey = key
@@ -49,7 +48,7 @@ import {mapState} from 'vuex'
         if(key === '2') return $router.replace(`/e/${key}`)
         if(key === '3') return $router.replace(`/su/${key}`)
         if(key === '4') return $router.replace(`/si/${key}`)
-        // if(key === '4') return this.$router.replace(`/si/${key}`)
+        if(key === '5') return this.$router.replace(`/che_gen`)
         // 只有高级管理员才能访问
         if(key === 'che_hj' && adminData.adminGrade === 1){
           $router.replace(`/che_hj`)

@@ -41,12 +41,11 @@
 </template>
 <script>
 
-import {mapState} from 'vuex'
 export default {
     name: 'Register',
     data(){
         return{
-            email: '2291945117@qq.com',//邮箱
+            email: '',//邮箱
             checkId: '',//验证码查询标志 id
             // 验证变量
             checkCode: '',//验证码
@@ -63,11 +62,6 @@ export default {
         if(this.$route.params.email){
             this.email = this.$route.params.email
         }
-    },
-    computed:{
-        ...mapState([
-            // 'regEmail'
-        ])
     },
     methods:{
 
@@ -94,7 +88,7 @@ export default {
         * 
         */
         handleEmail(){
-            const {email, regEmail, toastText, dAlert, sendEmailCode} = this
+            const {email, regEmail,  tText, dAlert, sendEmailCode} = this
 
             //验证 邮箱输入是否正确
             if(!email){

@@ -10,9 +10,9 @@ import service from './request.js'
  * @function 获取数据
  * @param {*} params 发送的数据
  */
-export const aUserInfo = params =>{
+export const examineUser = params =>{
     return service({
-        url: '/a_userInfo',
+        url: '/examine_user',
         method: 'get',
         params
     })
@@ -22,9 +22,9 @@ export const aUserInfo = params =>{
  * @function 用户的创建
  * @param {*} data 发送的数据
  */
-export const cAdmin = data =>{
+export const createAdmin = data =>{
     return service({
-        url: '/c_admin',
+        url: '/create_admin',
         method: 'post',
         data
     })
@@ -33,9 +33,9 @@ export const cAdmin = data =>{
  * @function 密码修改
  * @param {*} data 发送的数据
  */
-export const cAdminPaw = data =>{
+export const updataAdmin = data =>{
     return service({
-        url: '/up_admin',
+        url: '/updata_admin',
         method: 'post',
         data
     })
@@ -46,9 +46,9 @@ export const cAdminPaw = data =>{
  * @function 管理员登陆
  * @param {*} data 发送的数据
  */
-export const lAdmin = data =>{
+export const adminLogin = data =>{
     return service({
-        url: '/l_admin',
+        url: '/admin_login',
         method: 'post',
         data
     })
@@ -57,9 +57,9 @@ export const lAdmin = data =>{
  * @function 高级管理员查找用户
  * @param {*} params 发送的数据
  */
-export const fAdminCount = params =>{
+export const getAdmin = params =>{
     return service({
-        url: '/f_adminCount',
+        url: '/get_admin',
         method: 'get',
         params
     })
@@ -68,21 +68,22 @@ export const fAdminCount = params =>{
  * @function 高级管理员删除用户
  * @param {*} data 发送的数据
  */
-export const aDestroyCount = data =>{
+export const destroyCount = data =>{
     return service({
-        url: '/a_destroycount',
+        url: '/destroy_count',
         method: 'post',
         data
     })
 }
 
+
 /**
  * @function 用户搜索
  * @param {*} params 发送的数据
  */
-export const aSearchUser = params =>{
+export const searchUser = params =>{
     return service({
-        url: '/a_searchUser',
+        url: '/search_user',
         method: 'get',
         params
     })
@@ -92,21 +93,22 @@ export const aSearchUser = params =>{
  * @function 修改用户的数据
  * @param {*} data 发送的数据
  */
-export const aUpUInfo = data =>{
+export const updataUser = data =>{
     return service({
-        url: '/a_upUInfo',
+        url: '/updata_user',
         method: 'post',
         data
     })
 }
 
+
 /**
  * @function 查找帖子信息
  * @param {*} data 发送的数据
  */
-export const aFInfo = params =>{
+export const examineObject = params =>{
     return service({
-        url: '/a_fInfo',
+        url: '/examine_object',
         method: 'get',
         params
     })
@@ -117,9 +119,9 @@ export const aFInfo = params =>{
  * @function 修改帖子信息
  * @param {*} data 发送的数据
  */
-export const aUpOInfo = data =>{
+export const updataObject = data =>{
     return service({
-        url: '/a_upOInfo',
+        url: '/updata_object',
         method: 'post',
         data
     })
@@ -130,9 +132,9 @@ export const aUpOInfo = data =>{
  * @function 帖子的搜索 
  * @param {*} params 搜索的限制条件
  */
-export const gSearchInfo = params =>{
+export const searchObject = params =>{
     return service({
-        url: '/search_f_info',
+        url: '/search_object',
         method: 'get',
         params
     })

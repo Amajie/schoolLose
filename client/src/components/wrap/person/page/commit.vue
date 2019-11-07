@@ -4,7 +4,7 @@
             <van-nav-bar
                 @click-left="back"
                 :border="false"
-                title="留言管理"
+                title="评论管理"
             >
                 <van-icon name="arrow-left" slot="left" size="1.5em" color="#fff" />
             </van-nav-bar>
@@ -223,7 +223,7 @@ export default {
 
             commitTag = commitTag.replace(`${cheId}`, `${cheId.substring(0, 6)}-delect-${cheId.substring(6)}`)
 
-            dConfirm('提示', '是否删除该留言').then(() =>{
+            dConfirm('提示', '是否删除该评论').then(() =>{
                 delectMyCommit({
                     commitId,
                     commitTag
@@ -252,10 +252,10 @@ export default {
             $refs.commitNode.focus()
             const commitTime = Date.now()
             if(!commit){
-                return tText('请输入留言内容')
+                return tText('请输入评论内容')
             }
 
-            this.rCommit({
+            this.insertCommit({
                 infoUserId,
                 infoId,
                 fromId: cheId,
@@ -268,7 +268,7 @@ export default {
                 console.log(res)
                 const {code, commitId} = res.data
 
-                if(code === 0) return tText('留言失败，请稍后再试')
+                if(code === 0) return tText('评论失败，请稍后再试')
 
                 let arrData = {}
                 
@@ -296,7 +296,7 @@ export default {
                 }
 
                 //此时要把新的数据 添加早新的评论数组中
-                //要根据是回复还是 留言
+                //要根据是回复还是 评论
                 this.commit = ''
                 this.saveCommit = ''
                 // 隐藏发布按钮

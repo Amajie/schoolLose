@@ -6,7 +6,6 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
     state: sessionStorage.getItem('c_state') ? JSON.parse(sessionStorage.getItem('c_state')):{
-        remeberCount: false,
         lodingETag: false,
         lodingSTag: false,
         userData: {},
@@ -95,7 +94,7 @@ const store = new Vuex.Store({
             sessionStorage.removeItem('c_state')
             cookie.remove('c_che_token')
             store.replaceState(JSON.parse(sessionStorage.getItem('c_empty_state')))
-            $router.replace({name: 'Login', params:{logoutTag: state.remeberCount}})
+            $router.replace('/login')
         }
     },
     actions:{

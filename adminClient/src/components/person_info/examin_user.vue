@@ -94,8 +94,6 @@
         <div class="page">
             <div>
                 <el-pagination
-                  @prev-click="handlePage(false)"
-                  @next-click="handlePage(true)"
                   @current-change="handleCPage"
                   background
                   :page-size="pageSize"
@@ -110,7 +108,7 @@
     </div>
 </template>
 <script>
-import NoData from '../info_show/no_data.vue'
+import NoData from '../common/no_data.vue'
 export default {
   data() {
     return {
@@ -134,7 +132,7 @@ export default {
   
   methods: {
     getInfo(condition){
-      this.aUserInfo({condition: JSON.stringify(condition)}).then(res =>{
+      this.examineUser({condition: JSON.stringify(condition)}).then(res =>{
         const {total, userData} = res.data
         if(!total) return console.log('没有数据')
         // 此时只有初始化才会设置总页数
@@ -190,7 +188,7 @@ export default {
         passStep: 2// 通过
       }
 
-      this.aUpUInfo({
+      this.updataUser({
           _id: row._id,
           email: row.email,
           remindInfo,
@@ -219,20 +217,8 @@ export default {
         })
       })
     },
-
-    // true 下一页 false 上一页
-    handlePage(tag){
-      if(tag){
-        this.page++
-      }else{
-        this.page--
-      }
-      const {userData, pageSize, page} = this
-      this.userPageData = userData.slice(page*pageSize, (page+1)*pageSize)
-    },
-    // 直接点击页码
+    // 页码改变的时候触发
     handleCPage(page){
-
       const {userData, pageSize} = this
       this.userPageData = userData.slice((page - 1)*pageSize, page*pageSize)
     }

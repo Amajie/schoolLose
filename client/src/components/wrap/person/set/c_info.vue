@@ -32,7 +32,6 @@
                     <van-field
                         clearable
                         :label="labelStId"
-                        type="number"
                         v-model="stId"
                         placeholder="请如实填写"
                     />
@@ -104,8 +103,6 @@
                         upload-text="上传证件照"
                         :max-count="2"
                         :preview-full-image="false"
-                        :after-read="afterRead"
-                        :before-read="beforeRead"
                     />
                 </div>
             </div>
@@ -209,6 +206,7 @@ export default {
             genderData: ['男', '女'],
             credePic: [],
             userType: '',
+            statusReg: /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/,
 
             //label 文字
             labelStId: '学号',
@@ -305,7 +303,7 @@ export default {
             let formData = new FormData()
             //获取相应的数据
             const {name, stId, gender, courtyard, userData, userType, credePic, handleRouter, setState,
-                major, classes, address, cInfo, tText, dAlert} = this
+                major, classes, address, statusReg, cInfo, tText, dAlert} = this
             
             if(!name || !stId || !gender || !address ||
                 (userType === 1 && !classes) ||
@@ -313,6 +311,9 @@ export default {
                 ((userType === 1 || userType === 2) && !courtyard)
             ){
                 return tText('内容不能为空')
+            }else if(userType === 3 && !statusReg.test(stId)){
+                console.log(statusReg.test(stId))
+                return tText('身份格式不正确')
             }else if(!credePic.length){
                 return tText('请上传证件照')
             }
@@ -348,17 +349,7 @@ export default {
                     handleRouter({})
                 })
             })
-        },
-
-        //图片读取前调用
-        beforeRead(file){
-            return true
-        },
-        //图片读取完毕 限制图片个数为 1
-        afterRead(){
-            // this.credePic = this.credePic.slice(-1)
-            console.log(this.credePic)
-        },
+        }
     }
 }
 </script>

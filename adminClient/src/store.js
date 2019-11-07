@@ -29,7 +29,7 @@ const store = new Vuex.Store({
 
         searchTotal: 0,
 
-        pageSize: 2, //每一页展示几条
+        pageSize: 1, //每一页展示几条
 
         //学院
         courtyardData: {},

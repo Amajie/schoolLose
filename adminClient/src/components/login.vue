@@ -65,11 +65,11 @@
         sendLogin(adminName, encrypt(adminPassword))
      },
      sendLogin(adminName, adminPassword){
-        const {lAdmin,
+        const {adminLogin,
           $message, $alert, encrypt, cookie, $store, $router} = this
         
         // 密码加密
-        lAdmin({
+        adminLogin({
          adminName,
          adminPassword
         }).then(res =>{
@@ -110,7 +110,6 @@
       
       next(vm =>{
         const {cookie, sendLogin, decrypt, $store} = vm
-        debugger
         const token = cookie.get('a_che_token')
         const name = cookie.get('a_che_in')
         const paw = cookie.get('a_che_id')

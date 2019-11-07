@@ -99,9 +99,9 @@ export const cEmail = data =>{
  * @function 获取个人信息是否被激活
  * @param {*} params 发送的数据
  */
-export const getUInfo = params =>{
+export const getAuthoryTag = params =>{
     return notService({
-        url: '/gi',
+        url: '/get_authory',
         method: 'get',
         params
     })
@@ -151,9 +151,9 @@ export const upAvater = data =>{
  * @function 寻物消息的发布
  * @param {*} data 发送的数据
  */
-export const reObject = data =>{
+export const insertObject = data =>{
     return sendService({
-        url: '/reObject',
+        url: '/insert_object',
         method: 'post',
         data
     })
@@ -163,9 +163,9 @@ export const reObject = data =>{
  * @function 寻物消息的更新
  * @param {*} data 发送的数据
  */
-export const upObject = data =>{
+export const editObject = data =>{
     return sendService({
-        url: '/upObject',
+        url: '/edit_Object',
         method: 'post',
         data
     })
@@ -179,7 +179,7 @@ export const upObject = data =>{
  */
 export const deObject = params =>{
     return sendService({
-        url: '/deObject',
+        url: '/de_object',
         method: 'get',
         params
     })
@@ -205,7 +205,7 @@ export const gInfo = params =>{
  */
 export const getDetail = params =>{
     return entryService({
-        url: '/fDetailInfo',
+        url: '/get_detail',
         method: 'get',
         params
     })
@@ -270,6 +270,7 @@ export const getMyCommit = params =>{
         params
     })
 }
+
 /**
  * @function 留言删除
  * @param {*} params 发送的数据
@@ -287,9 +288,9 @@ export const delectMyCommit = params =>{
  * @function 首页消息的查找
  * @param {*} params 发送的数据
  */
-export const gHomeInfo = params =>{
+export const gHomeData = params =>{
     return notService({
-        url: '/home_f_info',
+        url: '/get_home_data',
         method: 'get',
         params
     })
@@ -300,9 +301,9 @@ export const gHomeInfo = params =>{
  * @function 消息的搜索 此时应该只有 内容区显示加载 后面再改
  * @param {*} params 搜索的限制条件
  */
-export const gSearchInfo = params =>{
+export const searchObject = params =>{
     return notService({
-        url: '/search_f_info',
+        url: '/search_object',
         method: 'get',
         params
     })
@@ -313,9 +314,9 @@ export const gSearchInfo = params =>{
  * @function 写留言
  * @param {*} data 发送的数据
  */
-export const rCommit = data =>{
+export const insertCommit = data =>{
     return sendService({
-        url: '/rCommit',
+        url: '/insertCommit',
         method: 'post',
         data
     })
@@ -324,9 +325,9 @@ export const rCommit = data =>{
  * @function 查找留言
  * @param {*} params 发送的数据
  */
-export const fCommit = params =>{
+export const getObjectCommit = params =>{
     return notService({
-        url: '/fCommit',
+        url: '/get_object_commit',
         method: 'get',
         params
     })

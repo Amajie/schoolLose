@@ -18,7 +18,6 @@
           </div>
           <ObjectShow v-if="searchOData.length" 
             :object-data="searchOData"
-            @p-n-page="handlePN" 
             @click-page="handleCPage"
             :page-size="pageSize"
             :total="searchTotal"
@@ -29,8 +28,8 @@
 </template>
 <script>
 import {mapState, mapMutations} from 'vuex'
-import ObjectShow from '../info_show/object_info.vue'
-import NoData from '../info_show/no_data.vue'
+import ObjectShow from '../common/object_info.vue'
+import NoData from '../common/no_data.vue'
 export default {
   data() {
     return {
@@ -73,12 +72,12 @@ export default {
     },
 
     searchData(){
-        const {gSearchInfo, objectTypeId, $message,
+        const {searchObject, objectTypeId, $message,
           searchOPage, target, pageSize, setState} = this
 
       
         // 发送请求
-        gSearchInfo({
+        searchObject({
               objectTypeId,
               target,
               page: searchOPage,
@@ -99,108 +98,12 @@ export default {
         })
     },
 
-    //处理上下一夜
-    handlePN(tag){
-      let {setState, searchOPage, searchData} = this
-      // true 即为下一页 false 上一页
-      if(tag){
-        ++searchOPage
-      }else{
-        --searchOPage
-      }
-      this.setState({searchOPage: searchOPage})
-      searchData()
-    },
-
-    // 页码
+    // 页码改变触发
     handleCPage(page){
+      console.log(page)
       this.setState({searchOPage: --page})
       this.searchData()
-    },
-
-    rowClick(row, column, event){
-      const {toggleRow, prevRow, $refs} = this
-      if(prevRow === row){
-        this.toggleRow = !toggleRow
-      }else{
-        this.toggleRow = true
-        prevRow && $refs.table.toggleRowExpansion(prevRow, false)
-        this.prevRow = row
-      }
-      // 展开 关闭
-      $refs.table.toggleRowExpansion(row, this.toggleRow)
-    },
-
-    sendComfirm(row){
-      const {aUpOInfo, $confirm, $alert} = this
-
-      $confirm(`是否通过 ${row.userName} 发布的帖子？`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-      }).then(() => {
-        aUpOInfo({
-          objectId: row.objectId,
-          data: {
-            objectStepTag : 2,
-            objectPassTag : true,
-            objectReason: ''
-          }
-        }).then(res =>{
-          const {code} = res.data
-          if(code === 0) return $alert('操作失败，请稍后重试', '提示', {
-            confirmButtonText: '确定'
-          })
-
-          row.objectPassTag = true
-          row.objectStepTag = 2
-
-          // 通过验证
-          this.$message({
-            message: '已通过帖子发布申请',
-            type: 'success'
-          })
-        })
-      }).catch(() => {
-          console.log('取消')      
-      })
-      
-    },
-    // 处理权限的问题
-    handleAuthory(objectAuthory, row){
-
-      const {searchUData, $message, aUpOInfo} = this
-
-      this.$confirm(objectAuthory?'是否解除该帖子的冻结？':'是否冻结该帖子？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        aUpOInfo({
-          objectId: row.objectId,
-          data:{
-            objectAuthory
-          }
-        }).then(res =>{
-          const {code} = res.data
-          
-          if(!code) return $message('操作失败，请稍后再试')
-
-          // 操作成功了 设置当前的 freezeTag
-          row.objectAuthory = objectAuthory
-
-          if(!objectAuthory) return this.$message('已冻结该帖子')
-          
-          // 成功
-          $message({
-            message: '已成功解冻该帖子',
-            type: 'success'
-          })
-        })
-      }).catch(() => {
-          console.log('取消')       
-      })
-    },
+    }
   },
   watch:{
     keyWord(newData){

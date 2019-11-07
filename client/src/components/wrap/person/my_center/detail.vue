@@ -4,8 +4,11 @@
             <div @click.stop="handleRouter({})" class="left">
                 <icon name="detail_arrow" :w="svg" :h="svg"></icon>
             </div>
-            <div @click.stop="showOption = true" class="right">
+            <div v-if="meTag" @click.stop="showOption = true" class="right">
                 <icon name="more_right" :w="svg" :h="svg"></icon>
+            </div>
+            <div v-else @click.stop="handleCollection" class="right">
+                <icon :name="collectionName" :w="svg" :h="svg"></icon>
             </div>
         </div>
         <div class="swip-wrap">
@@ -45,7 +48,7 @@
             <div class="commit-wrap">
                 <van-sticky @scroll="handleScroll" :offset-top="0">
                     <div class="title">
-                        --- 相关留言 ---
+                        --- 相关评论 ---
                     </div>
                 </van-sticky>
                 <div class="content cell">
@@ -155,11 +158,14 @@ export default {
             commitData: [],
             saveCommit: '',
             commitHolder: '我来说两句',
+            collectionName: 'collection_no',
             toId: '',
             replyCommit: '',
             replyTag: false,
+            meTag: true,
             options:[
-                {name: '转发', id: 1}
+                {name: '删除', id: 1},
+                {name: '添加', id: 2},
             ],
             showOption: false,
             showLoad: false,
@@ -175,7 +181,6 @@ export default {
 
         }
     },
-    inject:['reload'],
     created(){
         this.cheId = this.$route.params.cheId
         this.objectId = this.$route.params.objectId
@@ -214,13 +219,11 @@ export default {
             if(i != -1) this.collectionTag = true
 
             if(cheId != userData.cheId) {
-                const obj = this.collectionTag ? {name: '取消收藏', id: 5} : {name: '收藏', id: 4}
-                this.options.push(obj)
+                const text = this.collectionTag ? 'collection_had' : 'collection_no'
+                this.collectionName = text
+                this.meTag = false
                 return
             }
-
-            this.options.push({name: '删除', id: 2})
-            this.options.push({name: '添加', id: 3})
         },
         //获取详细信息
         handleGetDetail(){
@@ -254,7 +257,7 @@ export default {
             // 暂时不触发 loadData函数
             this.loading = true
 
-            this.fCommit({
+            this.getObjectCommit({
                 infoId: this.$route.params.objectId,
                 page: this.page++,
                 pageNum: this.pageNum
@@ -268,8 +271,6 @@ export default {
                 }
 
                 this.loading = false
-
-                console.log(commitData)
 
                 this.commitData = this.commitData.concat(commitData)
                 
@@ -321,6 +322,11 @@ export default {
         //点击评论 回复
         handlereplyItem(index){
 
+             // 没有获取权限 无法评论
+             // 这里也要 判断一些权限有没有 
+             // 在获取焦点也判断设置 只在那里判断不行 因为这里也会往下执行
+            if(!this.getAuthory()) return
+            
             this.targetData = this.commitData[index]
             const {targetData, tText, $refs, userData} = this
 
@@ -349,10 +355,10 @@ export default {
             $refs.commitNode.focus()
             const commitTime = Date.now()
             if(!commit){
-                return tText('请输入留言内容')
+                return tText('请输入评论内容')
             }
 
-            this.rCommit({
+            this.insertCommit({
                 infoId: objectId,
                 infoUserId: cheId,
                 fromId: userData.cheId,
@@ -362,10 +368,10 @@ export default {
                 commit,
                 commitTime
             }).then(res =>{
-                console.log(res)
+
                 const {code, commitId} = res.data
 
-                if(code === 0) return tText('留言失败，请稍后再试')
+                if(code === 0) return tText('评论失败，请稍后再试')
 
                 let arrData = {}
 
@@ -395,7 +401,7 @@ export default {
                 }
 
                 //此时要把新的数据 添加早新的评论数组中
-                //要根据是回复还是 留言
+                //要根据是回复还是 评论
                 this.commit = ''
                 this.saveCommit = ''
                 // 隐藏发布按钮
@@ -413,14 +419,67 @@ export default {
             // 清空目标人的信息
             this.targetData = null
         },
+        // 处理收藏信息
+        handleCollection(){
+            const {sCollection, rejectCollection, collectionTag} = this
+            
+            // 此时为已经关注 取消关注
+            if(collectionTag) return rejectCollection()
+
+            // 否则没有关注 则关注
+            sCollection()
+        },
+        // 收藏
+        sCollection(){
+            const {userData, maxCLen, objectId, 
+            tText, dConfirm, sendCollection} = this
+            // 判断收藏夹满了没有
+            if(userData.myCollection.length > maxCLen) 
+                return dConfirm('提示', '您的收藏夹满啦，需要清理一下').then(() =>{
+                    handleRouter({url: `/collection`, tag: 'p'})
+                }).catch(() =>{})
+
+            // 发送请求收藏请求
+            const addList = [objectId, ...userData.myCollection]
+            sendCollection({
+                myCollection: addList
+            }).then(res =>{
+                const {code} = res.data
+                if(code === 0) return tText('收藏失败, 请稍后再试')
+                tText(`已收藏`)
+
+                // 把搜藏的物品 id保存
+                userData.myCollection = addList
+                this.collectionName = 'collection_had'
+                this.collectionTag = true
+            })
+        },
+        // 取消搜藏
+        rejectCollection(){
+            const {userData, objectId, tText, sendCollection} = this
+            const i = userData.myCollection.findIndex(item => item === objectId)
+            const reList = userData.myCollection.slice()
+            reList.splice(i, 1)
+
+            sendCollection({
+                myCollection: reList
+            }).then(res =>{
+                const {code} = res.data
+                if(code === 0) return tText('取消失败, 请稍后再试')
+                tText(`已取消收藏`)
+
+                // 把当前的 收藏id移除
+                userData.myCollection = reList
+                this.collectionName = 'collection_no'
+                this.collectionTag = false
+            })
+        },
         // 更多操作
         onSelect(item, index){
             const {deObject, cheId, userData, objectId, maxCLen, sendCollection,  
                     handleRouter, dConfirm, tText, dAlert} = this
             switch(item.id){
-                case 1://转发
-                    break
-                case 2://删除
+                case 1://删除
                     dConfirm('提示', '是否删除该寻物消息?')
                     .then(() =>{
                         deObject({objectId}).then(res =>{
@@ -436,53 +495,12 @@ export default {
                         console.log('取消')
                     })
                     break
-                case 3://添加
+                case 2://添加
                     handleRouter({url: `/c/redata/${cheId}`, tag: 'p'})
                     break
-                case 4://收藏
-
-                    if(userData.myCollection.length > maxCLen) 
-                        return dConfirm('提示', '您的收藏夹满啦，需要清理一下').then(() =>{
-                            handleRouter({url: `/collection`, tag: 'p'})
-                        }).catch(() =>{})
-                    const addList = [objectId, ...userData.myCollection]
-                    sendCollection({
-                        myCollection: addList
-                    }).then(res =>{
-                        const {code} = res.data
-                        if(code === 0) return tText('收藏失败, 请稍后再试')
-                        tText(`已收藏`)
-
-                        // 把搜藏的物品 id保存
-                        userData.myCollection = addList
-                        this.handleCollection(true)
-                    })
-                    break
-                case 5://取消收藏
-                    const i = this.userData.myCollection.findIndex(item => item === objectId)
-                    const reList = this.userData.myCollection.slice()
-                    reList.splice(i, 1)
-
-                    sendCollection({
-                        myCollection
-                    }).then(res =>{
-                        const {code} = res.data
-                        if(code === 0) return tText('取消失败, 请稍后再试')
-                        tText(`已取消收藏`)
-
-                        // 把当前的 收藏id移除
-                        
-                        this.userData.myCollection = reList
-                        this.handleCollection(false)
-                    })
-                    break
+                default:
+                    return
             }
-        },
-        // 收藏和取消收藏
-        handleCollection(tag){
-            this.collectionTag = tag
-            if(tag) return this.options[2] = {name: '取消收藏', id: 7}
-            this.options[2] = {name: '收藏', id: 6}
         },
         loadData(){
             this.handleGetCommit()

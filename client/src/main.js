@@ -21,10 +21,10 @@ Vue.prototype.tText = tText// 轻提示
 
 //请求函数的封装
 import {register, sendEmailCode, checkEmailCode, login,
-  cName, cPaw, cEmail, cInfo, fInfo, upAvater, reObject,
-  upObject, deObject, gInfo, gHomeInfo, gSearchInfo, getDetail, 
-  rCommit, fCommit, concren, getConcren, sendCollection,
-  getCollection, getMyCommit, delectMyCommit, getUInfo, text} from './axios/api.js'
+  cName, cPaw, cEmail, cInfo, fInfo, upAvater, insertObject,
+  editObject, deObject, gInfo, gHomeData, searchObject, getDetail, 
+  insertCommit, getObjectCommit, concren, getConcren, sendCollection,
+  getCollection, getMyCommit, delectMyCommit, getAuthoryTag, text} from './axios/api.js'
 Vue.prototype.register = register//发送注册请求
 Vue.prototype.sendEmailCode = sendEmailCode//发送邮箱验证码
 Vue.prototype.checkEmailCode = checkEmailCode//发送 输入的 验证码
@@ -36,22 +36,22 @@ Vue.prototype.cEmail = cEmail//发送 密码修改请求
 Vue.prototype.cInfo = cInfo//发送 个人信息的修改
 Vue.prototype.fInfo = fInfo//发送 个人信息的获取  （这里没有用到）
 Vue.prototype.upAvater = upAvater//发送 头像的修改
-Vue.prototype.reObject = reObject//发送 寻物消息的添加
-Vue.prototype.upObject = upObject//发送 寻物消息的更新
+Vue.prototype.insertObject = insertObject//发送 寻物消息的添加
+Vue.prototype.editObject = editObject//发送 寻物消息的更新
 Vue.prototype.deObject = deObject//发送 寻物消息的删除
 Vue.prototype.gInfo = gInfo//发送 寻物消息
-Vue.prototype.gHomeInfo = gHomeInfo//发送 首页寻物消息
-Vue.prototype.gSearchInfo = gSearchInfo//发送 搜索
+Vue.prototype.gHomeData = gHomeData//发送 首页寻物消息
+Vue.prototype.searchObject = searchObject//发送 搜索
 Vue.prototype.getDetail = getDetail//发送 详情页
-Vue.prototype.rCommit = rCommit//发送 写留言
-Vue.prototype.fCommit = fCommit//发送 查找留言
+Vue.prototype.insertCommit = insertCommit//发送 写留言
+Vue.prototype.getObjectCommit = getObjectCommit//发送 查找留言
 Vue.prototype.concren = concren//发送 关注请求
 Vue.prototype.getConcren = getConcren//发送 获取关注用户信息
 Vue.prototype.sendCollection = sendCollection//发送 收藏请求
 Vue.prototype.getCollection = getCollection//发送 获取收藏信息
 Vue.prototype.getMyCommit = getMyCommit//发送 获取我的留言信息
 Vue.prototype.delectMyCommit = delectMyCommit//发送 留言删除
-Vue.prototype.getUInfo = getUInfo//发送 个人权限是否通过
+Vue.prototype.getAuthoryTag = getAuthoryTag//发送 个人权限是否通过
 
 Vue.prototype.text = text//发送 密码修改请求
 

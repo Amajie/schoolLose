@@ -1,9 +1,11 @@
 const md5 = require('md5')
 const sendEmail = require('../nodemailer/nodemailer.js')
-
+const mongoose = require('mongoose')
 //数据库信息
 //个人信息表
 const userInfo = require('../mongodb/userInfo.js')
+const reInfo = require('../mongodb/release.js')
+const commitInfo = require('../mongodb/commit.js')
 //邮箱 验证码信息表
 const {emailInfo, emailSchema} = require('../mongodb/email.js')
 //邮箱验证码的类型
@@ -122,15 +124,13 @@ exports.enter = {
     *   5 验证码插入数据库 并发送邮箱验证码 并设置验证码24小时内有效 在这24小时无需要在发送
     */
     sendE:  (req, res) =>{
-        // console.log(req.headers)
         //获取激活邮箱
         const {email} = req.query
         //查看账户 是否绑定账户 是否已经激活
         userInfo.findOne({email}, (err, data) =>{
             
             // 没有绑定账户
-            if(!data) return res.json({"msg": "该邮箱没有绑定任何账户", "code": 0})
-            // if(!data) return res.send('无数据')
+            if(!data) return res.json({"msg": "该邮箱没有绑定任何用户", "code": 0})
     
             
             //为true 说明已经激活 无需在激活
@@ -156,15 +156,8 @@ exports.enter = {
         
                     // 插入验证码失败
                     if(!createDate) return res.json({"msg": "获取验证码失败，请重新获取", "code": -1})
+                    
                     //设置定时时间 24小时 因为mongodb 60s查询一下过期文档 因此 删除会有一点延时 试一下 这个是否可以删除
-                    
-                    
-                    //发送邮箱
-                    // sendEmail(email) //这里可以走通 但是此时不需要发送邮箱 直接看数据库获取验证码 测试即可
-                    //插入数据成功 此时需要返回数据库的 checkId 输入验证码的时候需要带上 查询验证码
-                    // res.json({"msg": "验证码已经发送，请注意查收", "code": 200, checkCode, checkId})
-    
-    
                     emailInfo.createIndexes(emailSchema.index({limeTime : 1}, {expires:120}),
                         function(err, info){
                                                     
@@ -181,7 +174,7 @@ exports.enter = {
                             }
                             console.log(mail)
                             //发送邮箱
-                            // sendEmail(mail) //这里可以走通 但是此时不需要发送邮箱 直接看数据库获取验证码 测试即可
+                            //sendEmail(mail) //这里可以走通 但是此时不需要发送邮箱 直接看数据库获取验证码 测试即可
                             //插入数据成功 此时需要返回数据库的 checkId 输入验证码的时候需要带上 查询验证码
                             res.json({"msg": "验证码已经发送，请注意查收", "code": 200, checkCode, checkId})
                     })
@@ -327,8 +320,6 @@ exports.cUserInfo = {
     /**
     * 
     * @function 修改用户的个人信息
-    *  1 每次修改都是 发送全部的数据 (这个不行 因为有数据不变的话 会更新错误)
-    *  2 想办法解决
     * 
     */
     cUserInfo: (req, res) =>{
@@ -346,10 +337,8 @@ exports.cUserInfo = {
             return res.json({"msg": "修改失败", "code": 0})
         }
         
-        // 此时更新 数据都设置为 passStep: 1
-        // userInfo.updateOne({_id: req.userId}, {...req.body, credePic, passStep: 1}, (err, data) =>{
+        // 此时更新 数据都设置为 authory false passStep: 1
         userInfo.updateOne({_id: req.userId}, {...req.body, credePic, authory: false, passStep: 1}, (err, data) =>{
-            console.log(data)
             if(!data.n) return res.json({"msg": "修改失败", "code": 0})
 
             res.json({"msg": "修改成功", "code": 200, credePic})
@@ -379,5 +368,691 @@ exports.cUserInfo = {
 
 // 我的
 exports.meList = {
+    /**
+     * 头像更换
+     * 
+     */
+    upAvatar: (req, res) =>{
+        if(req.file.filename) {
+            const avater = `http://192.168.43.124:7070/av/${req.file.filename}`
+            userInfo.updateOne({_id: req.userId}, {avater}, (err, data) =>{
+                if(data.n <= 0) return res.json({"msg": "上传失败", "code": 0})
+                
+                res.json({"msg": "上传成功", "code": 200, avater})
+            })
+        }
+    },
+    /**
+     * 个人中心数据的查找
+     */
+    fCenterData: (req, res) =>{
+
+        const {cheId, objectFinish, objectPassTag, 
+                objectStepTag, stopShow} = req.query
     
+        if(!cheId || (cheId && !mongoose.Types.ObjectId.isValid(cheId)))
+            return res.status(404).json({success: false, msg: '访问的页面不存在'})
+            
+        
+        // 默认为未删除
+        const $match = {
+            "objectUserId": mongoose.Types.ObjectId(cheId),
+            "objectDelect": true,
+        }
+    
+        // 是否是需要通过审核的
+        if(objectPassTag){
+            $match.objectPassTag = JSON.parse(objectPassTag)
+        }
+    
+        // 是否需要已经完成的
+        if(objectFinish){
+            $match.objectFinish = JSON.parse(objectFinish)
+        }
+    
+        // 是否需要哪个步骤的
+        if(objectStepTag){
+            $match.objectStepTag = parseInt(objectStepTag)
+        }
+        // 完成列表 需要获取已经完成的
+        if(stopShow){
+            $match.stopShow = parseInt(stopShow)
+        }
+    
+        reInfo.aggregate([
+            {
+                $lookup:{
+                    from: 'users',
+                    localField: 'objectUserId',
+                    foreignField: '_id',
+                    as: 'userData'
+                }
+            },
+            // 此时要根据 这个来排序
+            {$sort:{sendTime: -1}},
+            {$match},
+            { $unwind: "$userData"},
+            {$project:{
+                objectId:"$objectId",
+                objectDesc:"$objectDesc",
+                objectName:"$objectName",
+                objectAddress:"$objectAddress",
+                sendTime:"$sendTime",
+                objectTime:"$objectTime",
+                objectPassTag:"$objectPassTag",
+                objectStepTag:"$objectStepTag",
+                objectFinish:"$objectFinish",
+                objectId:"$objectId",
+                objectTypeId:"$objectTypeId",
+                objectWay:"$objectWay",
+                objectImg:"$objectImg",
+                objectReason:"$objectReason",
+                userName:"$userData.userName",
+                avater:"$userData.avater",
+                cheId:"$userData._id"
+            }}
+        ], (err, data) =>{
+    
+            // 存在数据
+            if(data.length != 0) return res.json({"msg": "查找成功", "code": 200, data})     
+            
+            //不存在数据
+            userInfo.findOne({_id: cheId}, (err, fData) =>{
+                
+                // 用户名 或者 电子邮箱错误错误
+                if(!fData) return res.status(404).json({"msg": "404页面", "code": -1})
+    
+    
+                res.json({
+                    "msg": "没有数据", "code": 1, 
+                    "userInfo": {
+                        userName: fData.userName,
+                        avater: fData.avater
+                    },
+                    "code": 200
+                })
+            })
+        })
+    },
+    // 关注他人
+    concren: (req, res) =>{
+        const {myConcern} = req.body
+        
+        // true 关注 false 取消关注
+    
+        userInfo.updateOne({_id: req.userId}, {myConcern}, (err, data) =>{
+            if(!data.n) return res.json({"msg": "关注失败", "code": 0})
+            res.json({"msg": "关注成功", "code": 200})
+        })
+    },
+    // 我的关注人信息查找
+    getConcren: (req, res) =>{
+        const concrenList = JSON.parse(req.query.concrenList)
+        /**
+         * 循环遍历 关注列表 数组包裹，每一条数据即为{_d: 5da3075072a90339f44cdf1a}
+         */
+    
+         const orArr = concrenList.map(item => {
+             return {_id: item}
+         })
+    
+        userInfo.find({$or: orArr},{
+    
+        }, (err, data) =>{
+            const newData = concrenList.map((key, index) =>{
+    
+                const i = data.findIndex(item =>{
+    
+                    return key === item._id.toString()
+                })
+                return data[i]
+    
+            })
+    
+            const concrenData = newData.map(item =>{
+                return {
+                    userName: item.userName,
+                    avater: item.avater,
+                    cheId: item._id,
+                }
+            })
+    
+            res.json({"msg": "获取成功", "code": 200, concrenData})
+        })
+    },
+    // 搜藏帖子
+    collection: (req, res) =>{
+
+        const {myCollection} = req.body
+    
+        userInfo.update({_id: req.userId}, {myCollection}, (err, data) =>{
+            if(!data.n) return res.json({"msg": "取消失败", "code": 0})
+            res.json({"msg": "取消成功", "code": 200})
+        })
+    },
+
+    // 收藏列表信息的查找
+    getCollection: (req, res) =>{
+        const collectionList = JSON.parse(req.query.collectionList)
+        const orArr = collectionList.map(item => {
+            return {objectId: item}
+        })
+    
+        reInfo.find({$or: orArr}, (err, reData) =>{
+            let arr = []
+            let userArr = []
+            let reArr = []
+    
+            // 先排序
+            const newReData = collectionList.map((key, index) =>{
+    
+                const i = reData.findIndex(item =>{
+    
+                    return key === item.objectId.toString()
+                })
+                return reData[i]
+            })
+          
+            // 这里先排序 帖子顺序
+            newReData.filter(item => {
+                let id = item.objectUserId.toString()
+                const i = arr.indexOf(id)
+                if(i === -1){
+                    arr.push(id)
+                    userArr.push({_id: item.objectUserId})
+                    reArr[reArr.length] = [item]
+                }else{
+                    reArr[i].push(item)
+                }
+            })
+    
+            userInfo.find({$or: userArr}, (err, userData) =>{
+    
+                // 再排个人信息的顺序
+                const newUserData = userArr.map((key, index) =>{
+    
+                    const i = userData.findIndex(item =>{
+                        return key._id.toString() === item._id.toString()
+                    })
+                    return userData[i]
+        
+                })
+    
+                const collectionData = newUserData.map((item, index) => {
+                    const obj = {}
+                    obj.userName = item.userName
+                    obj.avater = item.avater
+                    obj.cheId = item._id
+                    obj.objectData = reArr[index]
+                    return obj
+                })
+    
+                res.json({"msg": "获取成功", "code": 200, collectionData})
+            })
+    
+        })
+    
+    },
+    /**
+     * 留言的插入
+     */
+    insertCommit: (req, res) =>{
+
+        let {toId, fromId} = req.body
+        // 是回复 不需要生成唯一id
+        if(toId){
+            toId = mongoose.Types.ObjectId(toId)
+        // 不是回复 需要生成唯一id
+        }
+    
+        const commitId = getId()
+    
+        commitInfo.create({
+            ...req.body,
+            commitId,
+            toId,
+            fromId: mongoose.Types.ObjectId(fromId)
+        }, (err, data) =>{
+            if(!data) return res.json({"msg": "留言失败", "code": 0})
+            
+            res.json({"msg":"留言成功", "code": 200, "commitData": data, commitId})
+        })
+    },
+    /**
+     * 留言管理的查询
+     */
+    getCommit: (req, res) =>{
+        //这里 要根据这个 数据
+        let {cheId, page, pageNum} = req.query
+    
+        page = parseInt(page)
+        pageNum = parseInt(pageNum)  
+    
+        commitInfo.aggregate([
+            {
+                $lookup:{
+                    from: 'users',
+                    localField: 'fromId',
+                    foreignField: '_id',
+                    as: 'commitData'
+                }
+            },
+            {
+                $lookup:{
+                    from: 'users',
+                    localField: 'toId',
+                    foreignField: '_id',
+                    as: 'replyData'
+                }
+            },
+            {
+                $lookup:{
+                    from: 'users',
+                    localField: 'toId',
+                    foreignField: '_id',
+                    as: 'replyData'
+                }
+            },
+            {$sort: {commitTime: -1}},
+            {$match:{
+                // 此时可以正则表达式
+                commitTag: {$regex: cheId}
+            }},
+            {$skip : pageNum*page},
+            {$limit: pageNum},
+            {$unwind: "$commitData" }
+        ], function(err, data){
+            const commitData = data.map((item, index, array) =>{
+                const {fromId, toId, infoId, infoUserId, commit, commitId, commitTag,
+                     replyCommit, commitTime, commitData, replyData} = item
+    
+                const replyUserInfo = replyData[0]
+                let arrData = {}
+                arrData.fromId = fromId
+                arrData.toId = toId
+                arrData.infoUserId = infoUserId
+                arrData.infoId = infoId
+                arrData.commit = commit
+                arrData.commitId = commitId
+                arrData.commitTag = commitTag
+                arrData.replyCommit = replyCommit
+                arrData.commitTime = commitTime
+    
+                // 评论人的信息 评论人的信息 id不需要了 与上面的fromId 和 toId相同
+                arrData.fromUserName = commitData.userName
+                arrData.fromAvater = commitData.avater
+                arrData.toUserName = ''
+                arrData.toAvater = ''
+                // 没值直接返回
+                if(!replyUserInfo) return arrData
+    
+                //否则返回数据
+                return {
+                    ...arrData, 
+                    toUserName: replyUserInfo.userName,
+                    toAvater: replyUserInfo.avater,
+                }
+            })
+    
+            res.json({"msg": "获取评论成功", "code": 200, commitData})
+        })
+    
+    },
+    /**
+     * 留言删除
+     */
+    dMyCommit: (req, res) =>{
+
+        const {commitId, commitTag} = req.query
+        commitInfo.updateOne({commitId}, {commitTag}, (err, data) =>{
+            if(!data.n) return res.json({"msg": "删除失败，请稍后再试"})
+    
+            res.json({"msg": "修改成功", "code": 200})
+        })
+    
+    }
+}
+
+//个人中心
+exports.centerData = {
+    /**
+     * 详情页查找
+     */
+    getDetail: (req, res) =>{
+        // 此时需要判断以下 这个userId是否符合情况
+        const {objectId, objectUserId} = req.query
+    
+        // 此时要判断 用户的id是否正确
+        reInfo.findOne({
+            objectId, 
+            objectDelect: true,
+            objectUserId: mongoose.Types.ObjectId(objectUserId)
+        }, (err, data) =>{
+            if(!data) return res.json({"msg": "查找失败", "code": 0})
+    
+            res.json({"msg": "查找成功", "code": 200, "detailData": data})
+    
+        })
+    
+    },
+    // 详情页评论的查找
+    getObjectCommit: (req, res) =>{
+        //这里 要根据这个 数据
+        let {infoId, page, pageNum} = req.query
+        page = parseInt(page)
+        pageNum = parseInt(pageNum)
+    
+        commitInfo.aggregate([
+            {
+                $lookup:{
+                    from: 'users',
+                    localField: 'fromId',
+                    foreignField: '_id',
+                    as: 'commitData'
+                }
+            },
+            {
+                $lookup:{
+                    from: 'users',
+                    localField: 'toId',
+                    foreignField: '_id',
+                    as: 'replyData'
+                }
+            },
+            {$match:{infoId}},
+            {$skip : pageNum*page},
+            {$limit: pageNum},
+            {$unwind: "$commitData" }
+        ], function(err, data){
+            console.log(data)
+            const commitData = data.map((item, index, array) =>{
+                const {fromId, toId, infoId, infoUserId, commit, commitId, replyCommit, commitTime, commitData, replyData} = item
+    
+                const replyUserInfo = replyData[0]
+                let arrData = {}
+                arrData.fromId = fromId
+                arrData.toId = toId
+                arrData.infoUserId = infoUserId
+                arrData.infoId = infoId
+                arrData.toId = toId
+                arrData.commit = commit
+                arrData.commitId = commitId
+                arrData.replyCommit = replyCommit
+                arrData.commitTime = commitTime
+    
+                // 评论人的信息 评论人的信息 id不需要了 与上面的fromId 和 toId相同
+                arrData.fromUserName = commitData.userName
+                arrData.fromAvater = commitData.avater
+                arrData.toUserName = ''
+                arrData.toAvater = ''
+                // 没值直接返回
+                if(!replyUserInfo) return arrData
+    
+                //否则返回数据
+                return {
+                    ...arrData, 
+                    toUserName: replyUserInfo.userName,
+                    toAvater: replyUserInfo.avater,
+                }
+            })
+    
+            res.json({"msg": "获取评论成功", "code": 200, commitData})
+        })
+    
+    },
+    /**
+     * 数据的发布和编辑
+     */
+    insertObject: (req, res) =>{
+
+        let objectImg = null
+        // 如果有值 上传图片则
+        if(req.files.length){
+            objectImg = req.files.map(item =>{
+                return `http://192.168.43.124:7070/av/${item.filename}`
+            })
+        //否则显示默认图片
+        }else{
+            objectImg = ['http://192.168.43.124:7070/av/init.png']
+        }
+    
+        reInfo.create({
+            ...req.body, 
+            objectId: getId(), //可以直接获取 不需要定义一个函数
+            objectUserId: mongoose.Types.ObjectId(req.userId), //与用户信息表的userId相同
+            objectImg,
+            objectStepTag: 1
+        },(err, upData) =>{
+            if(!upData) return res.json({"msg": "发布失败", "code": 0})
+            
+            //此时返回数据
+            res.json({"msg": "发布成功", "code": 200})
+        })
+    },
+    // 数据的编辑
+    editObject: (req, res) =>{
+
+        // 因为是数组 因此也不需要在重新设置
+        let objectImg = JSON.parse(req.body.objectImg)
+        let objectId = req.body.objectId
+        // 此时删除这个消息 也可以不用删除 数据一样其他也会更新
+        // delete req.body.objectId
+    
+        // 如果有值 上传图片则
+        if(req.files.length){
+            req.files.map(item =>{
+                objectImg.push(`http://192.168.43.124:7070/av/${item.filename}`)
+            })
+        // 此时只能说 用户删除了所有的图片 显示默认的图片
+        }else if(!objectImg.length){
+            objectImg = ['http://192.168.43.124:7070/av/init.png']
+        }
+    
+        //消息的 id不用在此获取上传过来
+        reInfo.updateOne({
+            objectUserId: mongoose.Types.ObjectId(req.userId),
+            objectId
+        },{...req.body, objectImg, objectStepTag: 1}, (err, upData) =>{
+            // 更新失败 也要的
+            //此时返回数据
+            res.json({"msg": "发布成功", "code": 200})
+        })
+    },
+    // 数据的删除
+    delectObject: (req, res) =>{
+        const {objectId} = req.query
+    
+        //消息的 id不用在此获取上传过来
+        reInfo.updateOne({
+            objectUserId: mongoose.Types.ObjectId(req.userId),
+            objectId,
+        },
+        {objectDelect: false}, (err, upData) =>{
+           
+            if(!upData.n) return res.json({"msg": "删除失败", "code": 0})
+            //此时返回数据
+            res.json({"msg": "发布成功", "code": 200})
+        })
+    },
+    // 个人身份是否通过审核
+    getAuthoryTag: (req, res) =>{
+        userInfo.findOne({_id: req.userId}, (err, data) =>{
+            if(!data) return res.json({"msg": "查询失败", "code": 0, authory: false})
+    
+            res.json({"msg": "查询成功", "code": 200, data, authory: data.authory})
+        })
+    }
+}
+
+// 首页
+exports.homeData = {
+    // 首页数据查找
+    getHomeData: (req, res) =>{
+        let {pageNum, page} = req.query
+    
+        // 因为是字符串
+        pageNum = parseInt(pageNum)
+        page = parseInt(page)
+        reInfo.aggregate([
+            {
+                $lookup:{
+                    from: 'users',
+                    localField: 'objectUserId',
+                    foreignField: '_id',
+                    as: 'userData'
+                }
+            },
+            // 此时要根据 这个来排序
+            {$sort:{sendTime: -1}},
+            {"$match": {
+                objectPassTag: true, // 审核通过
+                objectAuthory: true, // 管理员没有冻结
+                objectFinish : true, // 没有完成的
+                objectDelect : true // 没有删除的
+            }},
+            {$skip : pageNum*page},
+            {$limit: pageNum},
+            { $unwind: "$userData"},
+            {$project:{
+                objectId:"$objectId",
+                objectDesc:"$objectDesc",
+                objectName:"$objectName",
+                objectAddress:"$objectAddress",
+                sendTime:"$sendTime",
+                objectId:"$objectId",
+                objectTypeId:"$objectTypeId",
+                objectWay:"$objectWay",
+                objectImg:"$objectImg",
+                userName:"$userData.userName",
+                freezeTag:"$userData.freezeTag",
+                cheId:"$userData._id"
+            }},
+            // 只能搜素 没有冻结的账号
+            {"$match": {
+                freezeTag: true
+            }},
+        ], (err, data) =>{
+            if(!data.length) return res.json({"msg": "查找成功", "code": 0, homeData: data})
+            res.json({"msg": "查找成功", "code": 200, homeData: data})
+        })
+    },
+    // 发布数据的查找
+    searchObject: (req, res) =>{
+        // target 用户搜索关键字
+        let {target, page, pageNum, upDownTag} = req.query
+        page = parseInt(page)
+        pageNum = parseInt(pageNum)
+    
+        // 正则搜素
+        let regText = ''
+        let $regex = new RegExp(``)
+    
+        // 如果为 存在req.adminGrade则为管理员搜素 
+        // 否则用户搜素 需要搜素没有冻结的
+        let freezeMatch = req.adminGrade ? {}: {
+            // 没有删除
+            objectDelect: true,
+            freezeTag: true
+        }
+    
+    
+        // 如果有关键字 则使用正则
+        if(target){
+            regText = target[0]
+            for(let i = 1; i< target.length; i++){
+                regText += `|${target[i]}`
+            }
+    
+            $regex = new RegExp(`${regText}`, "i")
+        }
+
+        reInfo.aggregate([
+            {
+                $lookup:{
+                    from: 'users',
+                    localField: 'objectUserId',
+                    foreignField: '_id',
+                    as: 'userData'
+                }
+            },
+            // 此时要根据 这个来排序
+            {$sort:{sendTime: parseInt(upDownTag? upDownTag : -1)}},
+            {$match:{
+                // 此时可以正则表达式
+                objectName: {$regex}
+            }},
+            // 可以根据查询
+            {"$match": getMatch(req.query)},
+            { $unwind: "$userData"},
+            {$project:{
+                objectId:"$objectId",
+                objectDesc:"$objectDesc",
+                objectName:"$objectName",
+                objectAddress:"$objectAddress",
+                sendTime:"$sendTime",
+                objectTime:"$objectTime",
+                objectId:"$objectId",
+                objectTypeId:"$objectTypeId",
+                objectWay:"$objectWay",
+                objectImg:"$objectImg",
+                objectStepTag:"$objectStepTag",
+                objectPassTag:"$objectPassTag",
+                objectAuthory:"$objectAuthory",
+                objectFinish:"$objectFinish",
+                objectDelect:"$objectDelect",
+                userName:"$userData.userName",
+                avater:"$userData.avater",
+                cheId:"$userData._id",
+                freezeTag:"$userData.freezeTag",
+                _id:"$__v"
+            }},
+            // 只能搜素 没有冻结的账号
+            {"$match": freezeMatch}
+        ], (err, searchData) =>{
+    
+            const total = searchData.length
+    
+            const newData = searchData.slice(pageNum*page, pageNum*(page+1))
+    
+            //此时可 返回数据 结束加载
+            if(!newData.length) return res.json({"msg": "查找成功", "code": 0, data: [], total})
+            res.json({"msg": "查找成功", "code": 200, data: newData, total})
+        })
+    }
+}
+
+
+function getMatch({startTime, endTime, objectTypeId, objectWay, objectUserId, objectPassTag}){
+
+    const $match = {}
+
+    // 要判断 时间段是否存在
+    if(startTime && endTime){
+        $match.sendTime = {$gte : parseInt(startTime), $lt: parseInt(endTime)}
+    }else if(startTime){
+        $match.sendTime = {$gte : parseInt(startTime), $lt: Date.now()}
+    }else if(endTime){
+        $match.sendTime = {$gte : new Date('2008-01-01 00:00:00').getTime(), $lt: parseInt(endTime)}
+    }else if(objectPassTag){// 如果有传值 即为搜素 普通用户搜素
+        $match.objectPassTag = true
+        $match.objectAuthory = true
+    }
+
+    if(objectTypeId) $match.objectTypeId = objectTypeId
+    if(objectWay) $match.objectWay = objectWay
+    // 因为 objectUserId比较特殊 如果不是 查找的时候需要转为 ObjectId
+    // 因此 需要判断是否符合 mongodb转为 该类型的参数
+    if(objectUserId && mongoose.Types.ObjectId.isValid(objectUserId)) {
+        $match.objectUserId = mongoose.Types.ObjectId(objectUserId)
+    }else if(objectUserId && !mongoose.Types.ObjectId.isValid(objectUserId)){
+        $match.objectUserId = ''// 此时肯定不会搜素到数据
+    }
+
+
+    console.log($match)
+    return $match
+}
+
+function getId(){
+    return (Math.random() + Date.now()).toString(36)
 }

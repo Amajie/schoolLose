@@ -91,7 +91,7 @@ export default {
                     this.userData.myConcern = myC
                     this.reload()
                 })
-            })
+            }).catch(() =>{})
         },
         back(){
            this.$router.go(-1)
