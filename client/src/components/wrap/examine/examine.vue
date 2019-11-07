@@ -19,7 +19,7 @@
                                 <span class="n">{{item.objectName}}</span>
                                 <span class="t" v-if="item.objectFinish">
                                     <b v-if="item.objectStepTag === 1" style="color:#007acc;">待审核</b>
-                                    <b v-else-if="item.objectStepTag === 2" style="color:#07c160;">通过</b>
+                                    <b v-else-if="item.objectStepTag === 2" style="color:#07c160;">已通过</b>
                                     <b v-if="item.objectStepTag === 3" style="color:red;">未通过</b>
                                 </span>
                                 <span class="t">{{item.sendTime | filterTime(false)}}</span>
@@ -225,6 +225,7 @@ export default {
 <style lang="less" scoped>
 #examine{
     .examine-wrap{
+        
         .wrap{
             .title-info{
                 .t{
@@ -253,6 +254,7 @@ export default {
         }
     }
     .empty-end{
+        padding-bottom: 65px;
         .data-end{
             color: #666;
             text-align: center;

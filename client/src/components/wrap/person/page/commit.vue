@@ -83,7 +83,11 @@
             </div>
             <div class="reply-wrap">
                 <div class="c-in">
-                    <van-field ref="commitNode" v-model="commit" :placeholder="commitHolder"
+                    <van-field 
+                        ref="commitNode" 
+                        v-model="commit"
+                        :maxlength="maxCommit"
+                        :placeholder="commitHolder + '--->限制字数'+ maxCommit"
                         type="textarea"
                         autosize
                         rows="1"
@@ -127,7 +131,8 @@ export default {
     inject:['reload'],
     computed:{
         ...mapState([
-            'userData'
+            'userData',
+            'maxCommit'
         ])
     },
     created(){
@@ -308,8 +313,15 @@ export default {
 
         // 关闭输入框
         handleClose(){
+            const {commit, dConfirm} = this
+            if(commit) return dConfirm('提示', '您有评论内容还没有回复，是否继续关闭？')
+            .then(() =>{
+                this.replyTag = false
+                this.commit = ''
+            }).catch(() =>{})
+
+            // 否则直接关闭
             this.replyTag = false
-            this.commitHolder = ''
         },
 
         loadData(){
@@ -329,6 +341,7 @@ export default {
 </script>
 <style lang="less" scoped>
 #commit{
+    padding-bottom: 100px;
     .header{
         .t{
             color: #fff;
@@ -382,6 +395,7 @@ export default {
                     padding: 0 7%;
                     padding-top: 5px;
                     .r{
+                        overflow-wrap: break-word;
                         font-size: 13px;
                         font-weight: bold;
                         color: #444547;

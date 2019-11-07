@@ -111,8 +111,11 @@
         <div @click.stop class="commit-reply">
             <div class="reply-wrap">
                 <div class="c-in">
-                    <van-field ref="commitNode" v-model="commit" :placeholder="commitHolder"
+                    <van-field ref="commitNode" 
+                        v-model="commit" 
+                        :placeholder="commitHolder + '--->限制字数'+ maxCommit"
                         type="textarea"
+                        :maxlength="maxCommit"
                         autosize
                         rows="1"
                         clearable
@@ -194,7 +197,8 @@ export default {
     },
     computed:{
         ...mapState([
-            'userData'
+            'userData',
+            'maxCommit'
         ])
     },
     methods:{                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
@@ -356,6 +360,8 @@ export default {
             const commitTime = Date.now()
             if(!commit){
                 return tText('请输入评论内容')
+            }else if(commit){
+
             }
 
             this.insertCommit({
@@ -586,6 +592,7 @@ export default {
                         padding: 0 7%;
                         padding-top: 5px;
                         .r{
+                            overflow-wrap: break-word;
                             font-size: 13px;
                             font-weight: bold;
                             color: #444547;

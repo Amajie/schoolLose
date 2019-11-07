@@ -10,6 +10,9 @@ const store = new Vuex.Store({
         lodingSTag: false,
         userData: {},
 
+        // 评论的最长字数
+        maxCommit: 88,
+
         homeData: [],
         homePage: 0,
         homePageNum: 4,

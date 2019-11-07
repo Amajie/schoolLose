@@ -79,7 +79,7 @@
                 </van-cell>
             </van-list>
             <Empty v-if="noData" />
-            <div v-else-if="!noData && !homeLoad" class="data-end">
+            <div v-else-if="!noData && homeFinished" class="data-end">
                 到底啦，不能再往下啦~~~
             </div>
             <Load @fresh="getHomeData" v-bind="loadObj" />
@@ -128,7 +128,6 @@ export default {
         ]),
         handleCreated(){
             // 如果有数据不必在获取 此时要看上拉之后是否要继续加载
-            console.log()
             if(this.homeData.length) return this.noData = false
             this.getHomeData()
         },
@@ -157,7 +156,7 @@ export default {
 
                 const {code, homeData} = res.data
 
-                console.log(this.noData, this.homeFinished)
+                
                 // 此时说明数据没有了 因此不比在触发加载事件
                 if(!code){
                     if(this.homeData.length === 0) this.noData = true
@@ -193,6 +192,8 @@ export default {
                 'homePage': 0,
                 'homeFinished': false
             })
+
+            this.noData = true
             this.reload()
         }
     },

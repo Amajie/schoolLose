@@ -24,13 +24,13 @@
             <van-loading size="30px" type="spinner" color="#569cd6" vertical />
         </div>
         <div class="uploader-btn" @click.stop="handleUploader">
-            <van-button type="danger" block>上传头像</van-button>
+            <van-button :disabled="!fileList[0]" type="danger" block>上传头像</van-button>
         </div>
     </div>
 </template>
 
 <script>
-import {mapMutations} from 'vuex'
+import {mapMutations, mapState} from 'vuex'
 export default {
     data(){
         return{
@@ -38,9 +38,14 @@ export default {
             fileList: [],
         }
     },
+    computed:{
+        ...mapState([
+            'userData'
+        ])
+    },
     methods:{
         ...mapMutations([
-            'setUserData',
+            'setState',
             'handleRouter'
         ]),
         //图片读取前调用
@@ -55,13 +60,7 @@ export default {
         },
         handleUploader(){
 
-            const {fileList, $notify, upAvater, setUserData} = this
-            //如果没有选择图片 提示选择图片
-            if(!fileList[0]) return $notify({
-                message:'请选择您的头像',
-                color: '#000',
-                background: '#f3f3f3'    
-            })
+            const {fileList, $notify, $router, upAvater, userData, setState} = this
 
             //否则就上传图片
             let formData = new FormData()
@@ -76,15 +75,18 @@ export default {
                     color: '#000',
                     background: '#f3f3f3'    
                 })
-
-                setUserData({...this.$store.state.userData, avater})
+                setState({userData: {...userData, avater}})
                 //关闭加载图标
                 this.show_loading = false
                 this.fileList = []
+                
                 $notify({
                     message:'上传成功',
                     type: 'info',
-                    background: '#07c160'    
+                    background: '#07c160',
+                    onClose(){
+                        $router.go(-1)
+                    }    
                 })
             })
 
