@@ -19,7 +19,7 @@
           <ObjectShow v-if="searchOData.length" 
             :object-data="searchOData"
             @click-page="handleCPage"
-            :page-size="pageSize"
+            :page-size="searchPageSize"
             :total="searchTotal"
           />
           <NoData :showText="showText" v-else />
@@ -49,7 +49,7 @@ export default {
     ...mapState([
       'searchOData',
       'searchOPage',
-      'pageSize',
+      'searchPageSize',
       'searchTotal',
       'target'
     ])
@@ -73,7 +73,7 @@ export default {
 
     searchData(){
         const {searchObject, objectTypeId, $message,
-          searchOPage, target, pageSize, setState} = this
+          searchOPage, target, searchPageSize, setState} = this
 
       
         // 发送请求
@@ -81,7 +81,7 @@ export default {
               objectTypeId,
               target,
               page: searchOPage,
-              pageNum: pageSize,
+              pageNum: searchPageSize,
         }).then(res =>{
             const {code, data, total} = res.data
 
@@ -100,7 +100,6 @@ export default {
 
     // 页码改变触发
     handleCPage(page){
-      console.log(page)
       this.setState({searchOPage: --page})
       this.searchData()
     }

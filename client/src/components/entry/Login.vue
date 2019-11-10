@@ -39,7 +39,7 @@
                 <van-checkbox v-model="remember">记住我</van-checkbox>
             </div>
             <div class="forget">
-                <router-link to="/couont">忘记密码?</router-link>
+                <router-link to="/forgetpaw">忘记密码?</router-link>
             </div>
         </div>
          <div class="login-btn">
@@ -109,7 +109,6 @@ export default {
                 remember
             }).then(res =>{
                 const {code, token, userData, courtyardData, type_nav} = res.data
-                console.log(userData)
                 
                 if(code === -1) return dAlert('该用户不存在')
                 if(code === -2) return dAlert('该账户已被冻结，请联系管理员解冻').then(() =>{
@@ -119,7 +118,7 @@ export default {
                     this.remember = false
                 })
 
-                if(code === 1) return dConfirm('提示', '该用户还没有激活').then(() =>{
+                if(code === 1) return dConfirm('提示', '该用户还没有激活，或者邮箱已修改，尚未激活，是否前往激活').then(() =>{
                     $router.replace({name: 'CheckEmail'})
                 }).catch(() =>{
 

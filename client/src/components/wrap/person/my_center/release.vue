@@ -7,7 +7,6 @@
                 :border="false"
             >
                 <van-icon name="arrow-left" slot="left" size="2em" color="#fff" />
-                <van-icon name="cross" slot="right" size="2em" color="#fff" />
             </van-nav-bar>
         </div>
         <div class="release-wrap">
@@ -15,10 +14,10 @@
                 <div class="type">
                     <van-row>
                         <van-col span="12">
-                            <van-button block :type="objectWay === '0'? 'info': 'default'" @click.native="objectWay = '0'" square>我是失主</van-button>
+                            <van-button block :type="objectWay? 'info': 'default'" @click.native="objectWay = true" square>我是失主</van-button>
                         </van-col>
                         <van-col span="12">
-                            <van-button block :type="objectWay === '1'? 'info': 'default'" @click.native="objectWay = '1'" square>我是拾主</van-button>
+                            <van-button block :type="!objectWay? 'info': 'default'" @click.native="objectWay = false" square>我是拾主</van-button>
                         </van-col>
                     </van-row>
                 </div>
@@ -114,7 +113,7 @@
             </div>
             <div class="chang_explain">
                 <span class="chang_explain_title">注意：</span>
-                <span class="chang_explain_text">以上信息必须填写才能发布相关信息，走读学生，宿舍地址请填写: 校外居住</span>
+                <span class="chang_explain_text">信息如实填写才能更好的帮助失主和拾主找回物品哟</span>
             </div>
         </div>
     </div>
@@ -126,14 +125,14 @@ export default {
     data(){
         return {
             gg: 0,
-            headerTitle: '消息发布',
+            headerTitle: '帖子发布',
             objectName: '',
             objectAddress: '达南502袋子',
             objectTime: '',
             selectTime: '',
             objectTypeId: '',
             objectType: '',
-            objectWay: '0',
+            objectWay: true,
             sendTime: '',
             objectDesc: '16电子1班值日生捡到的，请联系手机号1876003022',
             objectImg: [],
@@ -177,7 +176,7 @@ export default {
              *      2 是 遍历循环设置数据
              * 
              */
-            this.headerTitle = '消息编辑'
+            this.headerTitle = '帖子编辑'
             this.objectId = params.objectId
 
             // 发送请求获取编辑消息
@@ -272,7 +271,7 @@ export default {
 
             this.upData(formData)
         },
-        //添加数据 1572235928072
+        //添加数据
         addData(formData){
             /**
              * 图片上传 分为编辑 还是添加
@@ -284,7 +283,7 @@ export default {
              *          1 选取 那这就要
              */
 
-            const {objectImg, insertObject, dAlert} = this
+            const {objectImg, insertObject, reSuccess, dAlert} = this
 
             // 发布的时间不能更新
             const currentTime = new Date().getTime()
@@ -299,13 +298,13 @@ export default {
                 const {code} = res.data
                 if(code === 0) return dAlert('发布失败, 请稍后再试')
 
-                dAlert('发布成功')
+                reSuccess('发布成功')
             })
         },
         //更新数据
         upData(formData){
             
-            const {objectImg, dAlert, objectId, sendTime, editObject} = this
+            const {objectImg, dAlert, objectId, sendTime, editObject, reSuccess} = this
             let arrImg = []
 
             //消息的id 路由参数传递
@@ -321,9 +320,24 @@ export default {
                 const {code} = res.data
                 if(code === 0) return dAlert('发布失败, 请稍后再试')
 
-                dAlert('发布成功')
+                reSuccess('更新成功')
             })
 
+        },
+
+        
+        // 成功
+        reSuccess(message){
+            const {$notify, $router} = this
+            $notify({
+                message
+                ,
+                type: 'info',
+                background: '#07c160',
+                onClose(){
+                    $router.go(-1)
+                }    
+            })
         },
 
          /**

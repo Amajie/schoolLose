@@ -239,7 +239,6 @@ export default {
                     adminEmail
                 }).then(res =>{
                     const {code, msg} = res.data
-                    console.log(res)
                     if(code != 200) return $message('操作失败，请稍后再试')
 
                     // 成功

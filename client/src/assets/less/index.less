@@ -6,7 +6,6 @@ html{
         height: 100%;
         #app{
             height: 100%;
-
             //搜索框两边的padding值
             .van-search{
                 padding: 10px 7px;
@@ -116,6 +115,22 @@ html{
                 text-align: center;
                 padding: 5px 0;
             }
+        }
+
+
+
+        // 动画
+        .rl-enter{
+            transform: translateX(100%);
+        }
+        .rl-leave-to{
+            opacity: 0;
+            position: absolute;
+            transform: translateX(-100%);
+        }
+        .rl-enter-active,
+        .rl-leave-active{
+            transition: transform 0.5s;
         }
     }
 }

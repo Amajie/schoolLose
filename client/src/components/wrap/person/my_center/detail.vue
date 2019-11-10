@@ -41,7 +41,7 @@
                     <van-cell title="物品名称" :value="detailData.objectName" size="large" />
                     <van-cell title="丢失时间" :value="detailData.objectTime | filterTime" size="large" />
                     <van-cell title="发布时间" :value="detailData.sendTime | filterTime" size="large" />
-                    <van-cell title="丢失地点" :label="detailData.objectAddress" size="large" />
+                    <van-cell :title="detailData.objectWay?'丢失地点': '拾获地点'" :label="detailData.objectAddress" size="large" />
                     <van-cell title="楼主说明" :label="detailData.objectDesc" size="large" />
                 </div>
             </div>
@@ -178,7 +178,7 @@ export default {
             finished: false,
             detailData: {},
             page: 0,
-            pageNum: 1,
+            pageNum: 10,
             collectionTag: false,
             maxCLen: 15// 收藏的最大长度
 

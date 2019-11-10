@@ -96,9 +96,9 @@ export default {
       examineData: [],
       examinePageData:[],
       page: 0,
-      pageSize: 2,
-      total: 0,
-      pageCount: 0,
+      pageSize: 10,// 每页显示的条数
+      total: 0,// 总条数
+      pageCount: 0, // 总页数
       userType: 1,// 默认学生
       toggleRow: false,
       prevRow: null
@@ -117,9 +117,6 @@ export default {
               
           }).then(res =>{
               const {code, data, total} = res.data
-
-              console.log(data)
-              
 
               // 此时只有初始化才会设置总页数
               this.total = total
@@ -211,10 +208,7 @@ export default {
     // 直接点击页码
     handleCPage(page){
       const {examineData, pageSize} = this
-      // this.page = page
-      console.log(page)
       this.examinePageData = examineData.slice((page - 1)*pageSize, page*pageSize)
-
     }
   },
   filters:{

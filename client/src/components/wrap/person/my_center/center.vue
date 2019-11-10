@@ -14,10 +14,6 @@
                             @click.native="handleRouter({url: `/pSearch/${cheId}`, tag: 'p'})"
                         />
                     </div>
-                    <!-- 这个要根据是主人还是 访客显示不同的图标 -->
-                    <!-- <div @click="handleRouter({url: `/person`, tag: 'p'})" class="left">
-                        <icon name="tip" :w="svg" :h="svg"></icon>
-                    </div> -->
                     <div @click="handleReData" class="left">
                         <icon name="add_info" :w="svg" :h="svg"></icon>
                     </div>

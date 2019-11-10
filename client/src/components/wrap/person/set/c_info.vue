@@ -13,8 +13,8 @@
             <van-steps :active="stepActive">
                 <van-step>信息完善</van-step>
                 <van-step>审核中</van-step>
-                <van-step v-if="currenStep === 2">审核通过</van-step>
-                <van-step v-else-if="currenStep === 1">等待审核结果</van-step>
+                <van-step v-if="userData.passStep === 2">审核通过</van-step>
+                <van-step v-else-if="userData.passStep === 1">等待审核结果</van-step>
                 <van-step v-else>审核未通过</van-step>
             </van-steps>
         </div>
@@ -211,35 +211,12 @@ export default {
             //label 文字
             labelStId: '学号',
             stepActive: 0,
-            currenStep: 0,
             authory: false,
         }
     },
     created(){
-        //设置个人信息 在表中
-        const {userData} = this
-
-        for(let key in userData){
-            this[key] = userData[key]
-            if(key === 'credePic'){
-                this.credePic = userData[key].map(url =>{
-                    return {url}
-                })
-            }
-        }
-
-        this.stepActive = userData.passStep
-        this.currenStep = userData.passStep
-        // 这里 显示审核结果
-        if(userData.passStep === 3){
-            this.stepActive = 2
-        }
-
-        if(this.userType === 2){
-            this.labelStId = '教工号'
-        }else if(this.userType === 3){
-            this.labelStId = '身份证号'
-        }
+        // 初始化数据
+        this.handleCreate()
     },
     computed:{
         ...mapState([
@@ -252,6 +229,36 @@ export default {
             'setState',
             'handleRouter'
         ]),
+
+        // 初始化数据
+        handleCreate(){
+            //设置个人信息 在表中
+            const {userData} = this
+            for(let key in userData){
+                this[key] = userData[key]
+                if(key === 'credePic'){
+                    this.credePic = userData[key].map(url =>{
+                        return {url}
+                    })
+                }
+            }
+
+            // 教工号以及身份证显示
+            if(this.userType === 2){
+                this.labelStId = '教工号'
+            }else if(this.userType === 3){
+                this.labelStId = '身份证号'
+            }
+
+
+            this.stepActive = userData.passStep
+            
+            // 这里 显示审核结果
+            if(userData.passStep === 3){
+                this.stepActive = 2
+                this.dAlert('您提交的身份信息未能通过审核，请查看邮箱，根据具体原因，修改后可再次提交申请')
+            }
+        },
         /**
          * @function 处理专业选项
          *  1 应该只有学院选择了 才能选择专业

@@ -71,7 +71,6 @@
     </div>
 </template>
 <script>
-import {mapState} from 'vuex'
 export default {
     name: 'Register',
     data(){
@@ -105,7 +104,7 @@ export default {
              userType, regEmail, $router, tText,
              dConfirm, dAlert, register,
              encrypt} = this
-            console.log(userName.length)
+             
             //验证 用户填写的信息是否正确
             if(!userName){
                 return tText('用户名不能为空')
@@ -134,7 +133,6 @@ export default {
                 userType
             }).then(res =>{
                 const {code} = res.data
-
                 if(code === 1){
                     dAlert('该用户名已被使用，请您换一个再试试')
                 }else if(code === 0){// 注册失败
@@ -158,19 +156,7 @@ export default {
     },
     beforeRouteEnter (to, from, next) {
         next(vm =>{
-            const {cookie, sendLogin, decrypt, $store} = vm
-            const token = cookie.get('c_che_token')
-            
-            // token 存在 直接返回首页
-            if(token){
-                next('/home')
-            
-            // token不存在 则删除数据
-            }else{
-                sessionStorage.removeItem('c_state')
-                $store.replaceState(JSON.parse(sessionStorage.getItem('c_empty_state')))
-            }
-
+            vm.$store.commit('autoLogin', {vm, next})
         })
     }
 }

@@ -50,7 +50,7 @@
                                     <span>{{item.objectTime | filterTime(false)}}</span>
                                 </p>
                                 <p>
-                                    <span>丢失地点：</span>
+                                    <span>{{item.objectWay?'丢失地点': '拾获地点'}}：</span>
                                     <span>{{item.objectAddress}}</span>
                                 </p>
                                 <p>

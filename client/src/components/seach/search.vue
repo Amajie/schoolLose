@@ -177,9 +177,9 @@ export default {
             objectType: '不限',
             objectTypeId: '',
             selectTile: [
-                { text: '丢失消息', value: 0 },
-                { text: '拾获消息', value: 1 },
-                { text: '全部消息', value: 2 },
+                { text: '丢失帖子', value: 0 },
+                { text: '拾获帖子', value: 1 },
+                { text: '全部帖子', value: 2 }
             ],
             upDownTag: '-1',
             currentDate: new Date(),

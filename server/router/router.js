@@ -1,13 +1,12 @@
 
 const express = require('express')
 const router = express.Router()
-const mongoose = require('mongoose')
-
+const {FORGET_PASSWORD} = require('./CONST.js')
 const multer = require('multer')
 const storage = multer.diskStorage({
     //存储的位置
     destination(req, file, cb){
-        cb(null, 'p/av/')
+        cb(null, `p/${file.fieldname}/`)
     },
     //文件名字的确定 multer默认帮我们取一个没有扩展名的文件名，因此需要我们自己定义
     filename(req, file, cb){
@@ -28,17 +27,22 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage}) 
 
+//个人信息表
+const userInfo = require('../mongodb/userInfo.js')
+//邮箱 验证码信息表
+const {emailInfo, emailSchema} = require('../mongodb/email.js')
+
+
 //路由api
 const {enter, cUserInfo, meList, centerData, homeData} = require('../api/api.js')
 //生成和解析token
 const {checkToken} = require('../checkToken/jwt.js')
 
-const userInfo = require('../mongodb/userInfo.js')
-
 // 注册、登陆、发送激活验证码、验证验证码是否正确
 router.post('/register', enter.register)
 router.get('/login', enter.login)
-router.get('/sendE', enter.sendE)
+router.get('/send_forget_e', enter.sendForgetPassword)
+router.get('/send_active_e', enter.sendActiveE)
 router.get('/checkE', enter.checkE)
 
 
@@ -48,7 +52,7 @@ router.post('/cp', checkToken, cUserInfo.cUserPassword)
 router.post('/ce', checkToken, cUserInfo.cUserEmail)
 router.post('/ci', checkToken, upload.array('uCredePic', 2), cUserInfo.cUserInfo)
 
-router.post('/fi', checkToken, cUserInfo.fUserInfo)
+router.post('/check_authory', checkToken, cUserInfo.checkAuthory)
 
 
 // -----------------------------------------------我的 路由管理
@@ -94,28 +98,6 @@ router.get('/get_home_data', checkToken, homeData.getHomeData)
 // 搜素数据的查找
 router.get('/search_object', checkToken, homeData.searchObject)
 // -----------------------------------------------首页 路由管理
-
-
-const hjInfo = require('../mongodb/hj.js')
-router.get('/hj', (req, res) =>{
-    console.log(req.query)
-    hjInfo.create({name: 'hjj', array:[{name: '车神1', age: 53}]}, (err, data) =>{
-        res.send('插入成功')
-    })
-})
-
-router.get('/hjj', (req, res) =>{
-    hjInfo.update({'array.name': '我是黄杰', 'array.age': 23}, {$set:{'array.$.name': '黄家驹'}}, (err, data) =>{
-        console.log(data)
-    })
-})
-router.get('/hjjj', (req, res) =>{
-    const s = hjInfo.find({})
-    console.log(s)
-})
-
-
-
 
 
 /**

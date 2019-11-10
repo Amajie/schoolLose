@@ -36,7 +36,7 @@
                 </div>
                 <div class="cell-item">
                     <img src="../../../../assets/set/c_email.png" alt="">
-                    <van-cell to="/ce" title-class="text" title="修改邮箱" is-link>
+                    <van-cell @click.native="changeEmail" title-class="text" title="修改邮箱" is-link>
                         <van-icon
                             slot="right-icon"
                             name="arrow"
@@ -62,11 +62,35 @@
 </template>
 
 <script>
+import {mapState, mapMutations} from 'vuex'
 export default {
     data(){
         return{}
     },
+    created(){
+        this.userData.name && !this.userData.authory && this.checkAuthory().then(res =>{
+            const {code, authory, passStep} = res.data
+            console.log(res.data)
+            if(code != 200) return
+            this.setState({userData: {...this.userData, authory, passStep}})
+        })
+    },
+    computed:{
+        ...mapState([
+            'userData'
+        ])
+    },
     methods:{
+        ...mapMutations([
+            'setState'
+        ]),
+        changeEmail(){
+            this.dConfirm('提示', '一旦修改成功，需要重新激活账号才能登陆，是否继续？')
+            .then(() =>{
+                this.$router.push('/ce')
+            })
+            .catch(() =>{})
+        }
     }
 }
 </script>
@@ -76,7 +100,6 @@ export default {
     height: 100%;
     background-color: #f5f5f5;
     .cell-nav{
-         height: 100%;
         padding: 0 2%;
         margin-top: 10px;
         // cell 列表

@@ -20,13 +20,23 @@ export const register = data =>{
 }
 
 
+
 /**
  * @function 获取验证码
  * @param {*} params 发送的数据
  */
-export const sendEmailCode = params =>{
+export const sendActiveCode = params =>{
     return sendService({
-        url: '/sendE',
+        url: '/send_active_e',
+        method: 'get',
+        params
+    })
+}
+
+// 忘记密码
+export const sendForgetPawCode = params =>{
+    return sendService({
+        url: '/send_forget_e',
         method: 'get',
         params
     })
@@ -36,7 +46,6 @@ export const sendEmailCode = params =>{
  * @function 发送前台验证码
  * @param {*} params 发送的数据
  */
-
 export const checkEmailCode = params =>{
     return sendService({
         url: '/checkE',
@@ -124,9 +133,9 @@ export const cInfo = data =>{
  * @function 个人信息的获取
  * @param {*} params 发送的数据
  */
-export const fInfo = params =>{
-    return entryService({
-        url: '/fi',
+export const checkAuthory = params =>{
+    return notService({
+        url: '/check_authory',
         method: 'post',
         params
     })

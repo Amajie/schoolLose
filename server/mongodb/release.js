@@ -25,8 +25,8 @@ const reSchema = new Schema({
         type: String,
         required: true
     },
-    objectWay: {// 拾取 还是丢失
-        type: String,
+    objectWay: {// 拾取 还是丢失 true 丢失 false 拾取
+        type: Boolean,
         required: true
     },
     objectTypeId: {// 类型

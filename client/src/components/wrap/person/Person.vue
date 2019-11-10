@@ -8,7 +8,7 @@
             >
                 <van-icon name="add-o" slot="right" size="2em" color="#fff" />
                 <!-- 这里可以设置一个小红点 说明信息没有完善 -->
-                <van-icon name="setting-o" slot="left" dot size="2em" color="#fff" />
+                <van-icon name="setting-o" slot="left" size="2em" color="#fff" />
             </van-nav-bar>
         </div>
         <div class="p-wrap">

@@ -20,13 +20,14 @@ Vue.prototype.dAlert = dAlert// 确认消息框
 Vue.prototype.tText = tText// 轻提示
 
 //请求函数的封装
-import {register, sendEmailCode, checkEmailCode, login,
-  cName, cPaw, cEmail, cInfo, fInfo, upAvater, insertObject,
+import {register, sendActiveCode, sendForgetPawCode, checkEmailCode, 
+  login, cName, cPaw, cEmail, cInfo, checkAuthory, upAvater, insertObject,
   editObject, deObject, gInfo, gHomeData, searchObject, getDetail, 
   insertCommit, getObjectCommit, concren, getConcren, sendCollection,
   getCollection, getMyCommit, delectMyCommit, getAuthoryTag, text} from './axios/api.js'
 Vue.prototype.register = register//发送注册请求
-Vue.prototype.sendEmailCode = sendEmailCode//发送邮箱验证码
+Vue.prototype.sendActiveCode = sendActiveCode//发送激活账户邮箱验证码
+Vue.prototype.sendForgetPawCode = sendForgetPawCode//发送忘记邮箱验证码
 Vue.prototype.checkEmailCode = checkEmailCode//发送 输入的 验证码
 Vue.prototype.login = login//发送 登陆请求
 Vue.prototype.cName = cName//发送 用户名修改请求
@@ -34,7 +35,7 @@ Vue.prototype.cPaw = cPaw//发送 密码修改请求
 Vue.prototype.cEmail = cEmail//发送 密码修改请求
 Vue.prototype.cEmail = cEmail//发送 密码修改请求
 Vue.prototype.cInfo = cInfo//发送 个人信息的修改
-Vue.prototype.fInfo = fInfo//发送 个人信息的获取  （这里没有用到）
+Vue.prototype.checkAuthory = checkAuthory//发送 个人信息的获取
 Vue.prototype.upAvater = upAvater//发送 头像的修改
 Vue.prototype.insertObject = insertObject//发送 寻物消息的添加
 Vue.prototype.editObject = editObject//发送 寻物消息的更新

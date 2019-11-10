@@ -9,7 +9,7 @@ const commitInfo = require('../mongodb/commit.js')
 //邮箱 验证码信息表
 const {emailInfo, emailSchema} = require('../mongodb/email.js')
 //邮箱验证码的类型
-const {CREGISTER, COURTYARDDATA, TYPE_NAV} = require('../router/CONST.js')
+const {CREGISTER, FORGET_PASSWORD, COURTYARDDATA, TYPE_NAV, AVATER_INIT} = require('../router/CONST.js')
 
 //加密与解密
 const {decrypt, encrypt} = require('../crypto/encrypt.js')
@@ -48,7 +48,7 @@ exports.enter = {
             //加密 保存
             req.body.password = md5(password)
      
-            userInfo.create(req.body, (err, createDate) =>{
+            userInfo.create({...req.body, avater: AVATER_INIT}, (err, createDate) =>{
      
                  // 插入数据失败
                  if(!createDate) return res.json({"msg": "注册失败，请稍后再试", "code": -1})
@@ -73,7 +73,7 @@ exports.enter = {
     */ 
     login: (req, res) =>{
         const {userName, password} = req.query
-    
+        console.log(password)
         userInfo.findOne({$or:[
             {userName},
             {email:userName}
@@ -114,6 +114,74 @@ exports.enter = {
         })
     },
 
+    // 发送忘记密码修改验证码
+    sendForgetPassword: (req, res) =>{
+        //获取 找回密码验证码
+        const {email} = req.query
+        //查看是否有 该用户
+        userInfo.findOne({email}, (err, data) =>{
+            
+            // 没有绑定账户
+            if(!data) return res.json({"msg": "该邮箱没有绑定任何用户", "code": 0})
+    
+            //查看验证码是否已经发送
+            //获取用户的id
+            const checkId = data._id
+            emailInfo.findOne({checkId}, (err, findData) =>{
+    
+                // 已经发送 且有效 无需再次发送
+                if(findData) return res.json({
+                    "msg": "该邮箱的验证码已经发送，可查看邮箱获取验证码", 
+                    "code": 304, 
+                    checkId,
+                    checkTag: FORGET_PASSWORD
+                })
+    
+                // 没有发送或者验证码已经失效 获取验证码
+                const checkCode = Math.random().toString().slice(-6)
+    
+                /*
+                *@function 向数据库插入验证码信息
+                *@params checkId 即用户的 id
+                *@params checkCode 验证码
+                */
+                emailInfo.create({limeTime: new Date(), checkCode, checkId, checkTag: FORGET_PASSWORD}, (err, createDate) =>{
+        
+                    // 插入验证码失败
+                    if(!createDate) return res.json({"msg": "获取验证码失败，请重新获取", "code": -1})
+                    
+                    //设置定时时间 24小时 因为mongodb 60s查询一下过期文档 因此 删除会有一点延时 试一下 这个是否可以删除
+                    emailInfo.createIndexes(emailSchema.index({limeTime : 1}, {expires:120}),
+                        function(err, info){
+                                                    
+                            // 创建一个邮件对象
+                            const mail = {
+                                // 发件人
+                                from: '车神寻物网<651762920@qq.com>', //昵称<发件人邮箱>
+                                // 主题
+                                subject: '修改密码验证码',
+                                // 收件人
+                                to: email,
+                                // 邮件内容，也可以为HTML格式
+                                text: `您修改密码验证码为：${checkCode}, 请24小时内有效，请谨慎保管。` //可以是链接，也可以是验证码
+                            }
+                            console.log(mail)
+                            //发送邮箱
+                            //sendEmail(mail) //这里可以走通 但是此时不需要发送邮箱 直接看数据库获取验证码 测试即可
+                            //插入数据成功 此时需要返回数据库的 checkId 输入验证码的时候需要带上 查询验证码
+                            res.json({
+                                "msg": "验证码已经发送，请注意查收",
+                                "code": 200, 
+                                checkId,
+                                checkTag: FORGET_PASSWORD
+                                
+                            })
+                    })
+                })
+            })
+        })
+    },
+
     /**
     * @function 获取客户端的邮箱 发送邮箱验证码 
     *   1 获取激活的邮箱账户
@@ -123,7 +191,7 @@ exports.enter = {
     *       2 没有发送 获取验证码
     *   5 验证码插入数据库 并发送邮箱验证码 并设置验证码24小时内有效 在这24小时无需要在发送
     */
-    sendE:  (req, res) =>{
+   sendActiveE:  (req, res) =>{
         //获取激活邮箱
         const {email} = req.query
         //查看账户 是否绑定账户 是否已经激活
@@ -142,7 +210,12 @@ exports.enter = {
             emailInfo.findOne({checkId}, (err, findData) =>{
     
                 // 已经发送 且有效 无需再次发送
-                if(findData) return res.json({"msg": "该邮箱的验证码已经发送，可查看邮箱获取验证码", "code": 304, checkId})
+                if(findData) return res.json({
+                    "msg": "该邮箱的验证码已经发送，可查看邮箱获取验证码", 
+                    "code": 304, 
+                    checkId,
+                    checkTag: CREGISTER
+                })
     
                 // 没有发送或者验证码已经失效 获取验证码
                 const checkCode = Math.random().toString().slice(-6)
@@ -176,7 +249,12 @@ exports.enter = {
                             //发送邮箱
                             //sendEmail(mail) //这里可以走通 但是此时不需要发送邮箱 直接看数据库获取验证码 测试即可
                             //插入数据成功 此时需要返回数据库的 checkId 输入验证码的时候需要带上 查询验证码
-                            res.json({"msg": "验证码已经发送，请注意查收", "code": 200, checkCode, checkId})
+                            res.json({
+                                "msg": "验证码已经发送，请注意查收",
+                                "code": 200, 
+                                checkTag: CREGISTER, 
+                                checkId
+                            })
                     })
                 })
             })
@@ -193,25 +271,34 @@ exports.enter = {
     *   4 验证码正确 激活成功 （不需要在还是拿出验证码 因为已经激活 时间到了自然会删除）
     */
     checkE: (req, res) =>{
-        const {checkCode, checkId} = req.query
-    
+        let {checkCode, checkId, checkTag, changeData} = req.query
+
+        changeData = JSON.parse(changeData)
+
+        console.log(changeData)
         // 查询验证码
-        emailInfo.findOne({checkId}, (err, data) =>{
+        emailInfo.findOne({checkId, checkTag}, (err, data) =>{
             // 不存在 提示
             if(!data) return res.json({"msg": "验证码不存在或者已失效，请重新获取", "code": 0})
-    
+
             // 存在 验证是否正确 重新激活
             if(checkCode != data.checkCode) return res.json({"msg": "验证码错误，请重新输入!", "code": 1})
-    
+            
+
+            // 密码存在即为修改密码 现加密 后修改
+            if(changeData.password){
+                changeData.password = md5(changeData.password)
+            }
+
             // 修改用户为激活状态
-            userInfo.updateOne({_id: checkId}, {userActive: true}, (err, upData) =>{
+            userInfo.updateOne({_id: checkId}, changeData, (err, upData) =>{
                 // 激活失败
-                if(upData.nModified <= 0) return res.json({"msg": "激活失败，请重新输入验证码", "code": -1})
-    
+                if(upData.nModified <= 0) return res.json({"msg": "操作失败，请重新输入验证码", "code": -1})
+
                 // 验证码正确  并且修改用户为激活状态
-                emailInfo.deleteOne({checkId, checkTag: CREGISTER}, (err, deleteData) =>{
+                emailInfo.deleteOne({checkId, checkTag}, (err, deleteData) =>{
                     // 激活成功
-                    res.json({"msg": "验证码正确，激活成功", "code": 200})
+                    res.json({"msg": "验证码正确，操作成功", "code": 200})
                 })
             })
         })
@@ -288,8 +375,9 @@ exports.cUserInfo = {
             if(!data) return res.json({"msg": "用户不存在", "code": 1})
             //验证当前旧密码是否错误
             if(data.password != md5(password)) return res.json({"msg": "密码输入错误", "code": 0})
-        
-            userInfo.updateOne({_id: req.userId}, {email}, (err, upData) =>{
+            
+            // 此时设置为未激活状态
+            userInfo.updateOne({_id: req.userId}, {email, userActive: false}, (err, upData) =>{
                 // 更新失败
                 if(upData.nModified <= 0) return res.json({"msg": "修改失败，请稍后再试", "code": -1})
                 
@@ -305,7 +393,7 @@ exports.cUserInfo = {
                     text: `您绑定车神寻物网的账号邮箱已被修改为：${email}，若不是本人所为，请及时登陆修改!` //可以是链接，也可以是验证码
                 }
     
-                console.log('发送提示邮箱成功')
+                console.log(mail)
     
                 //发送有邮件
                 // sendEmail(mail)
@@ -329,7 +417,7 @@ exports.cUserInfo = {
         // 如果有值 上传图片则
         if(req.files.length){
             req.files.map(item =>{
-                credePic.push(`http://192.168.43.124:7070/av/${item.filename}`)
+                credePic.push(`http://192.168.43.124:7070/${item.fieldname}/${item.filename}`)
             })
         // 如果上传图片失败 或者说 证件照长度为 0 即为没有图片
         // 直接返回
@@ -346,11 +434,8 @@ exports.cUserInfo = {
 
     },
 
-    /**
-     * @function 个人信息的获取
-     * 
-     */
-    fUserInfo: (req, res) =>{
+    // 查询身份验证是否通过
+    checkAuthory: (req, res) =>{
 
         userInfo.findOne({_id: req.userId},
             {
@@ -359,9 +444,16 @@ exports.cUserInfo = {
                 userActive: 0
             }
             , (err, userData) =>{
-            if(!userData) return res.json({"msg": "获取信息失败", "code": 0})
+                console.log(userData)
+            if(!userData || userData.passStep === 0 || userData.passStep === 1) 
+                return res.json({"msg": "获取信息失败", "code": 0})
     
-            res.json({"msg": "获取数据成功", "code": 200, userData})
+            res.json({
+                "msg": "获取数据成功", 
+                "code": 200,
+                "authory": userData.authory,
+                "passStep": userData.passStep
+            })
         })
     }
 }
@@ -373,8 +465,9 @@ exports.meList = {
      * 
      */
     upAvatar: (req, res) =>{
+        console.log(req.file)
         if(req.file.filename) {
-            const avater = `http://192.168.43.124:7070/av/${req.file.filename}`
+            const avater = `http://192.168.43.124:7070/${req.file.fieldname}/${req.file.filename}`
             userInfo.updateOne({_id: req.userId}, {avater}, (err, data) =>{
                 if(data.n <= 0) return res.json({"msg": "上传失败", "code": 0})
                 
@@ -809,11 +902,11 @@ exports.centerData = {
         // 如果有值 上传图片则
         if(req.files.length){
             objectImg = req.files.map(item =>{
-                return `http://192.168.43.124:7070/av/${item.filename}`
+                return `http://192.168.43.124:7070/${item.fieldname}/${item.filename}`
             })
         //否则显示默认图片
         }else{
-            objectImg = ['http://192.168.43.124:7070/av/init.png']
+            objectImg = [`http://192.168.43.124:7070/init/init.png`]
         }
     
         reInfo.create({
@@ -841,11 +934,11 @@ exports.centerData = {
         // 如果有值 上传图片则
         if(req.files.length){
             req.files.map(item =>{
-                objectImg.push(`http://192.168.43.124:7070/av/${item.filename}`)
+                objectImg.push(`http://192.168.43.124:7070/${item.fieldname}/${item.filename}`)
             })
         // 此时只能说 用户删除了所有的图片 显示默认的图片
         }else if(!objectImg.length){
-            objectImg = ['http://192.168.43.124:7070/av/init.png']
+            objectImg = [`http://192.168.43.124:7070/init/init.png`]
         }
     
         //消息的 id不用在此获取上传过来

@@ -2,8 +2,13 @@
 * @CONST.js 常量表
 */
 
-//验证注册标志
+// 默认头像
+exports.AVATER_INIT = 'http://192.168.43.124:7070/init/init.png'
+
+// 验证注册标志
 exports.CREGISTER = 'register'
+// 忘记密码
+exports.FORGET_PASSWORD = 'forget_password'
 
 
 // 一下信息应该存在数据库里面

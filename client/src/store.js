@@ -15,16 +15,16 @@ const store = new Vuex.Store({
 
         homeData: [],
         homePage: 0,
-        homePageNum: 4,
+        homePageNum: 16,
         homeFinished: false,
 
         centerData: [],
         centerPage: 0,
-        centerPageNum: 1,
+        centerPageNum: 16,
 
         searchData: [],
         searchPage: 0,
-        searchPageNum: 6,
+        searchPageNum: 16,
         searchFinished: false,
         searchParams: {},
         
@@ -90,6 +90,36 @@ const store = new Vuex.Store({
             console.log(data)
             
         },
+
+        // 需要验证码修改用户信息 处理函数
+        handleCheckCode(state, vm){
+
+            const {checkCode, checkId, $router, checkTag,
+                dAlert, checkEmailCode, changeData, cookie} = vm
+
+            checkEmailCode({
+                checkCode, 
+                checkId,
+                checkTag,
+                changeData
+            }).then(res =>{
+
+                const {code} = res.data
+
+                if(code === 0) return dAlert('验证码不存在或者已失效，请重新获取!')
+
+                if(code === 1) return dAlert('验证码错误，请重新输入!')
+
+                if(code === -1) return dAlert('操作失败，请重新输入验证码!')
+
+                if(code === 200)  return dAlert('验证码正确，激活成功!')
+                    .then(() =>{
+                        //激活成功 前往登陆页面
+                        $router.replace('/login')
+                        cookie.remove('c_che_remeber')
+                    })
+            })
+        },
         // 账户退出
         logoutCount(state, {cookie, $router}){
             
@@ -98,6 +128,22 @@ const store = new Vuex.Store({
             cookie.remove('c_che_token')
             store.replaceState(JSON.parse(sessionStorage.getItem('c_empty_state')))
             $router.replace('/login')
+        },
+
+        // token存在 自动登陆 这是针对 登陆后 不能在访问的路由
+        autoLogin(state, {vm, next}){
+            const {cookie, $store} = vm
+            const token = cookie.get('c_che_token')
+            
+            // token 存在 直接返回首页
+            if(token){
+                next('/home')
+            
+            // token不存在 则删除数据
+            }else{
+                sessionStorage.removeItem('c_state')
+                $store.replaceState(JSON.parse(sessionStorage.getItem('c_empty_state')))
+            }
         }
     },
     actions:{

@@ -42,26 +42,19 @@
     </div>
 </template>
 <script>
-import {mapState, mapMutations} from 'vuex'
 export default {
     data(){
         return{
             email: '',
-            password: ''
+            password: '',
+            regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$")
         }
     },
-    computed:{
-        ...mapState([
-            'regEmail',
-        ])
-    },
+
     methods:{
-        ...mapMutations([
-            'setUserData'
-        ]),
         changeEmail(){
-            const {email, password, cEmail, tText,
-             regEmail, encrypt, setUserData} = this
+            const {email, password, cEmail, tText, dAlert,
+             regEmail, encrypt, $router, setState, cookie} = this
             //验证 用户填写的信息是否正确
             if(!password){
                 return tText('密码不能为空')
@@ -82,10 +75,13 @@ export default {
                 if(code === 1) return tText('该用户不存在')
                 if(code === 0) return tText('密码输入错误')
                 if(code === -1) return tText('修改失败，请稍后再试')
-                tText('修改邮箱成功，要跳转登陆页面')
-                this.password = ''
-                this.email = ''
-                setUserData({...this.$store.state.userData, email})
+                dAlert('修改邮箱成功，需要重新激活').then(() =>{
+                    // 删除 cookie c_che_token
+                    // 删除 c_state
+                    cookie.remove('c_che_token')
+                    sessionStorage.removeItem('c_state')
+                    $router.replace({name: 'CheckEmail', params: {email}})
+                })
             })
             
 

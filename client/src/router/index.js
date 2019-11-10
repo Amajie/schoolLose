@@ -5,6 +5,7 @@ import cookie from 'vue-cookies'
 // 登陆注册
 import Login from '../components/entry/Login.vue'
 import Register from '../components/entry/Register.vue'
+import ForgetPassword from '../components/entry/forger_password.vue'
 import CheckEmail from '../components/entry/Check_email.vue'
 
 // 内容
@@ -64,6 +65,14 @@ const router =  new Router({
         noRequireToken: true,
       },
       component: CheckEmail
+    },
+    {
+      path: '/forgetpaw',
+      name: 'ForgetPassword',
+      meta: {
+        noRequireToken: true,
+      },
+      component: ForgetPassword
     },
     //内容
     {

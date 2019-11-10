@@ -124,7 +124,7 @@
             <ObjectShow v-if="showUObjectTag" 
               :object-data="searchUOData"
               @click-page="handleCPage"
-              :page-size="pageSize"
+              :page-size="searchPageSize"
               :total="searchUOTotal"
               :is-freeze="searchUData.freezeTag"
               :user-tag="true"
@@ -159,7 +159,7 @@
         'showUObjectTag',
         'searchWord',
         'searchUOPage',
-        'pageSize',
+        'searchPageSize',
         'searchUOTotal'
       ])
     },
@@ -245,9 +245,7 @@
               type: 'success'
             })
           })
-        }).catch(() => {
-           console.log('取消')       
-        })
+        }).catch(() => {})
       },
       //通过身份验证
       sendComfirm(){
@@ -279,20 +277,18 @@
               type: 'success'
             })
           })
-        }).catch(() => {
-            console.log('取消')      
-        })
+        }).catch(() => {})
       },
       // 搜素帖子
       searchObjectData(){
           const {searchObject, searchUData,
-           searchUOPage, pageSize, setState} = this
+           searchUOPage, searchPageSize, setState} = this
            
           // 发送请求
           searchObject({
                objectUserId: searchUData._id,
                page: searchUOPage,
-               pageNum: pageSize,
+               pageNum: searchPageSize,
           }).then(res =>{
               const {code, data, total} = res.data
 

@@ -2,20 +2,19 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import cookie from 'vue-cookies'
-import store from '../store.js'
 
 import Wrap from '../components/wrap.vue'
-import ExamineUser from '../components/person_info/examin_user.vue'
-import Examine from '../components/person_info/examine.vue'
-import SearchUser from '../components/person_info/searchUser.vue'
-import searchObject from '../components/person_info/searchObject.vue'
+import ExamineUser from '../components/admin/examin_user.vue'
+import Examine from '../components/admin/examine_object.vue'
+import SearchUser from '../components/admin/searchUser.vue'
+import searchObject from '../components/admin/searchObject.vue'
 
 import Login from '../components/login.vue'
 
 // 高级管理员
-import SeniorAdmin from '../components/person_info/seniorAdmin.vue'
+import SeniorAdmin from '../components/admin/seniorAdmin.vue'
 // 普通管理员
-import GeneralAdmin from '../components/person_info/generalAdmin.vue'
+import GeneralAdmin from '../components/admin/generalAdmin.vue'
 
 Vue.use(Router)
 

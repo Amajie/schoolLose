@@ -13,7 +13,7 @@
         <!-- 验证注册 -->
         <div class="wrap">
             <transition name="rl" mode="out-in">
-                <div v-show="!checkCodeTag" class="email-wrap">
+                <div v-show="!checkTag" class="email-wrap">
                     <div class="ip">
                         <van-cell-group>
                             <van-field v-model="email" clearable placeholder="请输入激活账户绑定的邮箱" />
@@ -25,7 +25,7 @@
                 </div>
             </transition>
             <transition name="rl" mode="out-in">
-                <div v-show="checkCodeTag" class="check-wrap">
+                <div v-show="checkTag" class="check-wrap">
                     <div class="check-code">
                         <van-cell-group>
                             <van-field clearable @input.native="getCheckText" v-model="checkCode" placeholder="请输入6位激活验证码" />
@@ -51,7 +51,7 @@ export default {
             checkCode: '',//验证码
             confirmBtn: true,// 一开始 确认按钮是不可以点击的 只有输入验证码长度够了 才可以点击 
             checkLen: 6, // 验证码长度
-            checkCodeTag: false,// 输入邮箱和验证码界面切换标志位
+            checkTag: '',// 输入邮箱和验证码界面切换标志位
             regEmail: new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$")
         }
     },
@@ -68,16 +68,16 @@ export default {
         /*
         *
         *@function 点击导航栏左按钮 是前往注册页面 还是获取验证码页面
-        *@params checkCodeTag false 注册页面
-        *@params checkCodeTag true 获取验证码页面
+        *@params checkTag false 注册页面
+        *@params checkTag true 获取验证码页面
         * 
         */
 
         backReject(){
-            const { checkCodeTag, $router} = this
+            const { checkTag, $router} = this
 
             //true 
-            if(checkCodeTag) return this.checkCodeTag = !checkCodeTag
+            if(checkTag) return this.checkTag = ''
             //false
             $router.replace('/register')
         },
@@ -88,7 +88,7 @@ export default {
         * 
         */
         handleEmail(){
-            const {email, regEmail,  tText, dAlert, sendEmailCode} = this
+            const {email, regEmail,  tText, dAlert, sendActiveCode} = this
 
             //验证 邮箱输入是否正确
             if(!email){
@@ -98,8 +98,8 @@ export default {
             }
 
             //发送请求
-            sendEmailCode({email}).then(res =>{
-                const {code, checkId} = res.data
+            sendActiveCode({email}).then(res =>{
+                const {code, checkId, checkTag} = res.data
                 
                 if(code === 0) return dAlert('该邮箱没有绑定用户，请确认后再试!')
 
@@ -107,7 +107,7 @@ export default {
 
                 if(code === 304) return dAlert('验证码已经发发送到该邮箱，请查看邮箱是否收到!')
                     .then(() =>{
-                        this.checkCodeTag = true
+                        this.checkTag = checkTag
                         this.checkId = checkId
                     })
 
@@ -115,7 +115,7 @@ export default {
 
                 if(code === 200)  return dAlert('验证码已经发送到该邮箱，请注意查收!')
                     .then(() =>{
-                        this.checkCodeTag = true
+                        this.checkTag = checkTag
                         this.checkId = checkId
                     })
             })
@@ -128,24 +128,13 @@ export default {
         */
         handleCheckCode(){
 
-            const {checkCode, checkId, $router, dAlert, checkEmailCode} = this
-
-            checkEmailCode({checkCode, checkId}).then(res =>{
-
-                const {code} = res.data
-
-                if(code === 0) return dAlert('验证码不存在或者已失效，请重新获取!')
-
-                if(code === 1) return dAlert('验证码错误，请重新输入!')
-
-                if(code === -1) return dAlert('激活失败，请重新输入验证码!')
-
-                if(code === 200)  return dAlert('验证码正确，激活成功!')
-                    .then(() =>{
-                        //激活成功 前往登陆页面
-                        $router.replace('/login')
-                    })
+                
+            this.changeData = JSON.stringify({
+                userActive: true
             })
+            
+            this.$store.commit('handleCheckCode', this)
+           
         },
 
         /*
@@ -178,17 +167,5 @@ export default {
             width: 100%;
         }
     }
-}
-.rl-enter{
-    transform: translateX(100%);
-}
-.rl-leave-to{
-    opacity: 0;
-    position: absolute;
-    transform: translateX(-100%);
-}
-.rl-enter-active,
-.rl-leave-active{
-    transition: transform 0.5s;
 }
 </style>
