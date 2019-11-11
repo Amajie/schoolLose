@@ -7,6 +7,19 @@
 import service from './request.js'
 
 /**
+ * @function 初始化数据
+ * @param {*} params 发送的数据
+ */
+export const initData = params =>{
+    return service({
+        url: '/m_admin',
+        method: 'get',
+        params
+    })
+}
+
+
+/**
  * @function 获取数据
  * @param {*} params 发送的数据
  */

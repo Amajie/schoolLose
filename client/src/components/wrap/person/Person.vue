@@ -131,18 +131,20 @@ export default {
     },
     methods:{
         ...mapMutations([
-            'setUserData',
+            'setState',
             'handleRouter',
             'logoutCount'
         ]),
         handleCreated(){
-            const {getAuthoryTag, userData} = this
-            this.bigAvater[0] = userData.avater
-            if(userData.authory) return
+            const {userData, setState, checkAuthory} = this
             
-            getAuthoryTag().then(res =>{
-                const {authory} = res.data
-                userData.authory = authory
+            userData.name && !userData.authory && checkAuthory()
+            .then(res =>{
+                const {code, authory, passStep} = res.data
+                console.log(code)
+                if(code != 200) return
+
+                setState({userData: {...this.userData, authory, passStep}})
             })
         },
         handleReData(){

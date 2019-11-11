@@ -27,20 +27,13 @@ exports.checkToken = (req, res, next) =>{
      */
 
      // 拿取token 此时不需要判断token是否为 null或者undefined 前端判断即可
-    // const token = req.headers['jie412.com-token']
+    const token = req.headers['jie412.com-token']
     
+    const cookieArr = req.headers.cookie.split("=")
 
-    let token = null
-    const cookieArr = req.headers.cookie.split("; ")
-    // 解析cookie
-    for(var i=0; i<cookieArr.length; i++){
-        let newArr = cookieArr[i].split("=")
-        if(newArr[0].indexOf('che_token') != -1){
-            token = newArr[1]
-        }
-    }
+    const token1 = cookieArr[1]
 
-
+    console.log('sssss: '+token1)
     // 否则解析token
     jwt.verify(token, secretKey, (err, decoded) =>{
         //解析错误 说明为无效token 此时应该要去登陆页面

@@ -546,26 +546,25 @@ exports.meList = {
             }}
         ], (err, data) =>{
     
-            // //不存在数据
-            if(!data || !data.length){
-                return userInfo.findOne({_id: cheId}, (err, fData) =>{
-                    // 用户名 或者 电子邮箱错误错误
-                    if(!fData) return res.status(404).json({"msg": "404页面", "code": -1})
-        
-        
-                    res.json({
-                        "msg": "没有数据", "code": 1, 
-                        "userInfo": {
-                            userName: fData.userName,
-                            avater: fData.avater
-                        },
-                        "code": 200
-                    })
-                })
-            }
-
             // 存在数据
-            res.json({"msg": "查找成功", "code": 200, data})
+            if(data.length != 0) return res.json({"msg": "查找成功", "code": 200, data})     
+            
+            //不存在数据
+            userInfo.findOne({_id: cheId}, (err, fData) =>{
+                
+                // 用户名 或者 电子邮箱错误错误
+                if(!fData) return res.status(404).json({"msg": "404页面", "code": -1})
+    
+    
+                res.json({
+                    "msg": "没有数据", "code": 1, 
+                    "userInfo": {
+                        userName: fData.userName,
+                        avater: fData.avater
+                    },
+                    "code": 200
+                })
+            })
         })
     },
     // 关注他人
@@ -756,9 +755,6 @@ exports.meList = {
             {$limit: pageNum},
             {$unwind: "$commitData" }
         ], function(err, data){
-
-            if(!data) return res.json({"msg": "获取评论成功", "code": 200, commitData: []})
-
             const commitData = data.map((item, index, array) =>{
                 const {fromId, toId, infoId, infoUserId, commit, commitId, commitTag,
                      replyCommit, commitTime, commitData, replyData} = item
@@ -861,9 +857,7 @@ exports.centerData = {
             {$limit: pageNum},
             {$unwind: "$commitData" }
         ], function(err, data){
-            
-            if(!data) return res.json({"msg": "获取评论成功", "code": 200, commitData: []})
-
+            console.log(data)
             const commitData = data.map((item, index, array) =>{
                 const {fromId, toId, infoId, infoUserId, commit, commitId, replyCommit, commitTime, commitData, replyData} = item
     
@@ -1024,8 +1018,7 @@ exports.homeData = {
                 freezeTag: true
             }},
         ], (err, data) =>{
-            if(!data || !data.length) return res.json({"msg": "查找成功", "code": 0, homeData: []})
-
+            if(!data.length) return res.json({"msg": "查找成功", "code": 0, homeData: data})
             res.json({"msg": "查找成功", "code": 200, homeData: data})
         })
     },
@@ -1102,15 +1095,13 @@ exports.homeData = {
             // 只能搜素 没有冻结的账号
             {"$match": freezeMatch}
         ], (err, searchData) =>{
-            
-            if(!searchData || !searchData.length) return res.json({"msg": "查找成功", "code": 0, data: [], total: 0})
-
-            // 否则获取数据
+    
             const total = searchData.length
+    
             const newData = searchData.slice(pageNum*page, pageNum*(page+1))
     
             //此时可 返回数据 结束加载
-            // if(!newData.length) return res.json({"msg": "查找成功", "code": 0, data: [], total})
+            if(!newData.length) return res.json({"msg": "查找成功", "code": 0, data: [], total})
             res.json({"msg": "查找成功", "code": 200, data: newData, total})
         })
     }

@@ -14,10 +14,11 @@ import cookie from 'vue-cookies'
 Vue.prototype.cookie = cookie
 
 //请求函数的封装
-import {createAdmin, adminLogin, getAdmin, 
+import { initData, createAdmin, adminLogin, getAdmin, 
   destroyCount, updataAdmin, examineUser, 
   searchUser, updataUser, examineObject,
   updataObject, searchObject} from './axios/api.js'
+Vue.prototype.initData = initData//初始化数据
 Vue.prototype.createAdmin = createAdmin//用户的创建
 Vue.prototype.updataAdmin = updataAdmin//用户的创建
 Vue.prototype.getAdmin = getAdmin//高级管理员账户的查找

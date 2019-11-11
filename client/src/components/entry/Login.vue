@@ -9,7 +9,7 @@
             </van-nav-bar>
         </div>
         <div class="logo">
-            <img src="../../assets/logo1.jpg" alt="">
+            <img src="http://123.56.22.16:7070/logo/login.jpg" alt="">
         </div>
         <div class="from">
             <!-- 用户名 -->

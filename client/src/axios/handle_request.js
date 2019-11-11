@@ -20,6 +20,7 @@ export const request = ({config, tag, notLoad}) =>{
 
     //此时需要token 后台判断是否需要 token 
     config.headers['jie412.com-token'] = cookie.get('c_che_token')
+    console.log(cookie)
 
     return config
 

@@ -172,7 +172,7 @@ export default {
             ],
             showOption: false,
             showLoad: false,
-            noCommitText: '没有更多了',
+            noCommitText: '暂无用户评论',
             loadObj: {},
             loading: false,
             finished: false,
@@ -277,8 +277,8 @@ export default {
                 this.loading = false
 
                 this.commitData = this.commitData.concat(commitData)
-                
-                if(code === 0 && this.commitData.length === 0) return this.noCommitText = '暂无用户评论'
+
+                if(this.commitData.length) this.noCommitText = '没有更多了'
                 
                 if(commitData.length === 0){
                     this.finished = true
@@ -413,6 +413,7 @@ export default {
                 // 隐藏发布按钮
                 this.replyTag = false
                 this.commitData = [arrData, ...commitData]
+                this.noCommitText = '没有更多了'
                 tText('发表成功')
             })
         },

@@ -68,12 +68,12 @@ export default {
         return{}
     },
     created(){
-        this.userData.name && !this.userData.authory && this.checkAuthory().then(res =>{
-            const {code, authory, passStep} = res.data
-            console.log(res.data)
-            if(code != 200) return
-            this.setState({userData: {...this.userData, authory, passStep}})
-        })
+
+        // this.userData.name && !this.userData.authory && this.checkAuthory().then(res =>{
+        //     const {code, authory, passStep} = res.data
+        //     if(code != 200) return
+        //     this.setState({userData: {...this.userData, authory, passStep}})
+        // })
     },
     computed:{
         ...mapState([

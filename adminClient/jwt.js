@@ -27,8 +27,9 @@ exports.checkToken = (req, res, next) =>{
      */
 
      // 拿取token 此时不需要判断token是否为 null或者undefined 前端判断即可
-    // const token = req.headers['jie412.com-token']
-    
+    //const token = req.headers['jie412.com-token']
+    //const cookieArr = req.headers.cookie.split("=")
+   //const token = cookieArr[1]
 
     let token = null
     const cookieArr = req.headers.cookie.split("; ")
@@ -39,6 +40,8 @@ exports.checkToken = (req, res, next) =>{
             token = newArr[1]
         }
     }
+    
+    console.log(token)
 
 
     // 否则解析token

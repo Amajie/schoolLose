@@ -319,10 +319,11 @@ export default {
             ){
                 return tText('内容不能为空')
             }else if(userType === 3 && !statusReg.test(stId)){
-                console.log(statusReg.test(stId))
                 return tText('身份格式不正确')
             }else if(!credePic.length){
                 return tText('请上传证件照')
+            }else if(credePic.length <2){
+                return tText('证件照需要正反面的清晰图片，请上传两张证件照')
             }
 
             formData.append('name', name)

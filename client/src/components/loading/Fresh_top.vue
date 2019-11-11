@@ -4,7 +4,7 @@
             <img src="../../assets/fresh-btn.png">
             <p>刷新</p>
         </div>
-        <div class="top" @click="() =>{}">
+        <div v-if="false" class="top" @click="() =>{}">
             <img src="../../assets/top.png">
             <p>顶部</p>
         </div>

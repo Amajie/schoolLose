@@ -1,13 +1,12 @@
 import axios from 'axios'
 import {request, requestError, response, responseError} from './handle_request.js'
-// axios.defaults.withCredentials = true
 
 const createObj = {
-    //baseURL: 'http://192.168.43.124:7070',  // 这里即为 url 加上 这里baseURL  即指定了域名和端口 
+    // baseURL: 'http://192.168.43.124:7070',  // 这里即为 url 加上 这里baseURL  即指定了域名和端口 
     baseURL: '/api',
     timeout: 5000,  //请求超时时间
     crossDomain: true,//设置cross跨域
-    withCredentials: true
+    withCredentials: false
 }
 
 const eService = axios.create(createObj)

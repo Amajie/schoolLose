@@ -104,17 +104,6 @@ export const cEmail = data =>{
     })
 }
 
-/**
- * @function 获取个人信息是否被激活
- * @param {*} params 发送的数据
- */
-export const getAuthoryTag = params =>{
-    return notService({
-        url: '/get_authory',
-        method: 'get',
-        params
-    })
-}
 
 /**
  * @function 个人信息的修改

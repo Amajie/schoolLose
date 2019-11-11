@@ -34,6 +34,9 @@
           <div class="a-btn">
             <el-button style="width: 100%;" @click.native="handleLogin" size="medium" type="success">登陆</el-button>
           </div>
+          <div class="a-btn">
+            <el-button style="width: 100%;" @click.native="initAdmin" size="medium" type="success">init</el-button>
+          </div>
         </div>
       </div>
     </div>
@@ -52,6 +55,7 @@
     methods: {
 
       handleLogin(){
+
        const {adminName, adminPassword, encrypt, $message, sendLogin, $msg} = this
 
       // 可以在这里设置想要的密码
@@ -95,6 +99,12 @@
             this.$router.replace('/')
             console.log(4444444444)
         })
+     },
+
+     initAdmin(){
+       this.initData().then(res =>{
+         console.log(res)
+       })
      }
     },
     beforeRouteEnter (to, from, next) {
