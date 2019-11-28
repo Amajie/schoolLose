@@ -33,7 +33,7 @@
                             required
                         />
                     </van-cell-group>
-                    <van-button type="danger" square block @click.native="forgetePaw">修改</van-button>
+                    <van-button type="danger" square block @click.native="forgetePaw">提交</van-button>
                 </div>
             </transition>
 
@@ -45,7 +45,7 @@
                         </van-cell-group>
                     </div>
                     <div class="check-btn">
-                        <van-button type="primary" :disabled="confirmBtn" @click.native="handleCheckCode" :square="true" block>激活</van-button>
+                        <van-button type="primary" :disabled="confirmBtn" @click.native="handleCheckCode" :square="true" block>确认</van-button>
                     </div>
                 </div>
             </transition>
@@ -56,8 +56,8 @@
 export default {
     data(){
         return{
-            email: '2291945117@qq.com',
-            password: '77777777',
+            email: '',
+            password: '',
             checkCode: '',
             checkTag: '',
             confirmBtn: true,

@@ -417,7 +417,7 @@ exports.cUserInfo = {
         // 如果有值 上传图片则
         if(req.files.length){
             req.files.map(item =>{
-                credePic.push(`http://192.168.43.124:7070/${item.fieldname}/${item.filename}`)
+                credePic.push(`http://127.0.0.1:7070/${item.fieldname}/${item.filename}`)
             })
         // 如果上传图片失败 或者说 证件照长度为 0 即为没有图片
         // 直接返回
@@ -467,7 +467,7 @@ exports.meList = {
     upAvatar: (req, res) =>{
         console.log(req.file)
         if(req.file.filename) {
-            const avater = `http://192.168.43.124:7070/${req.file.fieldname}/${req.file.filename}`
+            const avater = `http://127.0.0.1:7070/${req.file.fieldname}/${req.file.filename}`
             userInfo.updateOne({_id: req.userId}, {avater}, (err, data) =>{
                 if(data.n <= 0) return res.json({"msg": "上传失败", "code": 0})
                 
@@ -908,11 +908,11 @@ exports.centerData = {
         // 如果有值 上传图片则
         if(req.files.length){
             objectImg = req.files.map(item =>{
-                return `http://192.168.43.124:7070/${item.fieldname}/${item.filename}`
+                return `http://127.0.0.1:7070/${item.fieldname}/${item.filename}`
             })
         //否则显示默认图片
         }else{
-            objectImg = [`http://192.168.43.124:7070/init/init.png`]
+            objectImg = [`http://127.0.0.1:7070/init/init.png`]
         }
     
         reInfo.create({
@@ -940,11 +940,11 @@ exports.centerData = {
         // 如果有值 上传图片则
         if(req.files.length){
             req.files.map(item =>{
-                objectImg.push(`http://192.168.43.124:7070/${item.fieldname}/${item.filename}`)
+                objectImg.push(`http://127.0.0.1:7070/${item.fieldname}/${item.filename}`)
             })
         // 此时只能说 用户删除了所有的图片 显示默认的图片
         }else if(!objectImg.length){
-            objectImg = [`http://192.168.43.124:7070/init/init.png`]
+            objectImg = [`http://127.0.0.1:7070/init/init.png`]
         }
     
         //消息的 id不用在此获取上传过来
@@ -1102,7 +1102,6 @@ exports.homeData = {
             // 只能搜素 没有冻结的账号
             {"$match": freezeMatch}
         ], (err, searchData) =>{
-            
             if(!searchData || !searchData.length) return res.json({"msg": "查找成功", "code": 0, data: [], total: 0})
 
             // 否则获取数据
@@ -1110,7 +1109,7 @@ exports.homeData = {
             const newData = searchData.slice(pageNum*page, pageNum*(page+1))
     
             //此时可 返回数据 结束加载
-            // if(!newData.length) return res.json({"msg": "查找成功", "code": 0, data: [], total})
+            if(!newData.length) return res.json({"msg": "查找成功", "code": 0, data: [], total})
             res.json({"msg": "查找成功", "code": 200, data: newData, total})
         })
     }

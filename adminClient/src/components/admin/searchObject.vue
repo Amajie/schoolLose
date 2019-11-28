@@ -5,13 +5,6 @@
           <div class="search">
             <div>
               <el-input @keyup.native.enter="handleSearch"  v-model="keyWord" placeholder="请输入关键字" >
-                <el-select
-                  v-model="objectTypeId" slot="prepend" placeholder="请选择">
-                  <el-option 
-                    v-for="(item ,index) in $store.state.type_nav"
-                    :key="index"
-                    :label="item.type" :value="index"></el-option>
-                </el-select>
                 <el-button @click.native="handleSearch" slot="append" icon="el-icon-search"></el-button>
               </el-input>
             </div>

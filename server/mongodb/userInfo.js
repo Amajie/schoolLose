@@ -36,7 +36,8 @@ var userSchema = new Schema({
     },
     avater:{
         type: String,
-        default: 'http://192.168.43.124:7070/av/init.png'
+        // default: 'http://192.168.43.124:7070/av/init.png'
+        default: 'http://127.0.0.1:7070/init/init.png'
     }, //给他一张默认的图片
     myConcern:{
         type: Array,

@@ -134,8 +134,11 @@ export default {
   methods: {
     getInfo(condition){
       this.examineUser({condition: JSON.stringify(condition)}).then(res =>{
+
         const {total, userData} = res.data
-        if(!total) return console.log('没有数据')
+        
+        // 没有数据
+        if(!total) return 
         // 此时只有初始化才会设置总页数
         this.total = total
         this.pageCount = Math.ceil(total/this.pageSize)

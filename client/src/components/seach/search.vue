@@ -329,8 +329,6 @@ export default {
                 showEndTime
             }
 
-            console.log(params)
-
             // 如果是 参在参数cheId 则为用户个人中心搜索 把该用户的id带上
             if(cheId){
                 params.objectUserId = cheId
@@ -357,6 +355,7 @@ export default {
 
                 const {code, data} = res.data
                 this.searchLoad = false
+                console.log(code)
                 // 此时已经没有数据
                 if(code === 0) {
                     //此时 如果没有数据 就 显示提示

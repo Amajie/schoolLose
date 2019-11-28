@@ -192,7 +192,6 @@ export default {
         },
         clearCookie(){
             const {cookie, $store} = this
-
             cookie.remove('c_che_token')
             sessionStorage.removeItem('c_state')
             $store.replaceState(JSON.parse(sessionStorage.getItem('c_empty_state')))
@@ -225,7 +224,6 @@ export default {
             const token = cookie.get('c_che_token')
             const name = cookie.get('c_che_in')
             const paw = cookie.get('c_che_id')
-            const sessionStor = sessionStorage.getItem('c_state')
             // token存在
             if(token && name && paw){
                 console.log('存在token')

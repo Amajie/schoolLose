@@ -2,7 +2,6 @@ import axios from 'axios'
 
 import cookie from 'vue-cookies'
 import store from '../store.js'
-import router from '../router/index.js'
 
 const createObj = {
     //baseURL: 'http://192.168.43.124:7070',  // 这里即为 url 加上 这里baseURL  即指定了域名和端口 
@@ -19,8 +18,6 @@ service.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencod
 
 //请求处理  此时可以把token 保存在session中 并设置过期时间
 service.interceptors.request.use(config =>{
-
-    console.log(config)
 
     store.commit('setState', {fullsLoad: true})
 

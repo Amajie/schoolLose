@@ -23,7 +23,7 @@
                                 lazy></el-image>
                             </el-form-item>
 
-                            <el-form-item label="上传图片">
+                            <el-form-item label="物品图片">
                               <el-image
                                   :src="props.row.objectImg[0]" 
                                   :preview-src-list="props.row.objectImg"

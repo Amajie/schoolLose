@@ -28,21 +28,27 @@
 </template>
 
 <script>
-import {mapMutations} from 'vuex'
+import {mapMutations, mapState} from 'vuex'
 export default {
     data(){
         return{
            userName: ''
         }
     },
+    computed:{
+        ...mapState([
+            'userData'
+        ])
+    },
     methods:{
         
         ...mapMutations([
-            'setUserData',
+            'setState',
             'handleRouter'
         ]),
         changeName(){
-            const {userName, cName, tText, setUserData, handleRouter} = this
+            const {userName, cName, tText, setState, 
+            userData, handleRouter, cookie, encrypt} = this
 
             //验证 用户名是否输入正确
             if(!userName){
@@ -62,7 +68,8 @@ export default {
                 if(code === -1) return tText('修改失败，请稍后再试')
                 
                 tText('修改用户名成功')
-                setUserData({...this.$store.state.userData, userName})
+                setState({userData: {...userData, userName}})
+                cookie.get('c_che_in') && cookie.set('c_che_in', encrypt(userName))
                 handleRouter({})
             })
         }

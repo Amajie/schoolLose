@@ -1,22 +1,15 @@
 <template>
     <div id="fresh-top">
         <div v-if="freshTag" class="fresh" @click="$emit('fresh')">
-            <img src="../../assets/fresh-btn.png">
+            <img src="http://123.56.22.16:7070/init/fresh-btn.png">
             <p>刷新</p>
-        </div>
-        <div v-if="false" class="top" @click="() =>{}">
-            <img src="../../assets/top.png">
-            <p>顶部</p>
         </div>
     </div>
 </template>
 <script>
-
 export default {
     data(){
-        return{
-
-        }
+        return{}
     },
     props:['freshTag']
 }

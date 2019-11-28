@@ -50,7 +50,8 @@ export default {
     },
     methods:{
         changePaw(){
-            const {password, oldPassword, cPaw, tText, encrypt, $router} = this
+            const {password, oldPassword, cPaw, tText, 
+            cookie, encrypt, $router} = this
 
             if(!password){
                 return tText('密码不能为空')
@@ -63,24 +64,18 @@ export default {
             }
 
             cPaw({
-                password: encrypt({w: password, f: 'w'}),
-                oldPassword: encrypt({w: oldPassword, f: 'w'})
+                password: encrypt(password),
+                oldPassword: encrypt(oldPassword)
             }).then(res =>{
                 const {code} = res.data
                 if(code === 1) return tText('该用户不存在')
                 if(code === 0) return tText('当前输入密码错误')
                 if(code === -1) return tText('修改密码失败，请稍后再试')
-                tText('修改密码成功，要跳转登陆页面')
-                this.password = ''
-                this.oldPassword = ''
+                tText('修改密码成功')
+                cookie.get('c_che_id') && cookie.set('c_che_id', encrypt(password))
+                $router.go(-1)
             })
         }
     }
 }
 </script>
-
-<style lang="less" scoped>
-#chang-password{
-
-}
-</style>

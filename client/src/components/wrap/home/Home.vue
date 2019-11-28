@@ -9,14 +9,14 @@
                         background="#008fff"
                     />
                 </div>
-                <div class="left">
+                <!-- <div class="left">
                     <div v-if="isLogin" class="active-no">
                         <span>登陆</span>
                     </div>
                     <div v-if="!isLogin" class="active">
                         <icon name="user_active" :w="svg" :h="svg"></icon>
                     </div>
-                </div>
+                </div> -->
             </van-sticky>
         </div>
         <div class="nav-wrap">
@@ -142,6 +142,7 @@ export default {
 
             this.noData = false
             this.homeLoad = true
+            this.setState({homeFinished: false})
             //发送请求
             this.gHomeData({
                 page: homePage,
@@ -160,12 +161,15 @@ export default {
                 // 此时说明数据没有了 因此不比在触发加载事件
                 if(!code){
                     if(this.homeData.length === 0) this.noData = true
+                    console.log(this.noData)
                     return this.setState({homeFinished: true})
                 }     
 
+                console.log(this.homeFinished)
+
                 this.concatArr({key: 'homeData', data: homeData})
 
-                if(this.homeData.length === 0) this.noData = true
+                // if(this.homeData.length === 0) this.noData = true
                 this.setState({homePage: ++homePage})
                 // 表示 当上拉到底的时候 需要需要在继续触发 loadData函数    
                 this.homeLoad = false

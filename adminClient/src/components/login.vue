@@ -4,7 +4,7 @@
         <div class="logo">
             <el-image
               style="width: 100%; height: 100%"
-              src="http://192.168.43.124:7070/av/che_logo.png"
+              src="http://127.0.0.1:7070/init/che_logo.png"
               fit="fill">
             </el-image>
         </div>
@@ -46,11 +46,9 @@
     data() {
       return {
         adminName: '前端车神',
-        adminPassword:'huang661775'
+        adminPassword:'huang661775',
+        minTime: 60*60*5
       }
-    },
-    created(){
-      console.log(this.$store.state)
     },
     methods: {
 
@@ -58,8 +56,6 @@
 
        const {adminName, adminPassword, encrypt, $message, sendLogin, $msg} = this
 
-      // 可以在这里设置想要的密码
-      // console.log(encrypt('huang661775'))
        // 存在则关闭
        $msg && $msg.close()
 
@@ -68,8 +64,10 @@
        
         sendLogin(adminName, encrypt(adminPassword))
      },
+     
+     // 发送登陆请求
      sendLogin(adminName, adminPassword){
-        const {adminLogin,
+        const {adminLogin, minTime,
           $message, $alert, encrypt, cookie, $store, $router} = this
         
         // 密码加密
@@ -79,7 +77,7 @@
         }).then(res =>{
 
           const {code, token, adminData, type_nav} = res.data
-          console.log(2222222222222222)
+
           if(code === -1) return $message('用户名错误!')
           if(code === -2) return $alert('该管理员账户已被冻结，暂时无法登陆', '提示', {
               confirmButtonText: '确定',
@@ -89,17 +87,24 @@
                 this.adminPassword = ''
             }
           })
-          console.log(3333333333333333333)
+
           if(code === 0) return this.$msg = $message('密码错误!')
             // 设置
             $store.commit('setState', {adminData, type_nav})
-            cookie.set('a_che_token', token, 300)
-            cookie.set('a_che_in', encrypt(adminName), 300)
-            cookie.set('a_che_id', adminPassword, 300)
+            cookie.set('a_che_token', token, minTime)
+            cookie.set('a_che_in', encrypt(adminName), minTime)
+            cookie.set('a_che_id', adminPassword, minTime)
             this.$router.replace('/')
-            console.log(4444444444)
         })
      },
+
+    // 清除cookie数据
+    clearCookie(){
+      const {cookie, $store} = this
+      cookie.remove('c_che_token')
+      sessionStorage.removeItem('c_state')
+      $store.replaceState(JSON.parse(sessionStorage.getItem('c_empty_state')))
+    },
 
      initAdmin(){
        this.initData().then(res =>{
@@ -123,27 +128,17 @@
         const token = cookie.get('a_che_token')
         const name = cookie.get('a_che_in')
         const paw = cookie.get('a_che_id')
-        const sessionStor = sessionStorage.getItem('a_state')
-        
-        // 存在
-        if(token){
-          if(sessionStor){
-            next('/')
-          
-          }else{
-            if(name && paw){
-              sendLogin(decrypt(name), paw)
-            }
-          }
-        //不存在
-        }else{
-          sessionStorage.removeItem('a_state')
-          $store.replaceState(JSON.parse(sessionStorage.getItem('a_empty_state')))
+
+        // token存在
+        if(token && name && paw){
+            console.log('存在token')
+            sendLogin(decrypt(name), paw)
+        //token不存在 或者 token存在 但是用户名 密码不存在 删除cookie信息
+        }else if(!token || !(name && paw)){
+            console.log('不存在token')
+            clearCookie()
         }
       })
-
-
-
     },
     mounted(){
       console.log(this.$store.state)

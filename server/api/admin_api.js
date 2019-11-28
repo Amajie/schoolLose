@@ -13,7 +13,7 @@ const userInfo = require('../mongodb/userInfo.js')
 const reInfo = require('../mongodb/release.js')
 const adminInfo = require('../mongodb/admin.js')
 
-// 审核
+// 获取审核数据
 exports.examineData = {
     // 审核用户
     userData: (req, res) =>{

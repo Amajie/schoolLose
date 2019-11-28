@@ -36,6 +36,9 @@ import Commit from '../components/wrap/person/page/commit.vue'
 //搜素
 import Search from '../components/seach/search.vue'
 
+// 404页面
+import NoPage from '../components/loading/NoPage.vue'
+
 Vue.use(Router)
 
 const router =  new Router({
@@ -206,7 +209,8 @@ const router =  new Router({
     },
     {
       path: '*',
-      redirect: '/home',
+      name: 'NoPage',
+      component: NoPage
     },
   ]
 })

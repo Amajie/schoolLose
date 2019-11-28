@@ -20,7 +20,6 @@ export const request = ({config, tag, notLoad}) =>{
 
     //此时需要token 后台判断是否需要 token 
     config.headers['jie412.com-token'] = cookie.get('c_che_token')
-    console.log(cookie)
 
     return config
 
@@ -64,15 +63,12 @@ export const responseError = error =>{
          * 500错误 应该服务器错误
          * 
          */
-        case 404:  
+        case 500:  
             /**
              * 显示友好页面 但是此时是 根据返回的数据来是否显示404
              * 但是如果此时网络较差的话 还是会显示具体页面在跳转的404页面
              */
-            console.log('页面不存在')
-            router.replace({
-                path:'/home'
-            })
+            console.log('500错误')
         break
     }
 

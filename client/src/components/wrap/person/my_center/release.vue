@@ -159,15 +159,14 @@ export default {
         //初始化一些数据
         handleCreated(){
             const {meta, params} = this.$route
-            const {userData} = this
+            const {userData, $router} = this
             this.addObjectTag = meta.addObjectTag
             //此时要判断 用户的id是否正确 不正确即跳转到404页面
             if(params.cheId != userData.cheId){
-                console.log('用户id不相等，跳转到404页面')
+                $router.push('/404')
             }
-            console.log(meta.addObjectTag)
             //此时是添加
-            if(meta.addObjectTag) return console.log('添加数据')
+            if(meta.addObjectTag) return
 
             /**
              * 1 设置标题

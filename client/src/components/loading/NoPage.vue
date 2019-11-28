@@ -1,11 +1,17 @@
 <template>
-    <div id = "empty">
-        <div class="empty-wrap">
+    <div id = "noPage">
+        <div class="header b">
+            <van-nav-bar
+                :border="false"
+                title="404页面"
+            />
+        </div>
+        <div class="noPage-wrap">
             <div class="t">
-                数据不见了~~~
+               <van-button @click.native="$router.replace('/home')" type="primary">返回首页</van-button>
             </div>
             <div class="i">
-                <img src="http://123.56.22.16:7070/init/empty.png">
+                <img src="http://127.0.0.1:7070/init/noPage.png">
             </div>
         </div>
     </div>
@@ -13,24 +19,20 @@
 <script>
 export default {
     data(){
-        return{
-
-        }
+        return{}
     },
     props: ['loadTag', 'freshTag']
 }
 </script>
 
 <style lang="less" scoped>
-#empty{
-    padding-top: 20px;
-    .empty-wrap{
+#noPage{
+    .noPage-wrap{
+        padding-top: 50px;
         width: 100%;
         .t{
             text-align: center;
-            padding: 10px 0;
-            font-size: 20px;
-            color: #898c8f;
+            padding: 15px 0;
         }
         .i{
             > img{
