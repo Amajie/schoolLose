@@ -6,13 +6,10 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
     state: sessionStorage.getItem('a_state') ? JSON.parse(sessionStorage.getItem('a_state')):{
-    // state:{
         token: '',
-        lodingETag: false,
-        lodingSTag: false,
         adminData: {},
         createCount: [],
-
+        
         fullsLoad: false,
         // 用户
         searchUData: null,
@@ -36,7 +33,7 @@ const store = new Vuex.Store({
         type_nav: {}
     },
     mutations: {
-
+        
         //设置 state属性
         setState(state, setState){
             for(let key in setState){

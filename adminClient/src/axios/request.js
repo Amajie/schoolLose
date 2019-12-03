@@ -1,5 +1,5 @@
 import axios from 'axios'
-
+import $router from '../router/index.js'
 import cookie from 'vue-cookies'
 import store from '../store.js'
 
@@ -34,7 +34,11 @@ service.interceptors.request.use(config =>{
 service.interceptors.response.use(response => {
 
     store.commit('setState', {fullsLoad: false})
-
+    // 说明账户已经在别处登陆过
+    if(response.data.code === 110){
+        alert('该账号已在别处登陆，您已被强制下线！若不是本人操作，请尽快修改密码')
+        store.commit('logoutCount', {cookie, $router})
+    }
     return response
 }, error => {
 

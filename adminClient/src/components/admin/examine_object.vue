@@ -117,13 +117,16 @@ export default {
               
           }).then(res =>{
               const {code, data, total} = res.data
+              
+              if(code === -1) this.$message('获取数据失败！请稍后再试')
 
               // 此时只有初始化才会设置总页数
-              this.total = total
-              this.pageCount = Math.ceil(total/this.pageSize)
-              this.examineData = data
-              this.examinePageData = data.slice(0, this.pageSize)
-              console.log(this.examinePageData)
+              if(code === 200){
+                this.total = total
+                this.pageCount = Math.ceil(total/this.pageSize)
+                this.examineData = data
+                this.examinePageData = data.slice(0, this.pageSize)
+              }
           }, () =>{
               console.log('错误')
           })

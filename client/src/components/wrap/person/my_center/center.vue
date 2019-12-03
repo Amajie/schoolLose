@@ -23,36 +23,27 @@
                 <div class="center-wrap">
                     <div class="center">
                         <div class="center-opa">
-                            <van-row type="flex" justify="center">
-                                <van-col span="6">
-                                    <!-- 头像 -->
-                                    <div class="item">
-                                        <van-image
-                                            round
-                                            width="60"
-                                            height="60"
-                                            fit="cover"
-                                            :src="avater"
-                                        />
-
-                                    </div>
-                                </van-col>
-                                <van-col span="12">
-                                    <!--未登陆显示信息 -->
-                                    <div class="item">
-                                        <p class="un">
-                                            {{userName}}
-                                        </p>
-                                    </div>
-                                </van-col>
-                                <van-col span="3">
-                                    <!--关注 -->
-                                    <div class="item" v-if="!isMyCenter" @click.stop="handleConcren">
-                                        <icon v-if="!concernTag" name="concern" :w="svg" :h="svg"></icon>
-                                        <icon v-else name="concern_active" :w="svg" :h="svg"></icon>
-                                    </div>
-                                </van-col>
-                            </van-row>
+                            <!-- 头像 -->
+                            <div class="item hi">
+                                <van-image
+                                    round
+                                    width="100%"
+                                    height="100%"
+                                    fit="cover"
+                                    :src="avater"
+                                />
+                            </div>
+                            <!--未登陆显示信息 -->
+                            <div class="item info">
+                                <p class="un">
+                                    {{userName}}
+                                </p>
+                            </div>
+                            <!--关注 -->
+                            <div class="item con" v-if="!isMyCenter" @click.stop="handleConcren">
+                                <icon v-if="!concernTag" name="concern" :w="conSvg" :h="conSvg"></icon>
+                                <icon v-else name="concern_active" :w="svg" :h="svg"></icon>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -65,8 +56,8 @@
                 :key="index" >
                 <div class="item_img">
                     <van-image
-                        width="100"
-                        height="100"
+                        width="100%"
+                        height="100%"
                         fit="cover"
                         radius="5"
                         :src="item.objectImg[0]"
@@ -122,6 +113,7 @@ export default {
     data(){
         return{
             svg: 30,
+            conSvg: 35,
             cheId: '',
             userName: '',
             avater: '',
@@ -140,7 +132,6 @@ export default {
         ])
     },
     created(){
-        console.log(this.userData)
         /**
          *  此时这里 需要判断一下如果路由传递过来的 id
          */
@@ -298,21 +289,29 @@ export default {
         transition: all 10s;
         .center-wrap{
             .center{
-                padding: 5px 0;
                 .center-opa{
+                    display: flex;
+                    height: 80px;
+                    .hi{
+                        width: 60px;
+                        margin: 0 20px;
+                    }
+                    .info{
+                        flex: 1;
+                    }
+
+                    .con{
+                        flex: 1;
+                        text-align: center;
+                    }
+
                     .item{
-                        display: flex;
-                        height: 100%;
-                        flex-direction: column;
-                        justify-content: center;
-                        .hi{
-                            width: 60px;
-                            height: 60px;
-                            border-radius: 50%;
-                        }
+                        padding: 10px 0;
+                        height: 60px;
+                        line-height: 60px;
                         .un{
                             color: #ebedf0;
-                            font-size: 20px;
+                            font-size: 25px;
                         }
                     }
                 }

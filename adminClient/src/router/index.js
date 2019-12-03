@@ -7,7 +7,8 @@ import Wrap from '../components/wrap.vue'
 import ExamineUser from '../components/admin/examin_user.vue'
 import Examine from '../components/admin/examine_object.vue'
 import SearchUser from '../components/admin/searchUser.vue'
-import searchObject from '../components/admin/searchObject.vue'
+import SearchObject from '../components/admin/searchObject.vue'
+import ManageData from '../components/admin/manageData.vue'
 
 import Login from '../components/login.vue'
 
@@ -44,8 +45,14 @@ const router =  new Router({
         },
         {
           path: 'si/:key',
-          name: 'searchObject',
-          component: searchObject,
+          name: 'SearchObject',
+          component: SearchObject,
+        },
+        // 数据管理
+        {
+          path: 'da/:key',
+          name: 'ManageData',
+          component: ManageData,
         },
         // 普通管理员
         {

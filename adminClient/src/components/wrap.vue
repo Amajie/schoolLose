@@ -12,8 +12,9 @@
             <el-menu-item index="2">待审核帖子</el-menu-item>
             <el-menu-item index="3">账户搜索</el-menu-item>
             <el-menu-item index="4">帖子搜索</el-menu-item>
+            <el-menu-item index="5">数据管理</el-menu-item>
             <el-menu-item v-if="adminData.adminGrade === 1" index="che_hj">高级管理</el-menu-item>
-            <el-menu-item v-else index="5">个人管理</el-menu-item>
+            <el-menu-item v-else index="6">个人管理</el-menu-item>
         </el-menu>
         <router-view/>
     </div>
@@ -31,6 +32,7 @@ import {mapState} from 'vuex'
     },
     created(){
       // 初始化一些数据
+      console.log(this.adminData)
       this.handleCreate()
     },
     methods: {
@@ -48,7 +50,8 @@ import {mapState} from 'vuex'
         if(key === '2') return $router.replace(`/e/${key}`)
         if(key === '3') return $router.replace(`/su/${key}`)
         if(key === '4') return $router.replace(`/si/${key}`)
-        if(key === '5') return this.$router.replace(`/che_gen`)
+        if(key === '5') return $router.replace(`/da/${key}`)
+        if(key === '6') return this.$router.replace(`/che_gen`)
         // 只有高级管理员才能访问
         if(key === 'che_hj' && adminData.adminGrade === 1){
           $router.replace(`/che_hj`)

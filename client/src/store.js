@@ -17,6 +17,7 @@ const store = new Vuex.Store({
         homePage: 0,
         homePageNum: 16,
         homeFinished: false,
+        type_nav_data: [],
 
         centerData: [],
         centerPage: 0,
@@ -37,8 +38,8 @@ const store = new Vuex.Store({
     },
     mutations: {
         //删除token
-        removeToken(state){
-            localStorage.removeItem('token')
+        removeToken(state, cookie){
+            cookie.remove('c_che_token')
         },
         //设置 state属性
         setState(state, setState){

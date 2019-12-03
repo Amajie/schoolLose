@@ -15,20 +15,14 @@
             <!-- 登陆注册头像 -->
             <div class="p-person">
                 <div @click="handleRouter({url:`/c/center/${userData.cheId}`, tag: 'p'})" class="p-person-opa">
-                    <van-row type="flex" justify="center">
-                        <van-col span="8">
-                            <!-- 头像 -->
-                            <div class="peoson_img" @click.stop="show_img_action = true">
-                                <img :src="userData.avater">
-                            </div>
-                        </van-col>
-                        <van-col span="16">
-                              <!--未登陆显示信息 -->
-                              <div class="person_info">
-                                  <h2 class="t">{{userData.userName}}</h2>
-                              </div>
-                        </van-col>
-                    </van-row>
+                    <!-- 头像 -->
+                    <div class="peoson_img" @click.stop="show_img_action = true">
+                        <img :src="userData.avater">
+                    </div>
+                    <!--未登陆显示信息 -->
+                    <div class="person_info">
+                        <h2 class="t">{{userData.userName}}</h2>
+                    </div>
                 </div>
             </div>
             <div class="cell-nav">
@@ -141,7 +135,6 @@ export default {
             userData.name && !userData.authory && checkAuthory()
             .then(res =>{
                 const {code, authory, passStep} = res.data
-                console.log(code)
                 if(code != 200) return
 
                 setState({userData: {...this.userData, authory, passStep}})
@@ -160,11 +153,25 @@ export default {
          * 
          */
         handleLogout(){
-            const {logoutCount, cookie, $router} = this
-            logoutCount({
-                cookie,
-                $router
-            })
+
+            const {logoutCount, cookie, $router, outCount,
+            dAlert, dConfirm, userData} = this
+            dConfirm('提示', '是否退出当前账号？')
+            .then(() =>{
+                outCount({
+                    userId: userData.cheId
+                }).then(res =>{
+
+                    // 操作失败
+                    if(res.data.code != 200) return dAlert('操作失败，请稍后再试')
+                    // 操作成功
+                    logoutCount({
+                        cookie,
+                        $router
+                    })
+                })
+            })  
+            .catch(() =>{})
         },
                 //这个是 上拉菜单选项框
         onSelect(item){
@@ -184,23 +191,30 @@ export default {
         padding-bottom: 88px;
         .p-person{
             background: #008fff;
-            padding: 15px;
+            
             .p-person-opa{
+                height: 90px;
+                > div{
+                    float: left;
+                    height: 70px;
+                    padding: 10px 0;
+                }
                 .peoson_img{
+                    margin: 0 20px;
                     > img{
-                        width: 85px;
-                        height: 85px;
+                        width: 70px;
+                        height: 70px;
                         border-radius: 50%;
                         max-width: 85px;
                     }
                 }
                 .person_info{
                     display: flex;
-                    height: 100%;
                     flex-direction: column;
                     justify-content: center;
                     .t{
                         color: #ebedf0;
+                        font-size: 25px;
                     }
                 }
             }

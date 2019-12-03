@@ -24,7 +24,7 @@ import {register, sendActiveCode, sendForgetPawCode, checkEmailCode,
   login, cName, cPaw, cEmail, cInfo, checkAuthory, upAvater, insertObject,
   editObject, deObject, gInfo, gHomeData, searchObject, getDetail, 
   insertCommit, getObjectCommit, concren, getConcren, sendCollection,
-  getCollection, getMyCommit, delectMyCommit, text} from './axios/api.js'
+  getCollection, getMyCommit, delectMyCommit, outCount, text} from './axios/api.js'
 Vue.prototype.register = register//发送注册请求
 Vue.prototype.sendActiveCode = sendActiveCode//发送激活账户邮箱验证码
 Vue.prototype.sendForgetPawCode = sendForgetPawCode//发送忘记邮箱验证码
@@ -52,6 +52,7 @@ Vue.prototype.sendCollection = sendCollection//发送 收藏请求
 Vue.prototype.getCollection = getCollection//发送 获取收藏信息
 Vue.prototype.getMyCommit = getMyCommit//发送 获取我的留言信息
 Vue.prototype.delectMyCommit = delectMyCommit//发送 留言删除
+Vue.prototype.outCount = outCount//发送 留言删除
 
 Vue.prototype.text = text//发送 密码修改请求
 
@@ -73,6 +74,10 @@ Vue.component('icon', IconSvg)
 
 // 字体图标库
 import './assets/iconfont/iconfont.css'
+
+// vant 适配
+import 'lib-flexible/flexible'
+
 
 // ui view组件库
 import {Button, Icon, NavBar,

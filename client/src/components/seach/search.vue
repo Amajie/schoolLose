@@ -83,8 +83,8 @@
                     <div class="data_item">
                         <div class="item_img">
                             <van-image
-                                width="100"
-                                height="100"
+                                width="100%"
+                                height="100%"
                                 fit="cover"
                                 radius="5"
                                 :src="item.objectImg[0]"

@@ -63,6 +63,10 @@ export default {
                 return tText('新密码不能和当前密码相同')
             }
 
+            // tText('修改密码成功')
+            // $router.go(-1)
+            // return
+
             cPaw({
                 password: encrypt(password),
                 oldPassword: encrypt(oldPassword)

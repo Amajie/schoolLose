@@ -63,6 +63,11 @@ export default {
             }else if(!regEmail.test(email)){
                 return tText('邮箱格式不正确')
             }
+
+
+            // return dAlert('测试账号不能修改').then(() =>{
+            //     this.$router.go(-1)
+            // })
             
             //发送请求
             cEmail({

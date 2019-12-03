@@ -8,6 +8,7 @@ const reInfo = require('../mongodb/release.js')
 const commitInfo = require('../mongodb/commit.js')
 //邮箱 验证码信息表
 const {emailInfo, emailSchema} = require('../mongodb/email.js')
+const constInfo = require('../mongodb/constant.js')
 //邮箱验证码的类型
 const {CREGISTER, FORGET_PASSWORD, COURTYARDDATA, TYPE_NAV, AVATER_INIT} = require('../router/CONST.js')
 
@@ -72,14 +73,13 @@ exports.enter = {
     *      3 返回token
     */ 
     login: (req, res) =>{
-        const {userName, password} = req.query
-        console.log(password)
+        let {userName, password, token} = req.query
         userInfo.findOne({$or:[
             {userName},
             {email:userName}
         ]}, (err, data) =>{
             
-            // 用户名 或者 电子邮箱错误错误
+            // 用户名 或者 电子邮箱错误
             if(!data) return res.json({"msg": "该用户不存在", "code": -1})
 
             const {
@@ -95,21 +95,40 @@ exports.enter = {
     
             //验证密码是否正确
             if(data.password != md5(password)) return res.json({"msg": "密码错误", "code": 0})
-    
-            // 密码正确 获取token
-            const token = createToken({userName, email, userId: _id})
+            
 
-            res.json({
-                "msg": "密码正确，登陆成功", "code": 200, 
-                token, 
-                userData: {
-                    userName, email, userType, cheId: _id,
-                    avater, name, stId, gender, myConcern, myCollection, 
-                    courtyard, major, classes, address, credePic, passStep,
-                    authory     
+            // 查询数据
+            constInfo.find({$or:[
+                {
+                    constKey: 'type_nav'
                 },
-                courtyardData: COURTYARDDATA,
-                type_nav: TYPE_NAV
+                {
+                    constKey: 'courtyardData'
+                }
+            ]}, (err, constData) =>{
+
+                if(!constData.length) return res.json({"msg": "获取数据失败", "code": 2})
+                let constObj = {}
+                constData.forEach(item =>{
+                    constObj[item.constKey] = item.constVal
+                })
+
+                //获取token
+                token = token ? token : createToken({userName, email, userId: _id})
+
+                res.json({
+                    "msg": "密码正确，登陆成功", "code": 200, 
+                    token, 
+                    userData: {
+                        userName, email, userType, cheId: _id,
+                        avater, name, stId, gender, myConcern, myCollection, 
+                        courtyard, major, classes, address, credePic, passStep,
+                        authory     
+                    },
+                    courtyardData: constObj.courtyardData,
+                    type_nav: constObj.type_nav
+                })
+
             })
         })
     },
@@ -424,14 +443,20 @@ exports.cUserInfo = {
         }else if(!req.files.length && !credePic.length){
             return res.json({"msg": "修改失败", "code": 0})
         }
-        
-        // 此时更新 数据都设置为 authory false passStep: 1
-        userInfo.updateOne({_id: req.userId}, {...req.body, credePic, authory: false, passStep: 1}, (err, data) =>{
-            if(!data.n) return res.json({"msg": "修改失败", "code": 0})
 
-            res.json({"msg": "修改成功", "code": 200, credePic})
+        // 判断学号教工号 身份证是否被人用过
+        userInfo.findOne({stId: req.body.stId}, (err, findData) =>{
+
+            // 用过
+            if(findData) return res.json({"msg": "修改失败", "code": -1})
+
+            // 此时更新 数据都设置为 authory false passStep: 1
+            userInfo.updateOne({_id: req.userId}, {...req.body, credePic, authory: false, passStep: 1}, (err, data) =>{
+                if(!data.n) return res.json({"msg": "修改失败", "code": 0})
+
+                res.json({"msg": "修改成功", "code": 200, credePic})
+            })
         })
-
     },
 
     // 查询身份验证是否通过

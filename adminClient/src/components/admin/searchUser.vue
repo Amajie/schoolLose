@@ -144,7 +144,6 @@
         keyWord: '',
         noDataText: '未填写',
         password: '',
-        authoryText: '',
         showText: '暂无数据'
       }
     },

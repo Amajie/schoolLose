@@ -59,6 +59,11 @@ export default {
                 return tText('用户名长度过长')
             }
 
+
+            // return this.dAlert('测试账号不能修改').then(() =>{
+            //     this.$router.go(-1)
+            // })
+
             cName({
                 userName,
             }).then(res =>{

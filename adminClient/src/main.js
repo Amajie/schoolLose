@@ -15,9 +15,9 @@ Vue.prototype.cookie = cookie
 
 //请求函数的封装
 import { initData, createAdmin, adminLogin, getAdmin, 
-  destroyCount, updataAdmin, examineUser, 
-  searchUser, updataUser, examineObject,
-  updataObject, searchObject} from './axios/api.js'
+  destroyCount, updataAdmin, examineUser, outCount,
+  searchUser, updataUser, examineObject, addCourData,
+  updataObject, searchObject, upConstType, delectConstType} from './axios/api.js'
 Vue.prototype.initData = initData//初始化数据
 Vue.prototype.createAdmin = createAdmin//用户的创建
 Vue.prototype.updataAdmin = updataAdmin//用户的创建
@@ -30,6 +30,10 @@ Vue.prototype.updataUser = updataUser//更新账户的信息
 Vue.prototype.examineObject = examineObject//获取待审核的帖子
 Vue.prototype.updataObject = updataObject// 帖子的审核
 Vue.prototype.searchObject = searchObject//帖子的搜索
+Vue.prototype.upConstType = upConstType//分类数据获取
+Vue.prototype.delectConstType = delectConstType//分类数据删除
+Vue.prototype.addCourData = addCourData//学院添加
+Vue.prototype.outCount = outCount//学院添加
 
 import {encrypt, decrypt} from '../.../../../client/src/assets/crypto/encrypt.js'
 Vue.prototype.encrypt = encrypt//加密

@@ -21,16 +21,13 @@
         </div>
         <div class="nav-wrap">
             <div class="nav-list">
-                <van-swipe indicator-color="white">
-                    <van-swipe-item v-for="(item, index) in type_nav_data" :key="index">
-                        <van-grid clickable :column-num="maxNavLen">
-                            <van-grid-item @click.native="handleSelectNav(key)" v-for="(obj, key, i) in item" :key="i">
-                                <img class="type-icon" :src="obj.icon_link" alt="">
-                                <span>{{obj.type}}</span>
-                            </van-grid-item>
-                        </van-grid>
-                    </van-swipe-item>
-                </van-swipe>
+                <van-grid clickable :column-num="4">
+                    <van-grid-item @click.native="handleSelectNav(key)" v-for="(item, key, index) in type_nav" :key="index">
+                        <!-- <icon :name="item.name" :w="svg" :h="svg"></icon> -->
+                        <img class="type-icon" :src="item.icon_link" alt="">
+                        <span>{{item.type}}</span>
+                    </van-grid-item>
+                </van-grid>
             </div>
         </div>
         <div class="info-list cell">
@@ -107,9 +104,7 @@ export default {
             isLogin: false,
             homeLoad: false,
             loadObj: {},
-            noData: true,
-            // 每排显示4个
-            maxNavLen: 4
+            noData: true
         }
     },
     created(){
@@ -123,8 +118,6 @@ export default {
             'homePage',
             'homePageNum',
             'homeFinished',
-            // type_nav 二维数组数据
-            'type_nav_data'
         ])
     },
     methods:{
@@ -136,25 +129,12 @@ export default {
             'handleRouter'
         ]),
         handleCreated(){
-
-            const {homeData, getHomeData, type_nav, type_nav_data} = this
-
-            // 处理导航栏 只显示一排
-            let oneArr = []
-            !type_nav_data.length && Object.keys(type_nav).forEach((key, index) =>{
-                oneArr.push(type_nav[key])
-                if(oneArr.length === 4 || index === Object.keys(type_nav).length - 1){
-                    type_nav_data.push(oneArr)
-                    oneArr = []
-                }
-            })
-
-
             // 如果有数据不必在获取 此时要看上拉之后是否要继续加载
-            if(homeData.length) return this.noData = false
-            getHomeData()
+            if(this.homeData.length) return this.noData = false
+            this.getHomeData()
         },
         getHomeData(){
+            console.log('请求')
             let {homeData,homePage, homePageNum} = this
             // 显示加载
             this.loadObj = {
@@ -189,6 +169,7 @@ export default {
 
                 this.concatArr({key: 'homeData', data: homeData})
 
+                // if(this.homeData.length === 0) this.noData = true
                 this.setState({homePage: ++homePage})
                 // 表示 当上拉到底的时候 需要需要在继续触发 loadData函数    
                 this.homeLoad = false
@@ -202,10 +183,12 @@ export default {
         },
         // 处理点击便捷导航
         handleSelectNav(objectTypeId){
+            console.log(objectTypeId)
             this.handleRouter({url: `/search/${objectTypeId}`, tag: 'p'})
         },
         loadData(){
             this.getHomeData()
+            console.log('加载')
         },
         fresh(){
             this.setState({

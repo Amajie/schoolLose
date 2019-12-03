@@ -215,6 +215,8 @@ export default {
         }
     },
     created(){
+        // this.tText('隐私，不能查看哟')
+        // return this.$router.replace('/set')
         // 初始化数据
         this.handleCreate()
     },
@@ -269,7 +271,11 @@ export default {
             const {courtyard, tText, courtyardData} = this
 
             if(!courtyard) return tText('先选择所在的院系')
-            this.pickerData = courtyardData[courtyard]
+            
+            const i = courtyardData.findIndex(item => item.courtyard === courtyard)
+
+            this.pickerData = courtyardData[i].major
+
             this.showPicker = true
             this.dataKey = 'major'
             
@@ -278,17 +284,7 @@ export default {
         handleClick(data, key){
             this.showPicker = true
             this.dataKey = key
-            if(key === 'courtyard'){
-                let courtyardArr = []
-                for(let item in data){
-                    courtyardArr.push(item)
-                }
-                this.pickerData = courtyardArr
-            }else{
-                this.pickerData = data
-            }
-            
-            
+            this.pickerData = key === 'courtyard'?data.map(item => item.courtyard): data
         },
 
         selectPicker(val, index){
@@ -296,9 +292,12 @@ export default {
 
             this[dataKey] = val
             this.showPicker = false
+            // 只有学生才需要设置专业
+            if(dataKey === 'courtyard' && userData.userType === 1){
+                const i = courtyardData.findIndex(item => item.courtyard === val)
 
-            // 此时教师是不需要设置的
-            if(dataKey === 'courtyard' && userData.userType != 2) this.major = courtyardData[this[dataKey]][0]
+                this.major = courtyardData[i].major[0]
+            }
 
         },
         /**
@@ -309,9 +308,8 @@ export default {
 
             let formData = new FormData()
             //获取相应的数据
-            const {name, stId, gender, courtyard, userData, userType, credePic, handleRouter, setState,
+            const {name, stId, gender, courtyard, userData, userType, labelStId, credePic, handleRouter, setState,
                 major, classes, address, statusReg, cInfo, tText, dAlert} = this
-            
             if(!name || !stId || !gender || !address ||
                 (userType === 1 && !classes) ||
                 ((userType === 1 || userType === 3) && !major) ||
@@ -346,8 +344,8 @@ export default {
             cInfo(formData).then(res =>{
                 const {code, credePic} = res.data
                 if(code === 0) return tText('修改失败，请稍后再试')
+                if(code === -1) return dAlert(`该${labelStId}已经绑定某个用户，如存在乱绑行为，请联系管理员确认!`)
                 if(code === 200) return dAlert('操作成功').then(() =>{
-                    
                     setState({
                         userData:{...userData,
                             name, stId, gender, courtyard, passStep: 1,

@@ -334,6 +334,19 @@ export const getObjectCommit = params =>{
 
 
 /**
+ * @function 账号退出
+ * @param {*} data 发送的数据
+ */
+export const outCount = data =>{
+    return sendService({
+        url: '/out_count',
+        method: 'post',
+        data
+    })
+}
+
+
+/**
  * @function 测试
  * @param {*} data 发送的数据
  */

@@ -22,7 +22,6 @@ export const  filterTypeName = (key) => {
 
     // 这个过滤器 在组件初始化的时候会调用一次 因此 值可能为undefined的
     if(!key) return 
-
     return store.state.type_nav[key].type
 }
 

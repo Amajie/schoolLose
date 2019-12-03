@@ -76,7 +76,7 @@
          adminPassword
         }).then(res =>{
 
-          const {code, token, adminData, type_nav} = res.data
+          const {code, token, adminData, type_nav, courtyardData} = res.data
 
           if(code === -1) return $message('用户名错误!')
           if(code === -2) return $alert('该管理员账户已被冻结，暂时无法登陆', '提示', {
@@ -90,7 +90,9 @@
 
           if(code === 0) return this.$msg = $message('密码错误!')
             // 设置
-            $store.commit('setState', {adminData, type_nav})
+            $store.commit('setState', {adminData, type_nav, courtyardData})
+            // 这里每次都是重置token 因此 自动登陆无需携带token到后台
+            // 这里与前台有所区别
             cookie.set('a_che_token', token, minTime)
             cookie.set('a_che_in', encrypt(adminName), minTime)
             cookie.set('a_che_id', adminPassword, minTime)
@@ -98,13 +100,13 @@
         })
      },
 
-    // 清除cookie数据
-    clearCookie(){
-      const {cookie, $store} = this
-      cookie.remove('c_che_token')
-      sessionStorage.removeItem('c_state')
-      $store.replaceState(JSON.parse(sessionStorage.getItem('c_empty_state')))
-    },
+      // 清除cookie数据
+      clearCookie(){
+        const {cookie, $store} = this
+        cookie.remove('a_che_token')
+        sessionStorage.removeItem('a_state')
+        $store.replaceState(JSON.parse(sessionStorage.getItem('a_empty_state')))
+      },
 
      initAdmin(){
        this.initData().then(res =>{
@@ -124,7 +126,7 @@
        */
       
       next(vm =>{
-        const {cookie, sendLogin, decrypt, $store} = vm
+        const {cookie, sendLogin, decrypt, $store, clearCookie} = vm
         const token = cookie.get('a_che_token')
         const name = cookie.get('a_che_in')
         const paw = cookie.get('a_che_id')

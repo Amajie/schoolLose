@@ -3,6 +3,7 @@
 import store from '../store.js'
 import router from '../router/index.js'
 import cookie from 'vue-cookies'
+import {dAlert} from '../components/vant/vant.js'
 
 export const request = ({config, tag, notLoad}) =>{
 
@@ -37,12 +38,22 @@ export const response = response =>{
         lodingSTag: false
     })
 
+    // 说明账户已经在别处登陆过
+    if(response.data.code === 110){
+        dAlert('该账号已在别处登陆，您已被强制下线！若不是本人操作，请尽快修改密码')
+        .then(() =>{
+            cookie.remove('c_che_token')
+            router.replace('/login')
+        })
+    }
+
+
     return response
 }
 
 export const responseError = error =>{
     const {status} = error.response
-
+    console.log(error.response)
     switch(status){
         /**
          * 1 此时表示 token存在 但是已经过期
@@ -52,7 +63,7 @@ export const responseError = error =>{
          */
         case 401:  
             //删除token
-            store.commit('removeToken')
+            store.commit('removeToken', cookie)
             // 前往登陆 获取路由信息 登陆成功自动跳转
             router.replace({
                 path:'login',

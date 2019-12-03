@@ -152,3 +152,41 @@ export const searchObject = params =>{
         params
     })
 }
+
+// 分类数据更新
+export const upConstType = data =>{
+    return service({
+        url: '/up_type_data',
+        method: 'post',
+        data
+    })
+}
+// 删除分类
+export const delectConstType = data =>{
+    return service({
+        url: '/delect_type_data',
+        method: 'post',
+        data
+    })
+}
+
+// 添加学院
+export const addCourData = data =>{
+    return service({
+        url: '/up_cour_data',
+        method: 'post',
+        data
+    })
+}
+
+/**
+ * @function 账号退出
+ * @param {*} data 发送的数据
+ */
+export const outCount = data =>{
+    return service({
+        url: '/out_count',
+        method: 'post',
+        data
+    })
+}

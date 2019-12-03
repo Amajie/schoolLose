@@ -45,6 +45,11 @@
          <div class="login-btn">
             <van-button @click.native="handleLogin" type="info" size="large">登陆</van-button>
         </div>
+        <div class="test">
+            <p><span>测试用户名：</span>广西靓仔</p>
+            <p><span>测试密码：</span>12345678</p>
+            <p><span>说明：</span>暂时没开放发送邮箱功能，因为是测试账号，即使提示成功，也默认修改为：12345678</p>
+        </div>
     </div>
 </template>
 
@@ -94,11 +99,11 @@ export default {
             }
 
             // 发送登陆请求
-            sendLogin(userName, password, remember)
+            sendLogin(userName, password)
         },
         
         // 发送登陆请求
-        sendLogin(userName, password, remember){
+        sendLogin(userName, password, token){
             //获取数据
             const {$router, $route, dAlert, dConfirm, c_che_token, c_che_in, c_che_id,
                 login, encrypt, cookie, maxTime, minTime, setState} = this
@@ -106,7 +111,7 @@ export default {
             login({
                 userName,
                 password,
-                remember
+                token
             }).then(res =>{
                 const {code, token, userData, courtyardData, type_nav} = res.data
                 
@@ -139,13 +144,13 @@ export default {
 
                 // 获取是否记住密码
                 if(cookie.get('c_che_remeber')){// 记住
-                    // 已设置无需重复设置
+                    // 已设置无需重复设置 因为没有重新设置token 因此后台无需重新返回新token
+                    // 前台需要传递过去
                     if(!(c_che_token && c_che_in && c_che_id)){
                         cookie.set('c_che_token', token, minTime)
                         cookie.set('c_che_in', encrypt(userName), maxTime)
                         cookie.set('c_che_id', password, maxTime)
                     }
-
                 }else{// 不记住
                     // 已设置无需重复设置
                     if(!c_che_token){
@@ -206,6 +211,9 @@ export default {
             }else{
                 this.cookie.remove('c_che_remeber')
             }
+        },
+        password(newData){
+            !newData && this.cookie.remove('c_che_id')
         }
     },
     beforeRouteEnter (to, from, next) {
@@ -227,7 +235,7 @@ export default {
             // token存在
             if(token && name && paw){
                 console.log('存在token')
-                sendLogin(decrypt(name), paw)
+                sendLogin(decrypt(name), paw, token)
             //token不存在 或者 token存在 但是用户名 密码不存在 删除cookie信息
             }else if(!token || !(name && paw)){
                 console.log('不存在token')
@@ -271,6 +279,12 @@ export default {
     }
     .login-btn{
         margin-top: 10px;
+    }
+    .test{
+        margin: 10px;
+        p{
+            padding: 5px 0;
+        }
     }
 }
 </style>

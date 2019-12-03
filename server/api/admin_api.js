@@ -12,6 +12,7 @@ const {TYPE_NAV} = require('../router/CONST.js')
 const userInfo = require('../mongodb/userInfo.js')
 const reInfo = require('../mongodb/release.js')
 const adminInfo = require('../mongodb/admin.js')
+const constInfo = require('../mongodb/constant.js')
 
 // 获取审核数据
 exports.examineData = {
@@ -64,7 +65,9 @@ exports.examineData = {
                 "freezeTag": true
             }},
         ], (err, data) =>{
-            console.log(data)
+
+            if(!data) return res.json({"msg": "服务器错误", "code": -1, data: [], "total": 0})
+
             res.json({"msg": "成功", "code": 200, data, "total": data.length})
         })
     },
@@ -168,7 +171,7 @@ exports.manageData = {
             ]
         }, (err, data) =>{
             if(!data) return res.json({"msg": "该用户不存在", "code": -1})
-            const {adminName, adminEmail, adminGrade, adminTag} = data
+            const {adminName, adminEmail, adminGrade, adminTag, _id} = data
     
             if(!adminTag) 
                 return res.json({"msg": "账户已被冻结", "code": -2})
@@ -176,18 +179,41 @@ exports.manageData = {
             if(data.adminPassword != md5(adminPassword))
                 return res.json({"msg": "密码错误", "code": 0})
     
-            // 密码正确 获取token
-            const token = createToken({
-                adminEmail, 
-                adminGrade
-            })
+
+                constInfo.find({$or:[
+                    {constKey: 'type_nav'},
+                    {constKey: 'courtyardData'},
+                ]}, (err, constData) =>{
+
+                    // 默认值
+                    let constObj = {
+                        type_nav:{},
+                        courtyardData: []
+                    }
+
+                    // 有数据则获取
+                    if(constData.length){
+                        // 拿取数据
+                        constData.forEach(item =>{
+                            constObj[item.constKey] = item.constVal
+                        })
+                    }
+                    // 密码正确 获取token
+                    const token = createToken({
+                        adminEmail, 
+                        adminGrade,
+                        userId: _id
+                    })
+
+                    res.json({
+                        "msg": "密码正确，登陆成功", "code": 200, 
+                        token, 
+                        courtyardData: constObj.courtyardData,
+                        type_nav: constObj.type_nav,
+                        adminData: {adminName, adminEmail, adminGrade, cheId: _id}
+                    })
     
-            res.json({
-                "msg": "密码正确，登陆成功", "code": 200, 
-                token, 
-                type_nav: TYPE_NAV,
-                adminData: {adminName, adminEmail, adminGrade}
-            })
+                })
         })
     },
     // 数据的更新
@@ -238,6 +264,97 @@ exports.manageData = {
             if(!rData.n) return res.json({"msg": "操作失败，请稍后再试", "code": 0})
             // 成功
             res.json({"msg": "销毁成功", "code": 200})
+        })
+    }
+}
+
+// 学院、分类数据更新
+exports.updaData = {
+    // 分类数据更新
+    upTypeData: (req, res) =>{
+        let {type, type_nav, icon_link, edit_key, isEditType} = req.body
+        // 图片上传失败 直接返回
+        if(!icon_link && !req.file) return res.json({"msg":"更新失败", "code": 0})
+    
+        type_nav = JSON.parse(type_nav)
+    
+        if(!isEditType){
+            const maxLen = Object.keys(type_nav).length
+    
+            // 最大值为 99 个分类
+            const typeKey = 99 - maxLen
+            const typeNavObj = {
+                type,
+                icon_link: `http://127.0.0.1:7070/t_icon/${req.file.filename}`
+            }
+            type_nav[typeKey] = typeNavObj
+        }else{
+            type_nav[edit_key] = {
+                type,
+                icon_link: !req.file ? icon_link : `http://127.0.0.1:7070/t_icon/${req.file.filename}`
+            }
+        }
+    
+        constInfo.updateOne({constKey: 'type_nav'}, {constVal: type_nav}, (err, updata) =>{
+            // 失败
+            if(!updata.n) return res.json({"msg":"更新失败", "code": 0})
+            // 成功
+            res.json({"msg":"更新成功", "code": 200, type_nav})
+        })
+    },
+    // 删除分类
+    delectTypeData: (req, res) =>{
+    
+        let {delectKey, type_nav} = req.body
+        type_nav = JSON.parse(type_nav)
+        delete type_nav[delectKey]
+    
+        constInfo.updateOne({constKey: 'type_nav'}, {constVal: type_nav}, (err, updata) =>{
+            // 失败
+            if(!updata.n) return res.json({"msg":"更新失败", "code": 0})
+            // 成功
+            res.json({"msg":"更新成功", "code": 200, type_nav})
+        })
+    },
+    upCourData : (req, res) =>{
+    
+        let {courtyardData, upData, courtyardTag} = req.body
+    
+        // 添加数据
+        courtyardData = JSON.parse(courtyardData)
+        switch(courtyardTag){
+            case 'addC':
+                courtyardData.unshift(upData)
+                break
+            case 'addM':
+                courtyardData[upData.index].major.unshift(upData.major)
+                break
+            case 'editC':
+                courtyardData[upData.index].courtyard = upData.newCourtyard
+                break
+            case 'editM':
+                courtyardData[upData.index].major[upData.i] = upData.newMajor
+                break
+            case 'delectC':
+                // 对原数组有影响
+                courtyardData.splice(upData.index, 1)
+                break
+            case 'delectM':
+                // 对原数组有影响
+                courtyardData[upData.index].major.splice(upData.i, 1)
+                break
+            default:
+                break
+        }
+    
+        // 添加数据
+        constInfo.updateOne({constKey: 'courtyardData'}, 
+        {constVal: courtyardData}, (err, data) =>{
+            //  更新失败
+            if(!data.n) return res.json({"msg":"更新失败", "code": 0})
+    
+            res.json({"msg":"更新失败", "code": 200, courtyardData})
+    
         })
     }
 }

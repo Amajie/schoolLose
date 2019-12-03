@@ -58,13 +58,22 @@ export default {
     ]),
     // 退出登陆
     handleOut(){
-        const {logoutCount, $confirm, $router, cookie} = this
+        const {logoutCount, $confirm, $router, 
+            cookie, adminData, outCount} = this
         $confirm('是否退出登陆?', '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
         }).then(() => {
-            logoutCount({cookie, $router})
+            outCount({
+                userId: adminData.cheId
+            }).then(res =>{
+                
+                // 操作失败
+                if(res.data.code != 200) return dAlert('操作失败，请稍后再试')
+                // 操作成功
+                logoutCount({cookie, $router})
+            })
         }).catch(() => {
                 
         })

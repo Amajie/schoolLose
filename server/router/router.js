@@ -30,7 +30,7 @@ const upload = multer({storage})
 //路由api
 const {enter, cUserInfo, meList, centerData, homeData} = require('../api/api.js')
 //生成和解析token
-const {checkToken} = require('../checkToken/jwt.js')
+const {checkToken, delectLoginMap} = require('../checkToken/jwt.js')
 
 // 注册、登陆、发送激活验证码、验证验证码是否正确
 router.post('/register', enter.register)
@@ -47,7 +47,6 @@ router.post('/ce', checkToken, cUserInfo.cUserEmail)
 router.post('/ci', checkToken, upload.array('uCredePic', 2), cUserInfo.cUserInfo)
 
 router.post('/check_authory', checkToken, cUserInfo.checkAuthory)
-
 
 // -----------------------------------------------我的 路由管理
 //头像的上传
@@ -90,5 +89,11 @@ router.get('/get_home_data', checkToken, homeData.getHomeData)
 // 搜素数据的查找
 router.get('/search_object', checkToken, homeData.searchObject)
 // -----------------------------------------------首页 路由管理
+
+// -----------------------------------------------退出登录 删除map标识
+router.post('/out_count', delectLoginMap)
+// -----------------------------------------------退出登录 删除map标识
+
+
 
 module.exports = router
