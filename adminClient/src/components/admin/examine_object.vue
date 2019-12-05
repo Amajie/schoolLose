@@ -113,23 +113,21 @@ export default {
   methods: {
     
     getEData(){
-        this.examineObject({
-              
-          }).then(res =>{
-              const {code, data, total} = res.data
-              
-              if(code === -1) this.$message('获取数据失败！请稍后再试')
+        this.examineObject({}).then(res =>{
+            const {code, data, total} = res.data
+            
+            if(code === -1) this.$message('获取数据失败！请稍后再试')
 
-              // 此时只有初始化才会设置总页数
-              if(code === 200){
-                this.total = total
-                this.pageCount = Math.ceil(total/this.pageSize)
-                this.examineData = data
-                this.examinePageData = data.slice(0, this.pageSize)
-              }
-          }, () =>{
-              console.log('错误')
-          })
+            // 此时只有初始化才会设置总页数
+            if(code === 200){
+              this.total = total
+              this.pageCount = Math.ceil(total/this.pageSize)
+              this.examineData = data
+              this.examinePageData = data.slice(0, this.pageSize)
+            }
+        }, () =>{
+            console.log('错误')
+        })
     },
     rowClick(row, column, event){
       const {toggleRow, prevRow, $refs} = this
@@ -175,7 +173,6 @@ export default {
 
       if(passTag) data = {
         objectStepTag : 2,
-        objectPassTag : true,
         objectReason
       }
 
@@ -196,8 +193,6 @@ export default {
           return this.$message('已拒绝帖子发布申请')
         }
         
-
-        row.objectPassTag = true
         row.objectStepTag = 2
 
         // 通过验证
@@ -239,13 +234,6 @@ export default {
       }else{
         return '职业'
       }
-    },
-    filterTime(time, tag){
-        const data = new Date(Number(time))
-        if(!tag) return `${data.getFullYear()}-${('0'+(1+data.getMonth())).slice(-2)}-${('0'+data.getDate()).slice(-2)}`
-        return `${data.getFullYear()}-${('0'+(1+data.getMonth())).slice(-2)}-${('0'+data.getDate()).slice(-2)} 
-                        ${('0'+data.getHours()).slice(-2)}:
-                        ${('0'+data.getMinutes()).slice(-2)}`
     }
   },
   components:{

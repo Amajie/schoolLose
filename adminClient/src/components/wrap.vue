@@ -16,7 +16,9 @@
             <el-menu-item v-if="adminData.adminGrade === 1" index="che_hj">高级管理</el-menu-item>
             <el-menu-item v-else index="6">个人管理</el-menu-item>
         </el-menu>
-        <router-view/>
+        <keep-alive>
+          <router-view/>
+        </keep-alive>
     </div>
 </template>
 <script>

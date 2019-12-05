@@ -84,7 +84,7 @@
                 </van-cell>
             </van-list>
             <Empty v-if="noData" />
-            <div v-else-if="!noData && homeFinished" class="data-end">
+            <div v-else-if="!noData && !homeLoad" class="data-end">
                 到底啦，不能再往下啦~~~
             </div>
             <Load @fresh="getHomeData" v-bind="loadObj" />
@@ -171,6 +171,8 @@ export default {
                 pageNum: homePageNum
             }).then(res =>{
 
+                if(!res) return
+
                 // 关闭加载
                 this.loadObj = {
                     loadTag: false,
@@ -206,6 +208,7 @@ export default {
         },
         loadData(){
             this.getHomeData()
+            console.log(111)
         },
         fresh(){
             this.setState({

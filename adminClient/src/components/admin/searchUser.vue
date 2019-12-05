@@ -258,7 +258,6 @@
               _id: searchUData._id,
               email: searchUData.email,
               data:{
-                authory: true,
                 passStep: 2
               }
           }).then(res =>{
@@ -267,7 +266,6 @@
               confirmButtonText: '确定'
             })       
 
-            searchUData.authory = true
             searchUData.passStep = 2
 
             // 通过验证

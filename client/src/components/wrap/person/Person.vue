@@ -131,13 +131,11 @@ export default {
         ]),
         handleCreated(){
             const {userData, setState, checkAuthory} = this
-            
-            userData.name && !userData.authory && checkAuthory()
+            userData.name && userData.passStep != 2 && checkAuthory()
             .then(res =>{
-                const {code, authory, passStep} = res.data
+                const {code, passStep} = res.data
                 if(code != 200) return
-
-                setState({userData: {...this.userData, authory, passStep}})
+                setState({userData: {...this.userData, passStep}})
             })
         },
         handleReData(){

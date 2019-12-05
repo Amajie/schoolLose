@@ -317,7 +317,8 @@ export default {
                 objectTypeId,
                 upDownTag,
                 objectWay: objectWay != 2?objectWay: '',
-                objectPassTag: true
+                // 搜索通过审核的
+                objectStepTag: 2
             }
 
             const saveParams = {
@@ -355,14 +356,12 @@ export default {
 
                 const {code, data} = res.data
                 this.searchLoad = false
-                console.log(code)
                 // 此时已经没有数据
                 if(code === 0) {
                     //此时 如果没有数据 就 显示提示
                     if(this.searchData.length === 0){
                         this.noData = true
                     }
-                    console.log(222222)
                     return setState({searchFinished: true})
                 }
 

@@ -1,8 +1,5 @@
-const mongoose = require('mongoose')
 
-const Schema = mongoose.Schema
-
-mongoose.connect("mongodb://localhost/slose", { useNewUrlParser: true })
+const {mongoose, Schema} = require('./connectData.js')
 
 var constantSchema = new Schema({
     constKey:{

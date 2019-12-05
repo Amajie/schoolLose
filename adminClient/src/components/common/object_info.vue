@@ -186,7 +186,6 @@ import {mapState} from 'vuex'
             objectId: row.objectId,
             data: {
               objectStepTag : 2,
-              objectPassTag : true,
               objectReason: ''
             }
           }).then(res =>{
@@ -195,7 +194,6 @@ import {mapState} from 'vuex'
               confirmButtonText: '确定'
             })
 
-            row.objectPassTag = true
             row.objectStepTag = 2
 
             // 通过验证

@@ -1,8 +1,6 @@
-const mongoose = require('mongoose')
 
-const Schema = mongoose.Schema
 
-mongoose.connect("mongodb://localhost/slose", { useNewUrlParser: true })
+const {mongoose, Schema} = require('./connectData.js')
 
 var userSchema = new Schema({
 
@@ -18,10 +16,6 @@ var userSchema = new Schema({
         type: String,
         required: true
     },
-    authory: {
-        type: Boolean,
-        default: false
-    },// 是否具有权限 只有管理员才能修改
     passStep: {
         type: Number,
         default: 0
@@ -36,7 +30,6 @@ var userSchema = new Schema({
     },
     avater:{
         type: String,
-        // default: 'http://192.168.43.124:7070/av/init.png'
         default: 'http://127.0.0.1:7070/init/init.png'
     }, //给他一张默认的图片
     myConcern:{

@@ -1,8 +1,5 @@
-const mongoose = require('mongoose')
 
-const Schema = mongoose.Schema
-
-mongoose.connect("mongodb://localhost/slose", { useNewUrlParser: true })
+const {mongoose, Schema} = require('./connectData.js')
 
 const reSchema = new Schema({
     objectUserId: {// 楼主id
@@ -53,10 +50,10 @@ const reSchema = new Schema({
         type: Number,
         default: 1// 1 信息的填写 2 未通过审核 3 通过审核
     },
-    objectPassTag: {//消息是否通过审核
-        type: Boolean,
-        default: false // 默认没有通过审核
-    },
+    // objectPassTag: {//消息是否通过审核
+    //     type: Boolean,
+    //     default: false // 默认没有通过审核
+    // },
     objectReason: {// 消息 不通过的时候 理由
         type: String,
         default: ''
@@ -71,7 +68,7 @@ const reSchema = new Schema({
         type: Boolean,
         default: true
     },
-    finishTime: {// 消息 完成时间
+    finishTime: {// 消息 完成时间 还没用
         type: Number,
         required: true
     }

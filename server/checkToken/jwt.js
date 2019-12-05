@@ -6,7 +6,7 @@
 const jwt = require('jsonwebtoken')
 
 const secretKey = 'che-hj-www://jie412.com'//加密参数 解密也需要它
-const expiresIn = 60*60*4 // 设置token过期时间
+const expiresIn = 10 // 设置token过期时间
 let loginMap = new Map()
 
 /**
@@ -53,7 +53,8 @@ exports.checkToken = (req, res, next) =>{
     jwt.verify(token, secretKey, (err, decoded) =>{
 
         //解析错误 说明为无效token 此时应该要去登陆页面
-        if(err) return res.status(401).json({"success": false, "msg": 'token信息错误.'})
+        if(err) return res.json({"success": false, "msg": 'token信息错误.', "code": 401})
+
         // 获取最新的时间
         const mapTime = loginMap.get(decoded.userId.toString())
         // 此时 mapTime不存在无需判断 这里多此一举了 此时说明存在一个账户两处登陆

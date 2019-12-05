@@ -50,7 +50,6 @@ exports.examineData = {
                 objectAddress:"$objectAddress",
                 sendTime:"$sendTime",
                 objectTime:"$objectTime",
-                objectPassTag:"$objectPassTag",
                 objectStepTag:"$objectStepTag",
                 objectId:"$objectId",
                 objectTypeId:"$objectTypeId",
@@ -65,7 +64,7 @@ exports.examineData = {
                 "freezeTag": true
             }},
         ], (err, data) =>{
-
+            console.log(data)
             if(!data) return res.json({"msg": "服务器错误", "code": -1, data: [], "total": 0})
 
             res.json({"msg": "成功", "code": 200, data, "total": data.length})

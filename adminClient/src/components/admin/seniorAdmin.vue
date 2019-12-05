@@ -152,7 +152,6 @@ export default {
             if(!createCount.length){
                 getAdmin().then(res =>{
                     const {code, createCount} = res.data
-                    console.log(code)
                     if(code === 200) return setState({createCount})
                 })
             }

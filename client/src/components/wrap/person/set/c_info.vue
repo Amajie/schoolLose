@@ -18,8 +18,8 @@
                 <van-step v-else>审核未通过</van-step>
             </van-steps>
         </div>
-        <!-- 未通过 -->
-        <div v-if="!authory" class="info-wrap">
+        <!-- 未通过 passStep 不等于2 即为不通过 -->
+        <div v-if="passStep != 2" class="info-wrap">
             <div class="info-list">
                 <!-- 信息填写 -->
                 <van-cell-group>
@@ -107,7 +107,6 @@
                 </div>
             </div>
             <div class="info-btn">
-                <!-- <van-button type="danger" @click.native="handleInfo" :disabled="userData.authory" block>提交信息</van-button> -->
                 <van-button type="danger" @click.native="handleInfo" block>提交信息</van-button>
             </div>
             <div class="chang_explain">
@@ -211,7 +210,7 @@ export default {
             //label 文字
             labelStId: '学号',
             stepActive: 0,
-            authory: false,
+            passStep: 0,
         }
     },
     created(){

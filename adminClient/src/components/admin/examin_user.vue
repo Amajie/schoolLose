@@ -128,7 +128,7 @@ export default {
 
   created(){
     // 默认显示待审核信息
-    this.getInfo({authory : false, passStep: 1})
+    this.getInfo({passStep: 1})
   },
   
   methods: {
@@ -184,12 +184,8 @@ export default {
     },
     sendComfirm(passTag, row, remindInfo){
 
-      let data = {passStep: 3}// 默认不能通过
 
-      if(passTag) data = {
-        authory: true,
-        passStep: 2// 通过
-      }
+      let data = passTag ? {passStep: 2} : {passStep: 3}
 
       this.updataUser({
           _id: row._id,
@@ -209,8 +205,6 @@ export default {
           return this.$message('已拒绝该用户的身份验证')
         }
         
-
-        row.authory = true
         row.passStep = 2
 
         // 通过验证

@@ -33,35 +33,17 @@ export const requestError = () =>{
 
 export const response = response =>{
 
+    const {code} = response.data
+    
+    // 显示相应的加载图标
     store.commit('setState', {
         lodingETag: false,
         lodingSTag: false
     })
 
-    // 说明账户已经在别处登陆过
-    if(response.data.code === 110){
-        dAlert('该账号已在别处登陆，您已被强制下线！若不是本人操作，请尽快修改密码')
-        .then(() =>{
-            cookie.remove('c_che_token')
-            router.replace('/login')
-        })
-    }
-
-
-    return response
-}
-
-export const responseError = error =>{
-    const {status} = error.response
-    console.log(error.response)
-    switch(status){
-        /**
-         * 1 此时表示 token存在 但是已经过期
-         * 2 删除 token 跳转到登陆页面上
-         * 3 跳转到登陆页面 并获取当前的路由信息(router.currentRoute.fullPath) 
-         *      当登陆成功后跳转到该路由下
-         */
-        case 401:  
+    switch(code){
+        case 401: 
+            // 可以提示登陆时间到，需要重新登陆 
             //删除token
             store.commit('removeToken', cookie)
             // 前往登陆 获取路由信息 登陆成功自动跳转
@@ -74,20 +56,27 @@ export const responseError = error =>{
          * 500错误 应该服务器错误
          * 
          */
-        case 500:  
-            /**
-             * 显示友好页面 但是此时是 根据返回的数据来是否显示404
-             * 但是如果此时网络较差的话 还是会显示具体页面在跳转的404页面
-             */
-            console.log('500错误')
+        case 110:  
+            dAlert('该账号已在别处登陆，您已被强制下线！若不是本人操作，请尽快修改密码')
+            .then(() =>{
+                cookie.remove('c_che_token')
+                router.replace('/login')
+            })
         break
     }
 
+
+    return response
+}
+
+export const responseError = error =>{
+
+    // 关闭相应的加载图标
     store.commit('setState', {
         lodingETag: false,
         lodingSTag: false
     })
 
     //这里只是打印 并不需要 还需要处理500错误
-    // return Promise.reject(error.response.data)
+    return Promise.reject(error.response.data)
 }

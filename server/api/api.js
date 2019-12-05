@@ -7,7 +7,7 @@ const userInfo = require('../mongodb/userInfo.js')
 const reInfo = require('../mongodb/release.js')
 const commitInfo = require('../mongodb/commit.js')
 //邮箱 验证码信息表
-const {emailInfo, emailSchema} = require('../mongodb/email.js')
+const {emailInfo, emailSchema} = require('../mongodb/emailCode.js')
 const constInfo = require('../mongodb/constant.js')
 //邮箱验证码的类型
 const {CREGISTER, FORGET_PASSWORD, COURTYARDDATA, TYPE_NAV, AVATER_INIT} = require('../router/CONST.js')
@@ -86,7 +86,7 @@ exports.enter = {
                 userName, email, _id, userType, myConcern,
                 avater, name, stId, gender, userActive, myCollection,
                 courtyard, major, classes, address, credePic, passStep,
-                authory, freezeTag    
+                freezeTag    
             } = data
             if(!userActive) return res.json({"msg": "该用户还没有激活", "code": 1})
             // 已被冻结
@@ -122,8 +122,7 @@ exports.enter = {
                     userData: {
                         userName, email, userType, cheId: _id,
                         avater, name, stId, gender, myConcern, myCollection, 
-                        courtyard, major, classes, address, credePic, passStep,
-                        authory     
+                        courtyard, major, classes, address, credePic, passStep     
                     },
                     courtyardData: constObj.courtyardData,
                     type_nav: constObj.type_nav
@@ -446,12 +445,12 @@ exports.cUserInfo = {
 
         // 判断学号教工号 身份证是否被人用过
         userInfo.findOne({stId: req.body.stId}, (err, findData) =>{
+            
+            // 用过 但是如果是本人不必验证
+            if((req.userId != findData._id.toString()) && findData) return res.json({"msg": "修改失败", "code": -1})
 
-            // 用过
-            if(findData) return res.json({"msg": "修改失败", "code": -1})
-
-            // 此时更新 数据都设置为 authory false passStep: 1
-            userInfo.updateOne({_id: req.userId}, {...req.body, credePic, authory: false, passStep: 1}, (err, data) =>{
+            // 此时更新 数据都设置为 passStep: 1
+            userInfo.updateOne({_id: req.userId}, {...req.body, credePic, passStep: 1}, (err, data) =>{
                 if(!data.n) return res.json({"msg": "修改失败", "code": 0})
 
                 res.json({"msg": "修改成功", "code": 200, credePic})
@@ -469,14 +468,12 @@ exports.cUserInfo = {
                 userActive: 0
             }
             , (err, userData) =>{
-                console.log(userData)
             if(!userData || userData.passStep === 0 || userData.passStep === 1) 
                 return res.json({"msg": "获取信息失败", "code": 0})
     
             res.json({
                 "msg": "获取数据成功", 
                 "code": 200,
-                "authory": userData.authory,
                 "passStep": userData.passStep
             })
         })
@@ -505,8 +502,7 @@ exports.meList = {
      */
     fCenterData: (req, res) =>{
 
-        const {cheId, objectFinish, objectPassTag, 
-                objectStepTag, stopShow} = req.query
+        const {cheId, objectFinish, objectStepTag, stopShow} = req.query
     
         if(!cheId || (cheId && !mongoose.Types.ObjectId.isValid(cheId)))
             return res.status(404).json({success: false, msg: '访问的页面不存在'})
@@ -516,11 +512,6 @@ exports.meList = {
         const $match = {
             "objectUserId": mongoose.Types.ObjectId(cheId),
             "objectDelect": true,
-        }
-    
-        // 是否是需要通过审核的
-        if(objectPassTag){
-            $match.objectPassTag = JSON.parse(objectPassTag)
         }
     
         // 是否需要已经完成的
@@ -533,6 +524,7 @@ exports.meList = {
             $match.objectStepTag = parseInt(objectStepTag)
         }
         // 完成列表 需要获取已经完成的
+        // 这里很懵逼 不知道干啥用的
         if(stopShow){
             $match.stopShow = parseInt(stopShow)
         }
@@ -557,7 +549,6 @@ exports.meList = {
                 objectAddress:"$objectAddress",
                 sendTime:"$sendTime",
                 objectTime:"$objectTime",
-                objectPassTag:"$objectPassTag",
                 objectStepTag:"$objectStepTag",
                 objectFinish:"$objectFinish",
                 objectId:"$objectId",
@@ -1022,7 +1013,7 @@ exports.homeData = {
             // 此时要根据 这个来排序
             {$sort:{sendTime: -1}},
             {"$match": {
-                objectPassTag: true, // 审核通过
+                objectStepTag: 2, // 审核通过
                 objectAuthory: true, // 管理员没有冻结
                 objectFinish : true, // 没有完成的
                 objectDelect : true // 没有删除的
@@ -1114,7 +1105,6 @@ exports.homeData = {
                 objectWay:"$objectWay",
                 objectImg:"$objectImg",
                 objectStepTag:"$objectStepTag",
-                objectPassTag:"$objectPassTag",
                 objectAuthory:"$objectAuthory",
                 objectFinish:"$objectFinish",
                 objectDelect:"$objectDelect",
@@ -1141,7 +1131,7 @@ exports.homeData = {
 }
 
 
-function getMatch({startTime, endTime, objectTypeId, objectWay, objectUserId, objectPassTag}){
+function getMatch({startTime, endTime, objectTypeId, objectWay, objectUserId, objectStepTag}){
 
     const $match = {}
 
@@ -1152,8 +1142,11 @@ function getMatch({startTime, endTime, objectTypeId, objectWay, objectUserId, ob
         $match.sendTime = {$gte : parseInt(startTime), $lt: Date.now()}
     }else if(endTime){
         $match.sendTime = {$gte : new Date('2008-01-01 00:00:00').getTime(), $lt: parseInt(endTime)}
-    }else if(objectPassTag){// 如果有传值 即为搜素 普通用户搜素
-        $match.objectPassTag = true
+
+        // 这里应该设置为步骤2
+        // objectStepTag
+    }else if(objectStepTag){// 如果有传值 即为搜素 普通用户搜素
+        $match.objectStepTag = 2
         $match.objectAuthory = true
     }
 
